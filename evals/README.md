@@ -1,12 +1,12 @@
 # Evaluating Kavosh
 
-Kavosh does not publish a numeric improvement claim until the claim can be reproduced and audited.
+This framework measures how Kavosh changes research behavior and output quality under controlled, reviewable conditions.
 
 ## Evaluation question
 
 Compare the same model and tool environment under at least two conditions:
 
-1. **Baseline:** an ordinary research or generic deep-research instruction;
+1. **Baseline:** the same task prompt without the Kavosh skill;
 2. **Kavosh:** the same task with the Kavosh skill active.
 
 Keep the model, tool access, date window, source availability, and task wording as consistent as possible.
@@ -62,11 +62,9 @@ Every published benchmark should disclose:
 - failures and exclusions;
 - and known limitations.
 
-## Performance percentages
+## Comparative performance statements
 
-A statement such as “75% higher accuracy” is only valid when “accuracy” is operationally defined, the baseline and sample are disclosed, scoring is reproducible, and the calculation supports exactly that wording.
-
-Until then, use qualitative, architecture-level claims rather than a percentage.
+Any published comparison should name the measured outcome, define the metric, identify the baseline, disclose the task sample and scoring method, report the number of runs, and provide enough evidence for another reviewer to reproduce or audit the result.
 
 ## Minimum acceptance checks for v1
 

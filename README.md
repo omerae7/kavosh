@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg)](LICENSE)
 ![Agent Skills](https://img.shields.io/badge/standard-Agent%20Skills-2563eb)
-![Platforms](https://img.shields.io/badge/platforms-ChatGPT%20%7C%20Codex%20%7C%20Claude-7c3aed)
+![Platforms](https://img.shields.io/badge/platforms-ChatGPT%20%7C%20Codex%20%7C%20Claude%20Code-7c3aed)
 ![Status](https://img.shields.io/badge/status-v1%20community-f59e0b)
 
 **Five research layers. Twenty functional roles. Two independent control axes. Zero tolerance for fabricated evidence.**
@@ -13,7 +13,7 @@ Kavosh is an evidence-first, modular deep-research skill for AI assistants. It t
 
 > **Deep research should be deep in method—not merely long in output.**
 
-Kavosh is built for ChatGPT, Codex, and Claude using the open Agent Skills format. The same core skill works across supported environments; only installation and invocation differ. See the official [OpenAI Skills documentation](https://developers.openai.com/codex/build-skills) and [Claude Skills documentation](https://code.claude.com/docs/en/skills).
+Kavosh follows the open Agent Skills format and is designed for ChatGPT, Codex, and Claude Code. The core `SKILL.md` workflow remains portable; installation and invocation differ by host. See the official [OpenAI Skills documentation](https://developers.openai.com/codex/build-skills) and [Claude Code Skills documentation](https://code.claude.com/docs/en/skills).
 
 ## Not another “research prompt”
 
@@ -236,13 +236,11 @@ mkdir -p .claude/skills
 cp -R /path/to/kavosh/skill .claude/skills/kavosh
 ```
 
-Invoke it with `/kavosh`, or let Claude activate it when relevant.
+Invoke it with `/kavosh`, or let Claude Code activate it when relevant.
 
 ### ChatGPT
 
-Standalone skills are supported in the ChatGPT desktop experience. Download the `skill/` directory, package it as a folder or ZIP, and use `@skill-creator` to install the uploaded Kavosh skill. In ChatGPT, invoke it explicitly with `@kavosh` or allow implicit activation when the request matches the skill description.
-
-Broader one-click distribution in ChatGPT web and mobile requires plugin packaging and is not part of this v1 repository.
+In an eligible ChatGPT experience, open **Skills**, select **Create → Upload from your computer**, and upload a packaged copy of the `skill/` directory. Invoke Kavosh explicitly with `@kavosh`, or allow ChatGPT to activate it when the request matches the skill description. Skill availability can depend on account and workspace settings.
 
 ## Example prompts
 
@@ -271,19 +269,17 @@ Use Kavosh to assess whether this health claim is supported by current scientifi
 
 More examples are available in [`examples/PROMPTS.md`](examples/PROMPTS.md).
 
-## Accuracy claims and benchmarks
+## Evaluation
 
-Kavosh does **not** claim “75% higher accuracy,” “twice the quality,” or any other performance uplift without a defined benchmark, baseline, sample, scoring rubric, and reproducible results.
+The repository includes a reproducible evaluation framework in [`evals/README.md`](evals/README.md). It measures factual correctness, source selection, primary-source coverage, citation support, freshness, contradiction handling, quantitative accuracy, uncertainty calibration, and research efficiency across controlled tasks.
 
-The project includes an evaluation framework in [`evals/README.md`](evals/README.md) so future claims can be measured instead of invented. Until comparative evaluations are published, the defensible claim is architectural: Kavosh adds explicit source selection, evidence-state tracking, contradiction handling, uncertainty controls, and final quality checks that ordinary ad-hoc prompting may omit.
+## Platform support
 
-## Cross-platform status
+- **ChatGPT:** native Agent Skills structure with explicit `@kavosh` or implicit activation where skills are available.
+- **Codex:** native Agent Skills structure with explicit `$kavosh` or implicit activation.
+- **Claude Code:** compatible Agent Skills structure with explicit `/kavosh` or automatic activation when relevant.
 
-- **ChatGPT/Codex:** built on the OpenAI-supported Agent Skills structure.
-- **Claude Code:** compatible with Claude's Agent Skills implementation and manually tested by the project creator.
-- **Automated cross-platform benchmarks:** not yet published.
-
-Research quality still depends on the host model, web and citation tools, accessible sources, and the quality of the available evidence.
+The quality and completeness of each investigation depend on the host model, available tools, accessible sources, and the evidence available for the question.
 
 ## Repository structure
 
@@ -309,7 +305,7 @@ The installable skill stays clean and self-contained; project documentation and 
 ## Roadmap
 
 - publish representative research examples;
-- run comparative evaluations against ordinary search and generic deep-research prompting;
+- run reproducible comparative evaluations across representative research tasks;
 - test explicit and implicit activation across supported platforms;
 - expand contradiction, freshness, and uncertainty test cases;
 - package Kavosh for broader plugin-based distribution;
@@ -327,10 +323,10 @@ Kavosh v1 is a free, community-focused release under the MIT License. A separate
 
 ## License
 
-Kavosh v1 is released under the [MIT License](LICENSE). Attribution to the original creator must remain with redistributed copies as required by the license.
+Kavosh v1 is released under the [MIT License](LICENSE). Redistributed copies or substantial portions must retain the copyright and permission notice contained in the license.
 
 ---
 
 **Created and maintained by [@omerae7](https://github.com/omerae7).**
 
-If Kavosh helps you produce better research, star the repository, test it on a difficult real question, and share the result or failure case. Evidence—not hype—is how this project improves.
+If Kavosh improves your research workflow, star the repository, test it on a difficult real question, and share a reproducible example, compatibility report, or issue.

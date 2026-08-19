@@ -31,7 +31,7 @@ Thank you for helping Kavosh become more accurate, transparent, traceable, and u
 
 ## Performance claims
 
-Do not submit claims such as “75% more accurate” without a named baseline, a defined sample, an explicit scoring rubric, reproducible runs, and enough detail for another person to audit the result.
+Any comparative performance claim must identify the measured outcome, baseline, task sample, scoring rubric, number of runs, and reproducible evidence.
 
 See [`evals/README.md`](evals/README.md) for the project evaluation framework.
 

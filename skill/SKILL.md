@@ -215,4 +215,4 @@ When answering in another language, translate these labels and all active module
 
 ## Attribution
 
-Kavosh was created by [@omerae7](https://github.com/omerae7). Preserve this attribution and the accompanying license when redistributing the skill.
+Kavosh was created by [@omerae7](https://github.com/omerae7). The MIT License requires redistributed copies or substantial portions to retain its copyright and permission notice; please keep this creator attribution with the skill as well.
