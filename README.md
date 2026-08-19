@@ -1,6 +1,6 @@
 # Kavosh
 
-### Search finds pages. Kavosh builds evidence.
+![Kavosh — Evidence-first deep research](assets/social-preview.png)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg)](LICENSE)
 ![Agent Skills](https://img.shields.io/badge/standard-Agent%20Skills-2563eb)
@@ -14,6 +14,8 @@ Kavosh is an evidence-first, modular deep-research skill for AI assistants. It t
 > **Deep research should be deep in method—not merely long in output.**
 
 Kavosh follows the open Agent Skills format and is designed for ChatGPT, Codex, and Claude Code. The core `SKILL.md` workflow remains portable; installation and invocation differ by host. See the official [OpenAI Skills documentation](https://developers.openai.com/codex/build-skills) and [Claude Code Skills documentation](https://code.claude.com/docs/en/skills).
+
+**[Install Kavosh](#installation) · [See a documented example](examples/REAL_WORLD_EXAMPLE.md) · [Review the evaluation framework](evals/README.md)**
 
 ## Not another “research prompt”
 
@@ -269,6 +271,10 @@ Use Kavosh to assess whether this health claim is supported by current scientifi
 
 More examples are available in [`examples/PROMPTS.md`](examples/PROMPTS.md).
 
+## See Kavosh at work
+
+The documented case study, **[Can one Agent Skill work across ChatGPT, Codex, and Claude Code?](examples/REAL_WORLD_EXAMPLE.md)**, shows the question definition, source selection, evidence states, decisive findings, limitations, and Kavosh Execution Trace using current official platform documentation.
+
 ## Evaluation
 
 The repository includes a reproducible evaluation framework in [`evals/README.md`](evals/README.md). It measures factual correctness, source selection, primary-source coverage, citation support, freshness, contradiction handling, quantitative accuracy, uncertainty calibration, and research efficiency across controlled tasks.
@@ -286,9 +292,11 @@ The quality and completeness of each investigation depend on the host model, ava
 ```text
 kavosh/
 ├── README.md
+├── CHANGELOG.md
 ├── LICENSE
 ├── NOTICE
 ├── CONTRIBUTING.md
+├── assets/
 ├── skill/
 │   ├── SKILL.md
 │   ├── LICENSE
@@ -304,7 +312,7 @@ The installable skill stays clean and self-contained; project documentation and 
 
 ## Roadmap
 
-- publish representative research examples;
+- publish additional representative research examples;
 - run reproducible comparative evaluations across representative research tasks;
 - test explicit and implicit activation across supported platforms;
 - expand contradiction, freshness, and uncertainty test cases;
