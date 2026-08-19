@@ -1,0 +1,14 @@
+interface:
+  display_name: Kavosh
+  short_description: Evidence-first, traceable multi-source research
+  default_prompt: Use $kavosh to conduct multi-source research, evaluate the evidence,
+    and produce a traceable answer about this topic.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

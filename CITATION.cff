@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use Kavosh in research or evaluation work, please cite this repository."
+title: "Kavosh: An Evidence-First Deep-Research Skill for AI Assistants"
+type: software
+authors:
+  - name: "Omid (@omerae7)"
+    website: "https://github.com/omerae7"
+repository-code: "https://github.com/omerae7/kavosh"
+url: "https://github.com/omerae7/kavosh"
+license: MIT
+version: "1.0.0"
+date-released: "2026-08-19"
+keywords:
+  - deep research
+  - agent skills
+  - evidence
+  - fact checking
+  - source verification
+  - ChatGPT
+  - Codex
+  - Claude
