@@ -563,10 +563,10 @@ window.AZUI = (function () {
     });
 
     $$('[data-open-cart]').forEach(b => b.addEventListener('click', openCart));
-    $$('[data-open-advisor]').forEach(b => b.addEventListener('click', () => Advisor.open()));
+    $$('[data-open-advisor]').forEach(b => b.addEventListener('click', () => Advisor.open(null, b)));
     $$('[data-open-menu]').forEach(b => b.addEventListener('click', () => openSheet('#menuSheet', '360px')));
 
-    $$('[data-ask]').forEach(b => b.addEventListener('click', () => Advisor.open(b.dataset.ask)));
+    $$('[data-ask]').forEach(b => b.addEventListener('click', () => Advisor.open(b.dataset.ask, b)));
   }
 
   /* ============================== شروع ============================= */

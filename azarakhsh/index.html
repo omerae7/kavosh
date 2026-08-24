@@ -1,20 +1,31 @@
 <!doctype html>
-<html lang="fa" dir="rtl" class="sl-theme-dark">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>آذرخش | آجر نسوز نما، مستقیم از کوره</title>
 <meta name="description" content="کلکسیون آجر نسوز نمای آذرخش؛ ده کد از یک خط تولید، قیمت درب کارخانه، ضمانت کتبی ۲۵ ساله و مشاور هوشمند انتخاب نما.">
-<meta name="theme-color" content="#0b0a08">
+<meta name="theme-color" content="#e6dfd6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c0b0a" media="(prefers-color-scheme: dark)">
 <meta property="og:title" content="آذرخش | آجر نسوز نما، مستقیم از کوره">
 <meta property="og:description" content="نما را یک بار می‌سازید. درست بسازید.">
-<meta property="og:image" content="assets/hero/hero-facade.jpg">
+<meta property="og:image" content="assets/intro/gallery-wide.jpg">
 <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
 
 <link rel="preload" href="assets/fonts/Estedad-Arabic-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" as="image" href="assets/hero/hero-facade.jpg">
+<link rel="preload" as="image" href="assets/intro/gallery-wide.jpg" media="(min-width: 761px)">
+<link rel="preload" as="image" href="assets/intro/gallery-tall.jpg" media="(max-width: 760px)">
 
+<script>
+  (function () {
+    var t = 'light';
+    try { t = localStorage.getItem('azarakhsh-theme') || 'light'; } catch (e) {}
+    document.documentElement.dataset.theme = t;
+    document.documentElement.classList.add(t === 'dark' ? 'sl-theme-dark' : 'sl-theme-light');
+  })();
+</script>
+<link rel="stylesheet" href="vendor/shoelace/themes/light.css">
 <link rel="stylesheet" href="vendor/shoelace/themes/dark.css">
 <link rel="stylesheet" href="css/core.css">
 <link rel="stylesheet" href="css/shell.css">
@@ -26,21 +37,29 @@
 <body class="is-frozen">
 
 <!-- ========================== پردهٔ ورود ========================== -->
-<div class="veil" id="veil">
+<div class="veil" id="veil" role="presentation">
+  <div class="veil__shot" id="veilShot">
+    <picture>
+      <source media="(max-width: 760px)" srcset="assets/intro/gallery-tall.jpg">
+      <img src="assets/intro/gallery-wide.jpg" alt="" fetchpriority="high">
+    </picture>
+  </div>
+  <div class="veil__wash"></div>
   <div class="veil__in">
     <svg class="veil__mark" viewBox="0 0 40 40" aria-hidden="true">
-      <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="#d9c28e"/>
-      <rect x="19" y="5"    width="20" height="8.4" rx="1.6" fill="#f3eee5"/>
-      <rect x="1"  y="15.8" width="24" height="8.4" rx="1.6" fill="#f3eee5"/>
-      <rect x="27" y="15.8" width="12" height="8.4" rx="1.6" fill="#d9c28e"/>
-      <rect x="1"  y="26.6" width="12" height="8.4" rx="1.6" fill="#f3eee5"/>
-      <rect x="15" y="26.6" width="24" height="8.4" rx="1.6" fill="#d9c28e"/>
+      <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="#bb875a"/>
+      <rect x="19" y="5"    width="20" height="8.4" rx="1.6" fill="#dcd3ca"/>
+      <rect x="1"  y="15.8" width="24" height="8.4" rx="1.6" fill="#dcd3ca"/>
+      <rect x="27" y="15.8" width="12" height="8.4" rx="1.6" fill="#bb875a"/>
+      <rect x="1"  y="26.6" width="12" height="8.4" rx="1.6" fill="#dcd3ca"/>
+      <rect x="15" y="26.6" width="24" height="8.4" rx="1.6" fill="#bb875a"/>
     </svg>
     <div class="veil__word">آذرخش</div>
-    <div class="veil__sub">کارخانهٔ آجر نسوز نما · از ۱۳۶۷</div>
-    <div class="veil__bar"><span></span></div>
-    <div class="veil__pct">۰٪</div>
+    <div class="veil__line">هر نما، یک اثر است</div>
+    <div class="veil__rule"></div>
   </div>
+  <div class="veil__skip"><span class="on-fine">برای ورود کلیک کنید</span><span class="on-touch">برای ورود لمس کنید</span></div>
+</div>
 </div>
 
 <div class="film" aria-hidden="true">
@@ -76,6 +95,8 @@
   <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m2.5 7.5 9.5 6 9.5-6"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 1.9"/></symbol>
   <symbol id="i-drag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6 8 12l6 6"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.2A8.6 8.6 0 0 1 9.8 3.5a8.6 8.6 0 1 0 10.7 10.7z"/></symbol>
   <symbol id="i-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-telegram" viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.3 18.9 19c-.2 1-.8 1.2-1.7.8l-4.6-3.4-2.2 2.1c-.3.3-.5.5-1 .5l.4-4.9 9-8.1c.4-.3-.1-.5-.6-.2L7.1 12.8 2.6 11.4c-1-.3-1-1 .2-1.4l18-6.9c.8-.3 1.5.2 1.1 1.2z"/></symbol>
   <symbol id="i-whatsapp" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 1.9a8.1 8.1 0 1 1-4.2 15l-.3-.2-3 .8.8-2.9-.2-.3A8.1 8.1 0 0 1 12 3.9zm-3.3 4c-.2 0-.5 0-.7.4-.3.4-.9 1-.9 2.3s.9 2.6 1 2.8c.2.2 1.8 2.9 4.5 3.9 2.2.9 2.7.7 3.2.6.5 0 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3-1.7-.8c-.2 0-.4-.1-.6.2l-.8 1c-.2.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4 0-.5.2-.7l.4-.5.3-.5v-.5l-.8-1.9c-.2-.5-.4-.4-.6-.5h-.5z"/></symbol>
@@ -86,12 +107,12 @@
   <div class="bar__in">
     <a class="brand" href="#top" data-go aria-label="آذرخش">
       <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
-        <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="#d9c28e"/>
+        <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="var(--accent)"/>
         <rect x="19" y="5"    width="20" height="8.4" rx="1.6" fill="currentColor"/>
         <rect x="1"  y="15.8" width="24" height="8.4" rx="1.6" fill="currentColor"/>
-        <rect x="27" y="15.8" width="12" height="8.4" rx="1.6" fill="#d9c28e"/>
+        <rect x="27" y="15.8" width="12" height="8.4" rx="1.6" fill="var(--accent)"/>
         <rect x="1"  y="26.6" width="12" height="8.4" rx="1.6" fill="currentColor"/>
-        <rect x="15" y="26.6" width="24" height="8.4" rx="1.6" fill="#d9c28e"/>
+        <rect x="15" y="26.6" width="24" height="8.4" rx="1.6" fill="var(--accent)"/>
       </svg>
       <span class="brand__txt">
         <span class="brand__name">آذرخش</span>
@@ -116,6 +137,10 @@
         <svg width="18" height="18"><use href="#i-bag"/></svg>
         <span class="cart-dot">۰</span>
       </button>
+      <button class="btn-round theme-btn" type="button" id="themeBtn" aria-label="تغییر تم روشن و تیره">
+        <svg class="i-sun" width="18" height="18"><use href="#i-sun"/></svg>
+        <svg class="i-moon" width="18" height="18"><use href="#i-moon"/></svg>
+      </button>
       <button class="btn-round menu-btn" type="button" data-open-menu aria-label="فهرست">
         <svg width="18" height="18"><use href="#i-menu"/></svg>
       </button>
@@ -126,9 +151,12 @@
 <main id="top">
 
 <!-- ============================== هیرو ============================== -->
-<section class="hero">
+<section class="hero noir">
   <div class="hero__bg" id="heroBg">
-    <img src="assets/hero/hero-facade.jpg" alt="نمای آجری ساختمان با آجر نسوز آذرخش" fetchpriority="high">
+    <picture>
+      <source media="(max-width: 760px)" srcset="assets/intro/gallery-tall.jpg">
+      <img src="assets/intro/gallery-wide.jpg" alt="تالار نمایش نمونه‌های نمای آذرخش">
+    </picture>
   </div>
   <div class="hero__scrim"></div>
 
@@ -164,19 +192,17 @@
       </div>
 
       <div class="stage" id="heroStage">
-        <span class="stage__chip">پرفروش‌ترین کد کارخانه</span>
+        <span class="stage__chip">اثر شمارهٔ ۰۱</span>
         <div class="stage__card">
           <button class="stage__frame" type="button" id="stageOpen" data-cursor="جزئیات" aria-label="مشاهدهٔ محصول">
             <img id="stageImg" src="" alt="" data-slot>
             <span class="stage__glow"></span>
           </button>
-          <div class="stage__foot">
-            <div>
-              <div class="stage__name" id="stageName"></div>
-              <div class="stage__meta" id="stageMeta"></div>
-            </div>
-            <div class="stage__price" id="stagePrice"></div>
-          </div>
+        </div>
+        <div class="stage__label">
+          <div class="stage__name" id="stageName"></div>
+          <div class="stage__meta" id="stageMeta"></div>
+          <div class="stage__price" id="stagePrice"></div>
         </div>
       </div>
     </div>
@@ -197,7 +223,7 @@
 <!-- ============================= بیانیه ============================= -->
 <section class="band" id="story">
   <div class="shell shell--tight">
-    <span class="label" data-in>فلسفهٔ کارخانه</span>
+    <span class="label label--ch" data-in><i>۰۱</i>فلسفهٔ کارخانه</span>
     <p class="mf__text" id="manifesto" style="margin-top:1.4rem">
       ما آجر نمی‌فروشیم؛ <em>چهل سال دوام</em> می‌فروشیم.
       هر پارت از یک معدن، یک کوره و یک فرمول بیرون می‌آید تا نمای شما
@@ -229,7 +255,7 @@
   <div class="shell">
     <div class="band-head band-head--split">
       <div>
-        <span class="label" data-in>کلکسیون</span>
+        <span class="label label--ch" data-in><i>۰۲</i>کلکسیون</span>
         <h2 class="h2" data-in style="margin-top:.8rem">ده کد، <em>یک</em> خط تولید</h2>
         <p class="lede" data-in style="margin-top:1rem">
           همهٔ کدها هم‌ابعاد و هم‌کیفیت‌اند؛ یعنی می‌توانید بدون نگرانی ترکیبشان کنید.
@@ -268,14 +294,14 @@
 </section>
 
 <!-- =========================== مشاور نما =========================== -->
-<section class="band advisor-band" id="advisor">
+<section class="band advisor-band noir" id="advisor">
   <div class="shell">
     <div class="advisor-grid">
       <div>
         <div style="display:flex;align-items:center;gap:1rem" data-in>
           <span class="orb"><i></i><i></i><i></i><b></b></span>
           <div>
-            <span class="label label--bare">مشاور نما</span>
+            <span class="label label--ch label--bare"><i>۰۳</i>مشاور نما</span>
             <h2 class="h2" style="margin-top:.3rem">نمی‌دانید از کجا شروع کنید؟</h2>
           </div>
         </div>
@@ -342,7 +368,7 @@
   <div class="shell">
     <div class="band-head">
       <div>
-        <span class="label" data-in>ابزار برآورد</span>
+        <span class="label label--ch" data-in><i>۰۴</i>ابزار برآورد</span>
         <h2 class="h2" data-in style="margin-top:.8rem">چقدر آجر لازم دارید؟</h2>
         <p class="lede" data-in style="margin-top:1rem">
           ابعاد دیوار را با اسلایدرها تنظیم کنید تا متراژ خالص، تعداد آجر، تعداد پالت و برآورد هزینه
@@ -379,7 +405,7 @@
         </div>
       </div>
 
-      <div class="calc__out">
+      <div class="calc__out noir">
         <span class="label label--bare">برآورد سفارش</span>
         <ul class="calc__list">
           <li><span>مساحت خالص نما</span><b class="num" id="outArea">—</b></li>
@@ -413,7 +439,7 @@
   <div class="shell">
     <div class="band-head band-head--split">
       <div>
-        <span class="label" data-in>کارنامه</span>
+        <span class="label label--ch" data-in><i>۰۵</i>کارنامه</span>
         <h2 class="h2" data-in style="margin-top:.8rem">آجر ما، روی این نماها</h2>
         <p class="lede" data-in style="margin-top:1rem">
           از برج مسکونی تهران تا بازسازی خانه‌ای قجری در تبریز. روی هر تصویر بزنید تا بزرگ ببینید.
@@ -431,7 +457,7 @@
   <div class="shell">
     <div class="band-head">
       <div>
-        <span class="label" data-in>از معدن تا نما</span>
+        <span class="label label--ch" data-in><i>۰۶</i>از معدن تا نما</span>
         <h2 class="h2" data-in style="margin-top:.8rem">چهار قدم تا نمای تمام‌شده</h2>
       </div>
     </div>
@@ -461,7 +487,7 @@
         </li>
       </ol>
 
-      <aside class="datasheet" data-in>
+      <aside class="datasheet noir" data-in>
         <span class="label label--bare">برگهٔ فنی · خانوادهٔ نسوز</span>
         <dl class="spec-rows" style="margin-top:1.1rem">
           <div><dt>ابعاد استاندارد</dt><dd>۲۴۰ × ۷۰ × ۲۰ میلی‌متر</dd></div>
@@ -494,7 +520,7 @@
 <!-- ============================== نظرها ============================ -->
 <section class="band band--short">
   <div class="shell shell--tight">
-    <span class="label" data-in>حرف مشتری‌ها</span>
+    <span class="label label--ch" data-in><i>۰۷</i>حرف مشتری‌ها</span>
     <div class="voices" id="voices" data-in style="margin-top:1.8rem"></div>
     <div class="voice-nav" id="voiceNav"></div>
   </div>
@@ -505,7 +531,7 @@
   <div class="shell">
     <div class="contact">
       <div>
-        <span class="label" data-in>پرسش‌های رایج</span>
+        <span class="label label--ch" data-in><i>۰۸</i>پرسش‌های رایج</span>
         <h2 class="h2" data-in style="margin:.8rem 0 1.8rem">هرچه پیش از سفارش باید بدانید</h2>
         <div id="faq" data-in></div>
 
@@ -525,7 +551,7 @@
         </div>
       </div>
 
-      <div class="contact__panel" id="contactPanel" data-in>
+      <div class="contact__panel noir" id="contactPanel" data-in>
         <span class="label label--bare">مشاورهٔ فنی رایگان</span>
         <h3 class="h3" style="margin:.5rem 0 .6rem">شماره‌تان را بگذارید، ما زنگ می‌زنیم</h3>
         <p class="small" style="margin-bottom:1.6rem">
@@ -555,7 +581,7 @@
           <span class="orb" style="margin-inline:auto"><i></i><b></b></span>
           <h3 class="h3" style="margin-top:1rem">درخواستتان ثبت شد</h3>
           <p class="small" style="margin-top:.6rem">
-            شمارهٔ پیگیری <b class="num" id="leadRef" style="color:var(--champagne)"></b> برای شما صادر شد.
+            شمارهٔ پیگیری <b class="num" id="leadRef" style="color:var(--accent)"></b> برای شما صادر شد.
             کارشناس ما در اولین ساعت کاری تماس می‌گیرد.
           </p>
         </div>
@@ -567,7 +593,20 @@
 </main>
 
 <!-- ============================== پابرگ ============================ -->
-<footer class="foot">
+<footer class="foot noir">
+  <div class="payoff">
+    <div class="payoff__shot" aria-hidden="true">
+      <picture>
+        <source media="(max-width: 760px)" srcset="assets/intro/gallery-tall.jpg">
+        <img src="assets/intro/gallery-wide.jpg" alt="">
+      </picture>
+    </div>
+    <div class="shell">
+      <p data-in>نما را یک بار می‌سازید.<br><em>سی سال بعد، هنوز درست است.</em></p>
+      <span data-in>همان تالاری که از آن شروع کردیم — با نمایی که هنوز تازه است.</span>
+    </div>
+  </div>
+
   <div class="shell">
     <div class="foot__word" aria-hidden="true">آذرخش</div>
 
@@ -575,12 +614,12 @@
       <div class="foot__about">
         <a class="brand" href="#top" data-go>
           <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
-            <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="#d9c28e"/>
+            <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="var(--accent)"/>
             <rect x="19" y="5"    width="20" height="8.4" rx="1.6" fill="currentColor"/>
             <rect x="1"  y="15.8" width="24" height="8.4" rx="1.6" fill="currentColor"/>
-            <rect x="27" y="15.8" width="12" height="8.4" rx="1.6" fill="#d9c28e"/>
+            <rect x="27" y="15.8" width="12" height="8.4" rx="1.6" fill="var(--accent)"/>
             <rect x="1"  y="26.6" width="12" height="8.4" rx="1.6" fill="currentColor"/>
-            <rect x="15" y="26.6" width="24" height="8.4" rx="1.6" fill="#d9c28e"/>
+            <rect x="15" y="26.6" width="24" height="8.4" rx="1.6" fill="var(--accent)"/>
           </svg>
           <span class="brand__txt">
             <span class="brand__name">آذرخش</span>
@@ -698,7 +737,7 @@
       <span class="orb" style="margin-inline:auto"><i></i><b></b></span>
       <h3 class="h3" style="margin-top:1rem">سفارش ثبت شد</h3>
       <p class="small" style="margin-top:.7rem">
-        شمارهٔ پیگیری <b class="num" id="doneRef" style="color:var(--champagne)"></b><br>
+        شمارهٔ پیگیری <b class="num" id="doneRef" style="color:var(--accent)"></b><br>
         <span id="doneSum"></span>
       </p>
       <p class="small" style="margin-top:.9rem">
@@ -724,8 +763,22 @@
   <div id="productBody"></div>
 </sl-drawer>
 
-<sl-drawer id="advisorSheet" label="مشاور نما" placement="end">
-  <div class="chat">
+<div class="pop" id="advisorPop" aria-hidden="true">
+  <div class="pop__scrim" data-pop-close></div>
+  <div class="pop__panel noir" role="dialog" aria-modal="true" aria-labelledby="popTitle">
+    <span class="pop__beam" aria-hidden="true"></span>
+    <header class="pop__head" id="popHead">
+      <span class="pop__grip"></span>
+      <span class="orb orb--sm"><i></i><b></b></span>
+      <div>
+        <b id="popTitle">مشاور نما</b>
+        <span class="sub">پاسخ فوری · بدون انتظار</span>
+      </div>
+      <button class="btn-round" type="button" data-pop-close aria-label="بستن گفتگو">
+        <svg width="17" height="17"><use href="#i-close"/></svg>
+      </button>
+    </header>
+<div class="chat">
     <div class="chat__scroll" id="chatScroll">
       <div class="chat__intro" id="chatIntro">
         <span class="orb"><i></i><i></i><i></i><b></b></span>
@@ -754,7 +807,8 @@
       · <button class="chat__reset" type="button" id="chatReset">پاک‌کردن گفتگو</button>
     </div>
   </div>
-</sl-drawer>
+  </div>
+</div>
 
 <!-- ============================= لایت‌باکس ========================= -->
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="تصویر پروژه">

@@ -15,7 +15,9 @@ window.AZ = (function () {
 
   const en = v => String(v)
     .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
-    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+    .replace(/[٫،]/g, '.')      /* اعشار فارسی و عربی */
+    .replace(/٬/g, '');         /* جداکنندهٔ هزارگان */
 
   const faNum = n => fa(Math.round(Number(n) || 0).toLocaleString('en-US')).replace(/,/g, '٬');
 

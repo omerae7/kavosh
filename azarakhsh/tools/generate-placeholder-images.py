@@ -109,18 +109,18 @@ def studio_brick(size, colour, glazed=False):
     """A single brick on a warm studio backdrop."""
     w, h = size
     base = hx(colour)
-    img = Image.new("RGB", (w, h), (243, 238, 231))
+    img = Image.new("RGB", (w, h), (26, 22, 20))
     d = ImageDraw.Draw(img)
-    for i in range(h):  # backdrop sweep
+    for i in range(h):  # پس‌زمینهٔ استودیوی تیره — آجر مثل یک شیء در ویترین
         t = i / h
-        d.line([0, i, w, i], fill=mix((248, 244, 238), (219, 210, 199), t ** 1.4))
+        d.line([0, i, w, i], fill=mix((44, 37, 33), (14, 12, 11), t ** 1.15))
 
     bw, bh, dep = int(w * 0.72), int(h * 0.20), int(h * 0.062)
     x0, y0 = (w - bw) // 2, int(h * 0.44)
 
     sh = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     ImageDraw.Draw(sh).ellipse([x0 - 30, y0 + bh - 12, x0 + bw + 46, y0 + bh + 54],
-                               fill=(60, 44, 34, 118))
+                               fill=(0, 0, 0, 170))
     img = Image.alpha_composite(img.convert("RGBA"), sh.filter(ImageFilter.GaussianBlur(26))).convert("RGB")
     d = ImageDraw.Draw(img)
 
@@ -262,8 +262,5 @@ if __name__ == "__main__":
     for name, colour, op in GALLERY:
         save(cinematic(facade((1400, 1050), colour, op)), "gallery", f"{name}.jpg")
 
-    save(cinematic(facade((2400, 1500), "#8d4a30",
-                          [(0.60, 0.16, 0.12, 0.62), (0.78, 0.16, 0.12, 0.62)], bw=200, bh=54),
-                   vignette=0.68),
-         "hero", "hero-facade.jpg", quality=88)
     print("done.")
+    print("یادآوری: تصویر تالار (assets/intro/) عکس واقعی است و اینجا ساخته نمی‌شود.")

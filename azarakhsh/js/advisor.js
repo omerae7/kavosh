@@ -91,11 +91,12 @@
       if (looksLikeDims) {
         const w = nums[0], h = nums[1];
         const target = matchProduct(t) || byId(memory.lastProducts[0]) || byId('r110');
-        const est = estimate({ product: target, width: w, height: h, openings: nums[2] > 0 && nums[2] <= 80 ? nums[2] : 15 });
+        const openings = (nums[2] > 0 && nums[2] <= 80) ? nums[2] : 15;
+        const est = estimate({ product: target, width: w, height: h, openings });
         memory.lastArea = est.billed;
         memory.lastProducts = [target.id];
         return {
-          text: `برای دیوار **${faFloat(w)} × ${faFloat(h)} متر** با احتساب **۱۵٪ بازشو** و **۷٪ پرت اجرا**:\n` +
+          text: `برای دیوار **${faFloat(w)} × ${faFloat(h)} متر** با احتساب **${faFloat(openings)}٪ بازشو** و **۷٪ پرت اجرا**:\n` +
             list([
               `مساحت خالص: **${faFloat(est.area)} متر مربع**`,
               `تعداد آجر ${target.code}: **${faNum(est.bricks)} عدد**`,
@@ -383,8 +384,8 @@
     }
 
     if (reply.action === 'cart') setTimeout(() => window.AZUI.openCart(), 700);
-    if (reply.action === 'calc') setTimeout(() => { AZ.closeSheet('#advisorSheet'); window.AZUI.goTo('#calc'); }, 900);
-    if (reply.action === 'contact') setTimeout(() => { AZ.closeSheet('#advisorSheet'); window.AZUI.goTo('#contact'); }, 900);
+    if (reply.action === 'calc') setTimeout(() => { close(); window.AZUI.goTo('#calc'); }, 900);
+    if (reply.action === 'contact') setTimeout(() => { close(); window.AZUI.goTo('#contact'); }, 900);
 
     setChips(reply.chips);
     scrollDown();
@@ -487,15 +488,125 @@
 
     if (!restore()) setChips(PROMPTS.slice(0, 3));
     syncSend();
+    wirePop();
   }
 
-  async function open(question) {
-    await AZ.openSheet('#advisorSheet', '520px');
-    setTimeout(() => {
+  /* ======================== پاپ‌آپ اختصاصی ======================== */
+  const POP = () => $('#advisorPop');
+  const isSheet = () => window.matchMedia('(max-width: 860px)').matches;
+  const clamp = v => Math.max(0, Math.min(100, v));
+  let popped = false;
+
+  function open(question, trigger) {
+    const box = POP();
+    if (!box) return;
+    if (popped) { if (question) ask(question); return; }
+    popped = true;
+
+    box.classList.add('is-open');
+    box.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('is-frozen');
+    document.dispatchEvent(new CustomEvent('az:lock'));
+
+    const panel = $('.pop__panel', box);
+    const scrim = $('.pop__scrim', box);
+    const beam  = $('.pop__beam', box);
+    const sheet = isSheet();
+
+    /* پنل از همان دکمه‌ای بیرون می‌آید که فشرده شده */
+    if (trigger && !sheet) {
+      const t = trigger.getBoundingClientRect();
+      const p = panel.getBoundingClientRect();
+      gsap.set(panel, {
+        transformOrigin:
+          clamp(((t.left + t.width / 2) - p.left) / p.width * 100) + '% ' +
+          clamp(((t.top + t.height / 2) - p.top) / p.height * 100) + '%'
+      });
+    } else {
+      gsap.set(panel, { transformOrigin: sheet ? '50% 100%' : '92% 0%' });
+    }
+
+    const after = () => {
+      scrollDown();
       if (question) ask(question);
-      else if (!AZ.isPhone()) { const i = $('#chatInput'); if (i) i.focus(); }
-    }, 380);
+      else if (!sheet) { const i = $('#chatInput'); if (i) i.focus(); }
+    };
+
+    if (REDUCED) {
+      gsap.set(scrim, { opacity: 1 });
+      gsap.set(panel, { opacity: 1, scale: 1, y: 0, yPercent: 0 });
+      after();
+      return;
+    }
+
+    gsap.timeline({ onComplete: after })
+      .fromTo(scrim, { opacity: 0 }, { opacity: 1, duration: .45, ease: 'power2.out' }, 0)
+      .fromTo(panel,
+        sheet ? { yPercent: 104, opacity: 1, scale: 1 } : { scale: .8, opacity: 0, y: -8 },
+        sheet ? { yPercent: 0, duration: .8, ease: 'expo.out' }
+              : { scale: 1, opacity: 1, y: 0, duration: .85, ease: 'expo.out' }, .04)
+      .fromTo(beam, { xPercent: -130 }, { xPercent: 130, duration: 1.3, ease: 'power2.inOut' }, .2)
+      .from('.pop__head > *', { y: 10, opacity: 0, duration: .5, stagger: .05, ease: 'power3.out' }, .3)
+      .from('#advisorPop .chat__scroll > *', { y: 16, opacity: 0, duration: .55, stagger: .07, ease: 'power3.out' }, .34)
+      .from('#advisorPop .chat__chips, #advisorPop .composer', { y: 18, opacity: 0, duration: .5, stagger: .07, ease: 'power3.out' }, .4);
   }
 
-  window.Advisor = { init, open, ask, reset, respond };
+  function close() {
+    const box = POP();
+    if (!box || !popped) return;
+    popped = false;
+    const panel = $('.pop__panel', box);
+    const scrim = $('.pop__scrim', box);
+    const sheet = isSheet();
+
+    const done = () => {
+      box.classList.remove('is-open');
+      box.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('is-frozen');
+      document.dispatchEvent(new CustomEvent('az:unlock'));
+      gsap.set(panel, { clearProps: 'transform,opacity' });
+    };
+
+    if (REDUCED) { done(); return; }
+
+    gsap.timeline({ onComplete: done })
+      .to(panel, sheet
+        ? { yPercent: 104, duration: .45, ease: 'power2.in' }
+        : { scale: .9, opacity: 0, y: -6, duration: .4, ease: 'power2.in' }, 0)
+      .to(scrim, { opacity: 0, duration: .4, ease: 'power2.in' }, 0);
+  }
+
+  function wirePop() {
+    const box = POP();
+    if (!box) return;
+    $$('[data-pop-close]', box).forEach(b => b.addEventListener('click', close));
+    window.addEventListener('keydown', e => { if (e.key === 'Escape' && popped) close(); });
+
+    /* کشیدن دستگیره برای بستن روی موبایل */
+    const head = $('#popHead', box);
+    const panel = $('.pop__panel', box);
+    let dragging = false, startY = 0, moved = 0;
+
+    head.addEventListener('pointerdown', e => {
+      if (!isSheet()) return;
+      dragging = true; startY = e.clientY; moved = 0;
+      try { head.setPointerCapture(e.pointerId); } catch (err) { /* */ }
+    });
+    head.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      moved = Math.max(0, e.clientY - startY);
+      gsap.set(panel, { y: moved });
+    });
+    const release = () => {
+      if (!dragging) return;
+      dragging = false;
+      if (moved > 110) { gsap.set(panel, { y: 0 }); close(); }
+      else gsap.to(panel, { y: 0, duration: .6, ease: 'elastic.out(1, .72)' });
+      moved = 0;
+    };
+    head.addEventListener('pointerup', release);
+    head.addEventListener('pointercancel', release);
+  }
+
+  window.Advisor = { init, open, close, ask, reset, respond };
 })();

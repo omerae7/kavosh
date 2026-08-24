@@ -30,6 +30,8 @@ window.AZMotion = (function () {
     /* هنگام باز بودن شیت، صفحه پشت آن قفل می‌شود */
     document.addEventListener('sl-show', () => lenis && lenis.stop());
     document.addEventListener('sl-after-hide', () => lenis && lenis.start());
+    document.addEventListener('az:lock', () => lenis && lenis.stop());
+    document.addEventListener('az:unlock', () => lenis && lenis.start());
   }
 
   const barH = () => ($('#bar') ? $('#bar').offsetHeight + 22 : 90);
@@ -42,42 +44,99 @@ window.AZMotion = (function () {
     else window.scrollTo({ top: y, behavior: 'smooth' });
   }
 
-  /* ---------------------------- پردهٔ ورود -------------------------- */
+  /* ---------------------------- پردهٔ ورود --------------------------
+     نخستین قاب: تالار گالری. تصویر آرام زوم می‌شود و همان قاب،
+     پس‌زمینهٔ هیرو است؛ پرده که می‌رود، دوربین در همان اتاق می‌ماند.
+     ------------------------------------------------------------------ */
+  const ZOOM_END = 1.12;   /* هیرو دقیقاً از همین مقیاس شروع می‌کند */
+
   function veil() {
     const el = $('#veil');
     if (!el) return Promise.resolve();
 
-    if (REDUCED) {
+    const finish = () => {
+      el.classList.add('is-gone');
       el.style.display = 'none';
       document.body.classList.remove('is-frozen');
+      ScrollTrigger.refresh();
+    };
+
+    if (REDUCED) {
+      finish();
+      gsap.set('#heroBg', { scale: 1 });
       return Promise.resolve();
     }
 
     document.body.classList.add('is-frozen');
+    gsap.set('#heroBg', { scale: ZOOM_END });
 
     return new Promise(resolve => {
-      const pct = { v: 0 };
-      const tl = gsap.timeline({
-        onComplete: () => {
-          el.classList.add('is-gone');
-          el.style.display = 'none';
-          document.body.classList.remove('is-frozen');
-          ScrollTrigger.refresh();
-          resolve();
-        }
-      });
+      let done = false;
+      const settle = () => {
+        if (done) return;
+        done = true;
+        finish();
+        resolve();
+      };
 
-      tl.to('#veil .veil__mark rect', { opacity: 1, duration: .5, stagger: .07, ease: 'power2.out' })
-        .from('.veil__word', { y: 14, opacity: 0, duration: .6, ease: 'power3.out' }, '-=.3')
-        .from('.veil__sub',  { y: 8,  opacity: 0, duration: .5, ease: 'power3.out' }, '-=.4')
-        .to('.veil__bar span', { scaleX: 1, duration: 1.15, ease: 'power2.inOut' }, '-=.4')
-        .to(pct, {
-          v: 100, duration: 1.15, ease: 'power2.inOut',
-          onUpdate: () => { $('.veil__pct').textContent = fa(Math.round(pct.v)) + '٪'; }
-        }, '<')
-        .to('#veil .veil__in', { opacity: 0, y: -12, duration: .5, ease: 'power2.in' }, '+=.15')
-        .to(el, { yPercent: -100, duration: 1.05, ease: 'expo.inOut' }, '-=.25');
+      const tl = gsap.timeline({ onComplete: settle });
+
+      tl.fromTo('#veilShot',
+          { scale: 1, transformOrigin: '50% 48%' },
+          { scale: ZOOM_END, duration: 4.6, ease: 'power1.inOut' }, 0)
+        .to('#veil .veil__mark', { opacity: 1, y: 0, duration: .9, ease: 'power3.out' }, .35)
+        .from('.veil__word', { y: 18, opacity: 0, duration: .9, ease: 'power3.out' }, .5)
+        .from('.veil__line', { y: 12, opacity: 0, duration: .8, ease: 'power3.out' }, .7)
+        .to('.veil__rule', { width: 'min(180px, 40vw)', duration: 1.1, ease: 'power2.inOut' }, .85)
+        .to('.veil__skip', { opacity: 1, duration: .6 }, 1.6)
+        .to('.veil__in, .veil__skip', { opacity: 0, y: -10, duration: .5, ease: 'power2.in' }, 2.5)
+        .to('#veil', { opacity: 0, duration: .9, ease: 'power2.inOut' }, 2.7)
+        .set('#veil', { pointerEvents: 'none' }, 2.7);
+
+      /* رد شدن از اینترو */
+      const skip = () => {
+        if (done) return;
+        tl.kill();
+        gsap.to('#veil', {
+          opacity: 0, duration: .5, ease: 'power2.inOut',
+          onComplete: settle
+        });
+      };
+      el.addEventListener('click', skip, { once: true });
+      window.addEventListener('keydown', e => {
+        if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') skip();
+      }, { once: true });
+      window.addEventListener('wheel', skip, { once: true, passive: true });
+      window.addEventListener('touchstart', skip, { once: true, passive: true });
     });
+  }
+
+  /* ------------------------------- تم ------------------------------- */
+  const THEME_KEY = 'azarakhsh-theme';
+
+  function applyTheme(mode, animate) {
+    const root = document.documentElement;
+    if (animate) {
+      root.classList.add('theme-shift');
+      clearTimeout(applyTheme._t);
+      applyTheme._t = setTimeout(() => root.classList.remove('theme-shift'), 620);
+    }
+    root.dataset.theme = mode;
+    root.classList.toggle('sl-theme-dark', mode === 'dark');
+    root.classList.toggle('sl-theme-light', mode !== 'dark');
+    try { localStorage.setItem(THEME_KEY, mode); } catch (e) { /* حالت ناشناس */ }
+    document.dispatchEvent(new CustomEvent('az:theme', { detail: mode }));
+  }
+
+  function theme() {
+    const btn = $('#themeBtn');
+    const flip = () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      applyTheme(next, true);
+      if (!REDUCED && btn) gsap.fromTo(btn, { scale: .86 }, { scale: 1, duration: .55, ease: 'back.out(2.4)' });
+    };
+    if (btn) btn.addEventListener('click', flip);
+    $$('[data-theme-toggle]').forEach(b => b.addEventListener('click', flip));
   }
 
   /* ------------------------------ هیرو ----------------------------- */
@@ -107,6 +166,8 @@ window.AZMotion = (function () {
       gsap.set(['#heroTitle .w', '.hero [data-in]'], { opacity: 1, y: 0 });
       return;
     }
+    gsap.to('#heroBg', { scale: 1, duration: 2.6, ease: 'power2.out' });
+
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
     tl.from('.hero .label', { y: 16, opacity: 0, duration: .7 })
       .from(words, { y: 40, opacity: 0, duration: 1, stagger: .04 }, '-=.4')
@@ -356,6 +417,7 @@ window.AZMotion = (function () {
 
   /* ------------------------------ راه‌اندازی ------------------------ */
   async function start() {
+    theme();
     initScroll();
     cursor();
     chrome();
@@ -379,5 +441,5 @@ window.AZMotion = (function () {
     });
   }
 
-  return { start, goTo, rail };
+  return { start, goTo, rail, applyTheme };
 })();
