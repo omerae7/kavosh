@@ -1,0 +1,101 @@
+/* ===================== تک مقاله ===================== */
+.read-bar {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 2px;
+  z-index: 870;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right center;
+  pointer-events: none;
+}
+
+.art-hero {
+  position: relative;
+  min-height: min(64svh, 620px);
+  display: flex;
+  align-items: flex-end;
+  padding-block: calc(var(--bar-h) + 5rem) clamp(2.4rem, 5vw, 4rem);
+  overflow: hidden;
+}
+.art-hero__bg { position: absolute; inset: 0; }
+.art-hero__bg img { width: 100%; height: 100%; object-fit: cover; filter: brightness(1.15); }
+.art-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(8, 7, 6, .95) 8%, rgba(8, 7, 6, .3) 66%),
+    linear-gradient(to right, rgba(8, 7, 6, .12), rgba(8, 7, 6, .6));
+}
+.art-hero__in { position: relative; z-index: 2; }
+.art-hero h1 {
+  font-family: 'Estedad', sans-serif;
+  font-weight: 300;
+  font-size: clamp(1.8rem, 4vw, 3.4rem);
+  line-height: 1.42;
+  margin-top: .7rem;
+  max-width: 22ch;
+}
+.art-meta { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; margin-top: 1.3rem; font-size: .84rem; color: var(--text-3); }
+.art-meta span { display: inline-flex; align-items: center; gap: .45rem; }
+.art-meta svg { color: var(--accent); }
+
+.art-lead {
+  font-family: 'Estedad', sans-serif;
+  font-weight: 350;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  line-height: 1.95;
+  color: var(--text);
+  padding-bottom: 1.6rem;
+  margin-bottom: 1.6rem;
+  border-bottom: 1px solid var(--hair);
+  max-width: 62ch;
+}
+
+.toc { display: grid; gap: .1rem; }
+.toc a {
+  display: block;
+  padding: .55rem .7rem;
+  border-radius: 9px;
+  font-size: .86rem;
+  color: var(--text-3);
+  border-inline-start: 2px solid transparent;
+  transition: color .3s, background-color .3s, border-color .3s;
+}
+.toc a:hover { color: var(--text); background: rgba(var(--text-rgb), .05); }
+.toc a.is-on { color: var(--accent); border-inline-start-color: var(--accent); background: rgba(var(--accent-rgb), .07); }
+
+.art-share {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-top: 2.6rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--hair);
+}
+.art-share span { font-size: .82rem; color: var(--text-4); margin-inline-end: .3rem; }
+
+.art-author {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.6rem;
+  padding: 1.3rem;
+  border: 1px solid var(--hair);
+  border-radius: var(--r3);
+  background: var(--surface);
+}
+.art-author__av {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border: 1px solid var(--hair-2);
+  color: var(--accent);
+  font-family: 'Estedad', sans-serif;
+  font-size: 1.2rem;
+}
+.art-author b { display: block; font-size: .96rem; font-family: 'Estedad', sans-serif; font-weight: 500; }
+.art-author span { font-size: .8rem; color: var(--text-4); }

@@ -1,0 +1,80 @@
+/* ===================== صفحهٔ کلکسیون ===================== */
+.shop { display: grid; gap: clamp(1.6rem, 3vw, 2.6rem); align-items: start; }
+@media (min-width: 1040px) { .shop { grid-template-columns: 268px minmax(0, 1fr); } }
+
+.shop__side { display: grid; gap: .9rem; }
+@media (min-width: 1040px) { .shop__side { position: sticky; inset-block-start: calc(var(--bar-h) + 30px); } }
+@media (max-width: 1039px) {
+  .shop__side {
+    display: none;
+    padding: 1.1rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--r3);
+    background: var(--surface);
+    margin-bottom: 1.2rem;
+  }
+  .shop__side.is-open { display: grid; }
+}
+
+.shop__panel {
+  border: 1px solid var(--hair);
+  border-radius: var(--r2);
+  padding: 1.05rem 1.1rem 1.15rem;
+  background: var(--surface);
+}
+@media (max-width: 1039px) { .shop__panel { border: 0; padding: .4rem 0 .9rem; border-bottom: 1px solid var(--hair); border-radius: 0; background: none; } }
+.shop__panel h4 { font-size: .76rem; color: var(--accent); font-weight: 600; margin-bottom: .85rem; }
+.shop__panel--row { display: flex; align-items: center; }
+.shop__panel .searchbox { max-width: none; }
+.shop__panel .searchbox input { height: 42px; font-size: .88rem; }
+
+.shop__fams { display: grid; gap: .3rem; }
+.shop__fam {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  padding: .55rem .7rem;
+  border-radius: 10px;
+  font-size: .88rem;
+  color: var(--text-2);
+  transition: background-color .3s, color .3s;
+}
+.shop__fam i { font-style: normal; font-size: .76rem; color: var(--text-4); }
+.shop__fam:hover { background: rgba(var(--text-rgb), .05); color: var(--text); }
+.shop__fam.is-on { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+.shop__fam.is-on i { color: inherit; opacity: .7; }
+
+.shop__tones { display: flex; flex-wrap: wrap; gap: .5rem; }
+.shop__tone {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--hair-2);
+  transition: transform .4s var(--spring), box-shadow .35s;
+}
+.shop__tone:hover { transform: scale(1.14); }
+.shop__tone.is-on { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--accent); transform: scale(1.06); }
+
+.shop__price span {
+  display: block;
+  font-size: .88rem;
+  font-weight: 600;
+  margin-bottom: .6rem;
+  font-family: 'Vazirmatn', sans-serif;
+}
+
+.shop__check { display: inline-flex; align-items: center; gap: .6rem; font-size: .88rem; color: var(--text-2); cursor: pointer; }
+.shop__check input {
+  width: 18px; height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.shop__toggle { display: inline-flex; }
+@media (min-width: 1040px) { .shop__toggle { display: none; } }
+
+.shop .pgrid { grid-template-columns: 1fr; }
+@media (min-width: 620px)  { .shop .pgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1400px) { .shop .pgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+@media (pointer: coarse) { .shop__tone { width: 34px; height: 34px; } }

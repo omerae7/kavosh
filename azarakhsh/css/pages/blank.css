@@ -1,0 +1,13 @@
+/* ===================== برگهٔ خام / راهنمای سبک ===================== */
+.spec-stack { display: grid; gap: .6rem; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .86em;
+  padding: .12em .4em;
+  border-radius: 5px;
+  background: rgba(var(--accent-rgb), .1);
+  color: var(--accent);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.noir code { background: rgba(var(--accent-rgb), .16); }

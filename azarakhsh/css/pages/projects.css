@@ -1,0 +1,6 @@
+/* ===================== فهرست پروژه‌ها ===================== */
+.prj-card .tile__media { aspect-ratio: 4 / 3; }
+.prj-card .tile__kicker b { color: var(--accent); }
+.prj-meta { display: flex; flex-wrap: wrap; gap: .4rem .9rem; font-size: .78rem; color: var(--text-4); }
+.prj-meta span { display: inline-flex; align-items: center; gap: .35rem; }
+.prj-meta svg { color: var(--accent); }

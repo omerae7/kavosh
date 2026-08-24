@@ -27,6 +27,7 @@ window.AZUI = (function () {
     return `
       <article class="pc" data-id="${p.id}" data-tone="${esc(p.tones[0].name)}">
         <div class="pc__media">
+          <a class="pc__open" href="product.html?id=${p.id}" aria-label="برگهٔ کامل ${esc(p.name)}"></a>
           <img class="pc__img pc__img--main" src="${im.wall}" alt="بافت ${esc(p.name)}" loading="lazy" data-slot>
           <img class="pc__img pc__img--alt"  src="${im.single}" alt="تک آجر ${esc(p.name)}" loading="lazy" data-slot>
           <span class="pc__shade"></span>
@@ -46,7 +47,7 @@ window.AZUI = (function () {
             </span>
           </div>
 
-          <h3 class="pc__name">${esc(p.name)}</h3>
+          <h3 class="pc__name"><a href="product.html?id=${p.id}">${esc(p.name)}</a></h3>
           <p class="pc__desc">${esc(p.desc)}</p>
 
           <div class="pc__rule"></div>
@@ -129,6 +130,7 @@ window.AZUI = (function () {
 
   function renderFilters() {
     const box = $('#filters');
+    if (!box) return;
     box.innerHTML = FAMILIES.map(f => {
       const n = f.id === 'all' ? PRODUCTS.length : PRODUCTS.filter(p => p.family === f.id).length;
       return `<button class="filter${f.id === state.family ? ' is-on' : ''}" type="button"
@@ -143,6 +145,7 @@ window.AZUI = (function () {
 
   function renderRail() {
     const track = $('#railTrack');
+    if (!track) return;
     const items = list();
     track.innerHTML = items.map(p => `<div class="rail__item">${card(p)}</div>`).join('');
     wireImages(track);
@@ -156,6 +159,8 @@ window.AZUI = (function () {
   function openProduct(id, toneName) {
     const p = byId(id);
     if (!p) return;
+    /* صفحاتی که شیت محصول ندارند، به برگهٔ اثر می‌روند */
+    if (!$('#productSheet')) { window.location.href = 'product.html?id=' + encodeURIComponent(p.id); return; }
     let tone = toneName || p.tones[0].name;
     let qty = 1;
 
@@ -179,6 +184,10 @@ window.AZUI = (function () {
         <div>
           <span class="label label--bare">${esc(p.familyLabel)} · ${esc(p.code)}</span>
           <h3 class="pd__name">${esc(p.name)}</h3>
+          <a class="link-more" href="product.html?id=${p.id}" style="margin-top:.5rem">
+            برگهٔ کامل اثر
+            <svg width="15" height="15"><use href="#i-arrow"/></svg>
+          </a>
           <p class="lede" style="font-size:.92rem;margin-top:.6rem">${esc(p.story)}</p>
 
           <div class="pd__marks">
@@ -286,7 +295,10 @@ window.AZUI = (function () {
   }
 
   /* ============================ سبد سفارش ========================== */
-  function openCart() { openSheet('#cartSheet', '470px'); }
+  function openCart() {
+    if (!$('#cartSheet')) return;
+    openSheet('#cartSheet', '470px');
+  }
 
   function showPane(which) {
     ['cartPane', 'orderPane', 'donePane'].forEach(id => {
@@ -299,6 +311,14 @@ window.AZUI = (function () {
 
   function renderCart() {
     const box = $('#cartPane');
+    if (!box) {
+      const t0 = Cart.totals();
+      $$('.cart-dot').forEach(d => {
+        d.textContent = fa(t0.rows);
+        d.classList.toggle('is-on', t0.rows > 0);
+      });
+      return;
+    }
     const items = Cart.list();
     const t = Cart.totals();
 
@@ -358,20 +378,22 @@ window.AZUI = (function () {
       });
     }
 
-    $('#cartTotal').textContent = toman(t.sum);
-    $('#cartUnits').textContent = t.rows ? faFloat(t.qty) + ' واحد' : '—';
+    const put = (sel, v) => { const el = $(sel); if (el) el.textContent = v; };
+    put('#cartTotal', toman(t.sum));
+    put('#cartUnits', t.rows ? faFloat(t.qty) + ' واحد' : '—');
     $$('.cart-dot').forEach(d => {
       d.textContent = fa(t.rows);
       d.classList.toggle('is-on', t.rows > 0);
     });
     const btn = $('#toOrder');
     if (btn) { btn.disabled = !t.rows; btn.style.opacity = t.rows ? 1 : .4; }
-    $('#orderSum').textContent = fa(t.rows) + ' قلم · ' + toman(t.sum);
-    if ($('#cartPane').hidden === false || !t.rows) showPane('cartPane');
+    put('#orderSum', fa(t.rows) + ' قلم · ' + toman(t.sum));
+    if (box.hidden === false || !t.rows) showPane('cartPane');
   }
 
   /* ============================ محاسبه‌گر ========================== */
   async function initCalc() {
+    if (!$('#calcProduct')) return;
     await customElements.whenDefined('sl-range');
     await customElements.whenDefined('sl-select');
 
@@ -428,6 +450,7 @@ window.AZUI = (function () {
   /* ======================== گالری، نظرها، پرسش‌ها =================== */
   function renderGallery() {
     const box = $('#gallery');
+    if (!box) return;
     box.innerHTML = PROJECTS.map(p => `
       <button class="gal__i" type="button" data-src="${p.file}" data-title="${esc(p.title)}"
               data-meta="${esc(p.meta)}" data-cursor="بزرگ‌نمایی">
@@ -452,6 +475,7 @@ window.AZUI = (function () {
 
   function renderVoices() {
     const box = $('#voices');
+    if (!box) return;
     box.innerHTML = VOICES.map((v, i) => `
       <figure class="voice${i === 0 ? ' is-on' : ''}">
         <p>«${esc(v.text)}»</p>
@@ -477,7 +501,8 @@ window.AZUI = (function () {
   }
 
   async function renderFaq() {
-    const box = $('#faq');
+    const box = $('#faqList');
+    if (!box) return;
     box.innerHTML = FAQS.map((f, i) => `
       <sl-details ${i === 0 ? 'open' : ''} summary="${esc(f.q)}">
         <p class="small">${esc(f.a)}</p>
@@ -486,11 +511,13 @@ window.AZUI = (function () {
   }
 
   function renderTicker() {
+    if (!$('#ticker')) return;
     const row = TICKER.map(t => `<span class="tick">${esc(t)}</span>`).join('');
     $('#ticker').innerHTML = row + row;
   }
 
   function renderStage() {
+    if (!$('#stageImg')) return;
     const p = PRODUCTS[0];
     const im = toneImages(p, p.tones[0].name);
     $('#stageImg').src = im.wall;
@@ -507,7 +534,7 @@ window.AZUI = (function () {
 
     /* فرم تماس */
     const lead = $('#leadForm');
-    lead.addEventListener('submit', e => {
+    if (lead) lead.addEventListener('submit', e => {
       e.preventDefault();
       const name = $('#leadName'), phone = $('#leadPhone');
       let ok = true;
@@ -524,7 +551,7 @@ window.AZUI = (function () {
 
     /* فرم سفارش داخل شیت سبد */
     const order = $('#orderForm');
-    order.addEventListener('submit', e => {
+    if (order) order.addEventListener('submit', e => {
       e.preventDefault();
       const name = $('#ordName'), phone = $('#ordPhone'), city = $('#ordCity');
       let ok = true;
@@ -545,13 +572,19 @@ window.AZUI = (function () {
       toast('سفارش ثبت شد · پیگیری ' + ref);
     });
 
-    $('#toOrder').addEventListener('click', () => showPane('orderPane'));
-    $('#backToCart').addEventListener('click', () => showPane('cartPane'));
-    $('#doneClose').addEventListener('click', () => { closeSheet('#cartSheet'); showPane('cartPane'); });
+    const bind = (sel, fn) => { const el = $(sel); if (el) el.addEventListener('click', fn); };
+    bind('#toOrder', () => showPane('orderPane'));
+    bind('#backToCart', () => showPane('cartPane'));
+    bind('#doneClose', () => { closeSheet('#cartSheet'); showPane('cartPane'); });
   }
 
   /* ============================== ناوبری =========================== */
   function initNav() {
+    /* بخش فعال منو و داک از data-page روی body می‌آید،
+       تا اسکلت مشترک در همهٔ صفحه‌ها دقیقاً یکسان بماند. */
+    const key = document.body.dataset.page || '';
+    if (key) $$('[data-nav]').forEach(a => a.classList.toggle('is-on', a.dataset.nav === key));
+
     document.addEventListener('click', e => {
       const a = e.target.closest('[data-go]');
       if (!a) return;
@@ -582,7 +615,7 @@ window.AZUI = (function () {
     initForms();
     initNav();
     renderCart();
-    Advisor.init();
+    if (window.Advisor) Advisor.init();
 
     document.addEventListener('az:cart', renderCart);
   }

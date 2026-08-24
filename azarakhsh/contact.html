@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تماس با ما | آذرخش</title>
+<meta name="description" content="شمارهٔ تماس، نشانی کارخانه، واحدهای فروش و فنی و فرم درخواست تماس آذرخش.">
+<meta name="theme-color" content="#e6dfd6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c0b0a" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="تماس با ما | آذرخش">
+<meta property="og:description" content="شمارهٔ تماس، نشانی کارخانه، واحدهای فروش و فنی و فرم درخواست تماس آذرخش.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/intro/gallery-wide.jpg">
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+
+<link rel="preload" href="assets/fonts/Estedad-Arabic-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
+
+<script>
+  (function () {
+    var t = 'light';
+    try { t = localStorage.getItem('azarakhsh-theme') || 'light'; } catch (e) {}
+    document.documentElement.dataset.theme = t;
+    document.documentElement.classList.add(t === 'dark' ? 'sl-theme-dark' : 'sl-theme-light');
+  })();
+</script>
+<link rel="stylesheet" href="vendor/shoelace/themes/light.css">
+<link rel="stylesheet" href="vendor/shoelace/themes/dark.css">
+<link rel="stylesheet" href="css/core.css">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/card.css">
+<link rel="stylesheet" href="css/sections.css">
+<link rel="stylesheet" href="css/advisor.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/pages/contact.css">
+</head>
+
+<body data-page="contact">
+
+<div class="film" aria-hidden="true">
+  <div class="film__grain"></div>
+  <div class="film__vignette"></div>
+</div>
+
+<div class="rail-progress" id="railProgress"></div>
+
+<div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__label" id="cursorLabel"></span></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+
+<!-- az:sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6-11 11L4 12"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 8h16M4 16h16"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.1 6 5.9 1.8-5.9 1.9L12 18l-2.1-6.3L4 9.8 9.9 8z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4 3 11l7 3 3 7z"/><path d="m10 14 5-5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 4.5h14v12h-14z"/><path d="M15.5 8.5h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.3"/><circle cx="18.5" cy="18.5" r="2.3"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a6 6 0 0 0 6-6c0-4-6-9.5-6-9.5S6 12 6 16a6 6 0 0 0 6 6z"/><path d="M12 18a2.2 2.2 0 0 0 2.2-2.2c0-1.5-2.2-3.6-2.2-3.6s-2.2 2.1-2.2 3.6A2.2 2.2 0 0 0 12 18z"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M2.5 12h19M12 4.5v15"/></symbol>
+  <symbol id="i-calc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="2.5" width="15" height="19" rx="2.5"/><path d="M8.5 6.5h7M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.8h.01M12 14.8h.01M15.5 14.8h.01M8.5 18.4h7"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20z"/><path d="M9.5 21.5v-7h5v7"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m2.5 7.5 9.5 6 9.5-6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 1.9"/></symbol>
+  <symbol id="i-drag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6 8 12l6 6"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.2A8.6 8.6 0 0 1 9.8 3.5a8.6 8.6 0 1 0 10.7 10.7z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2.5H7a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7.5z"/><path d="M14 2.5v5h5M8.5 12.5h7M8.5 16.5h5"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2.5 9 4.8-9 4.8-9-4.8z"/><path d="m3 12.2 9 4.8 9-4.8M3 16.9l9 4.8 9-4.8"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.9-3.6 3.9-6 7.5-6s6.6 2.4 7.5 6"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12.5V4.5a1.5 1.5 0 0 1 1.5-1.5h8l8.5 8.5-9.5 9.5z"/><circle cx="8" cy="8" r="1.4"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13.5a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.6 1.6"/><path d="M14 10.5a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.6-1.6"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-telegram" viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.3 18.9 19c-.2 1-.8 1.2-1.7.8l-4.6-3.4-2.2 2.1c-.3.3-.5.5-1 .5l.4-4.9 9-8.1c.4-.3-.1-.5-.6-.2L7.1 12.8 2.6 11.4c-1-.3-1-1 .2-1.4l18-6.9c.8-.3 1.5.2 1.1 1.2z"/></symbol>
+  <symbol id="i-whatsapp" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 1.9a8.1 8.1 0 1 1-4.2 15l-.3-.2-3 .8.8-2.9-.2-.3A8.1 8.1 0 0 1 12 3.9zm-3.3 4c-.2 0-.5 0-.7.4-.3.4-.9 1-.9 2.3s.9 2.6 1 2.8c.2.2 1.8 2.9 4.5 3.9 2.2.9 2.7.7 3.2.6.5 0 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3-1.7-.8c-.2 0-.4-.1-.6.2l-.8 1c-.2.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4 0-.5.2-.7l.4-.5.3-.5v-.5l-.8-1.9c-.2-.5-.4-.4-.6-.5h-.5z"/></symbol>
+</svg>
+<!-- /az:sprite -->
+
+<!-- az:bar -->
+<header class="bar" id="bar">
+  <div class="bar__in">
+    <a class="brand" href="index.html" aria-label="آذرخش، صفحهٔ نخست">
+      <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
+        <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="var(--accent)"/>
+        <rect x="19" y="5"    width="20" height="8.4" rx="1.6" fill="currentColor"/>
+        <rect x="1"  y="15.8" width="24" height="8.4" rx="1.6" fill="currentColor"/>
+        <rect x="27" y="15.8" width="12" height="8.4" rx="1.6" fill="var(--accent)"/>
+        <rect x="1"  y="26.6" width="12" height="8.4" rx="1.6" fill="currentColor"/>
+        <rect x="15" y="26.6" width="24" height="8.4" rx="1.6" fill="var(--accent)"/>
+      </svg>
+      <span class="brand__txt">
+        <span class="brand__name">آذرخش</span>
+        <span class="brand__role">آجر نسوز نما</span>
+      </span>
+    </a>
+
+    <nav class="bar__nav" aria-label="فهرست اصلی">
+        <a href="shop.html" data-nav="shop">کلکسیون</a>
+        <a href="projects.html" data-nav="projects">پروژه‌ها</a>
+        <a href="blog.html" data-nav="blog">دفترچهٔ نما</a>
+        <a href="connect.html" data-nav="connect">دربارهٔ ما</a>
+        <a href="contact.html" data-nav="contact">تماس</a>
+    </nav>
+
+    <div class="bar__acts">
+      <button class="ai-btn" type="button" data-open-advisor data-cursor="بپرس">
+        <span class="ai-btn__orb"></span>
+        مشاور نما
+      </button>
+      <a class="btn-round" href="search.html" aria-label="جست‌وجو">
+        <svg width="18" height="18"><use href="#i-search"/></svg>
+      </a>
+      <button class="btn-round cart-btn" type="button" data-open-cart aria-label="سبد سفارش">
+        <svg width="18" height="18"><use href="#i-bag"/></svg>
+        <span class="cart-dot">۰</span>
+      </button>
+      <button class="btn-round theme-btn" type="button" id="themeBtn" aria-label="تغییر تم روشن و تیره">
+        <svg class="i-sun" width="18" height="18"><use href="#i-sun"/></svg>
+        <svg class="i-moon" width="18" height="18"><use href="#i-moon"/></svg>
+      </button>
+      <button class="btn-round menu-btn" type="button" data-open-menu aria-label="فهرست">
+        <svg width="18" height="18"><use href="#i-menu"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<!-- /az:bar -->
+
+<main id="top">
+
+<section class="page-head">
+  <div class="shell">
+    <nav class="crumbs" aria-label="مسیر">
+      <a href="index.html">خانه</a><i>—</i><span aria-current="page">تماس با ما</span>
+    </nav>
+    <div class="page-head__in">
+      <span class="label label--ch"><i>تالار ۰۵</i>تماس با ما</span>
+      <h1>شماره‌تان را بگذارید، <em>ما</em> زنگ می‌زنیم</h1>
+      <p class="lede">
+        شنبه تا چهارشنبه ۸ تا ۱۷ و پنجشنبه ۸ تا ۱۳ پاسخگو هستیم.
+        بیرون از ساعت کاری، فرم را پر کنید؛ اولین ساعت کاری تماس می‌گیریم.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="band band--short">
+  <div class="shell">
+    <div class="contact-grid">
+
+      <div class="contact-panel noir" id="ctPanel">
+        <span class="label label--bare">فرم تماس</span>
+        <h2 class="h2" style="font-size:clamp(1.4rem,2.4vw,1.9rem);margin:.5rem 0 1.4rem">درخواستتان را بنویسید</h2>
+
+        <form id="ctForm" novalidate>
+          <div class="ct-fields">
+            <sl-input id="ctName" label="نام و نام خانوادگی" placeholder="مثلاً رضا کیانی" autocomplete="name"></sl-input>
+            <sl-input id="ctPhone" label="شمارهٔ موبایل" placeholder="۰۹۱۲۳۴۵۶۷۸۹" inputmode="numeric" autocomplete="tel"></sl-input>
+            <sl-input id="ctMail" label="ایمیل (اختیاری)" placeholder="name@example.com" type="email" autocomplete="email"></sl-input>
+            <sl-select id="ctTopic" label="موضوع" value="sample" hoist>
+              <sl-option value="sample">درخواست جعبهٔ نمونه</sl-option>
+              <sl-option value="quote">دریافت پیش‌فاکتور</sl-option>
+              <sl-option value="advice">مشاورهٔ انتخاب کد</sl-option>
+              <sl-option value="agency">نمایندگی و همکاری</sl-option>
+              <sl-option value="support">پشتیبانی پس از فروش</sl-option>
+            </sl-select>
+            <sl-input id="ctArea" label="متراژ تقریبی نما" placeholder="۲۵۰" inputmode="numeric"></sl-input>
+            <sl-input id="ctCity" label="شهر پروژه" placeholder="مثلاً کرج"></sl-input>
+            <div class="span-2">
+              <sl-textarea id="ctNote" label="توضیح" placeholder="نوع پروژه، زمان اجرا، رنگ موردنظر…" rows="4"></sl-textarea>
+            </div>
+            <div class="span-2">
+              <button class="btn btn-wide" type="submit">
+                ثبت درخواست
+                <svg width="16" height="16"><use href="#i-arrow"/></svg>
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div class="ct-ok">
+          <span class="orb" style="margin-inline:auto"><i></i><b></b></span>
+          <h3 class="h3" style="margin-top:1rem">درخواستتان ثبت شد</h3>
+          <p class="small" style="margin-top:.7rem">
+            شمارهٔ پیگیری <b class="num" id="ctRef" style="color:var(--accent-2)"></b><br>
+            کارشناس ما در اولین ساعت کاری تماس می‌گیرد.
+          </p>
+          <button class="btn-ghost btn-sm" type="button" id="ctAgain" style="margin-top:1.4rem">ثبت درخواست تازه</button>
+        </div>
+      </div>
+
+      <aside class="contact-aside">
+        <div class="ct-card">
+          <h4>واحدهای کارخانه</h4>
+          <div class="ct-depts" id="ctDepts"></div>
+        </div>
+
+        <div class="ct-card">
+          <h4>نشانی و ساعت کاری</h4>
+          <div class="ct-map" aria-hidden="true">
+            <span class="ct-map__pin"><svg width="20" height="20"><use href="#i-pin"/></svg></span>
+            <span class="ct-map__note">نقشه — جای جاسازی نقشهٔ آنلاین</span>
+          </div>
+          <dl class="spec-rows" style="margin-top:1.1rem">
+            <div><dt>نشانی</dt><dd>تبریز، کیلومتر ۱۲ جادهٔ آذرشهر، شهرک صنعتی غرب، خیابان صنعت ۴</dd></div>
+            <div><dt>کد پستی</dt><dd class="ltr">۵۱۹۷۶-۳۳۴۱۲</dd></div>
+            <div><dt>شنبه تا چهارشنبه</dt><dd>۸:۰۰ تا ۱۷:۰۰</dd></div>
+            <div><dt>پنجشنبه</dt><dd>۸:۰۰ تا ۱۳:۰۰</dd></div>
+          </dl>
+          <a class="btn-ghost btn-sm btn-wide" href="https://maps.google.com" target="_blank" rel="noopener" style="margin-top:1rem">
+            <svg width="15" height="15"><use href="#i-pin"/></svg> مسیریابی
+          </a>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+<section class="band band--short" id="faq">
+  <div class="shell">
+    <div class="band-head">
+      <div>
+        <span class="label label--ch"><i>۰۲</i>پیش از تماس</span>
+        <h2 class="h2" style="margin-top:.7rem">شاید جوابتان همین‌جا باشد</h2>
+      </div>
+    </div>
+    <div class="with-side">
+      <div id="ctFaq"></div>
+      <aside class="side">
+        <div class="side__box noir">
+          <h4>پاسخ فوری</h4>
+          <p class="small" style="margin-bottom:1rem">مشاور نما بدون انتظار جواب می‌دهد؛ رنگ پیشنهاد می‌دهد و متراژ حساب می‌کند.</p>
+          <button class="btn btn-wide btn-sm" type="button" data-open-advisor>
+            <svg width="15" height="15"><use href="#i-spark"/></svg> شروع گفتگو
+          </button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- az:footer -->
+<footer class="foot noir">
+  <div class="shell">
+    <div class="foot__word" aria-hidden="true">آذرخش</div>
+
+    <div class="foot__grid">
+      <div class="foot__about">
+        <a class="brand" href="index.html">
+          <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
+            <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="var(--accent)"/>
+            <rect x="19" y="5"    width="20" height="8.4" rx="1.6" fill="currentColor"/>
+            <rect x="1"  y="15.8" width="24" height="8.4" rx="1.6" fill="currentColor"/>
+            <rect x="27" y="15.8" width="12" height="8.4" rx="1.6" fill="var(--accent)"/>
+            <rect x="1"  y="26.6" width="12" height="8.4" rx="1.6" fill="currentColor"/>
+            <rect x="15" y="26.6" width="24" height="8.4" rx="1.6" fill="var(--accent)"/>
+          </svg>
+          <span class="brand__txt">
+            <span class="brand__name">آذرخش</span>
+            <span class="brand__role">کارخانهٔ آجر نسوز نما</span>
+          </span>
+        </a>
+        <p>از سال ۱۳۶۷ در شهرک صنعتی غرب تبریز آجر نسوز نما تولید می‌کنیم. فروش بدون واسطه، قیمت درب کارخانه و ضمانت کتبی.</p>
+        <div class="socials">
+          <a href="#" aria-label="اینستاگرام"><svg width="17" height="17"><use href="#i-instagram"/></svg></a>
+          <a href="#" aria-label="تلگرام"><svg width="17" height="17"><use href="#i-telegram"/></svg></a>
+          <a href="#" aria-label="واتساپ"><svg width="17" height="17"><use href="#i-whatsapp"/></svg></a>
+        </div>
+      </div>
+
+      <div>
+        <h4>کلکسیون</h4>
+        <ul>
+          <li><a href="shop.html?family=nasooz">نمای نسوز</a></li>
+          <li><a href="shop.html?family=dastsaz">دست‌ساز قزاقی</a></li>
+          <li><a href="shop.html?family=plak">پلاک نازک</a></li>
+          <li><a href="shop.html?family=ghataat">کنج و فرش کف</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>راهنما</h4>
+        <ul>
+          <li><a href="index.html#calc">محاسبهٔ متراژ</a></li>
+          <li><a href="connect.html#craft">مراحل سفارش</a></li>
+          <li><a href="contact.html#faq">پرسش‌های رایج</a></li>
+          <li><a href="#" data-open-advisor>مشاور نما</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>تماس</h4>
+        <ul>
+          <li class="ltr" style="text-align:start">۰۴۱-۳۳۸۲۱۱۴۰</li>
+          <li class="ltr" style="text-align:start">sales@azarakhsh.shop</li>
+          <li>شنبه تا چهارشنبه، ۸ تا ۱۷</li>
+        </ul>
+        <div class="seals">
+          <span class="seal">نماد اعتماد الکترونیکی</span>
+          <span class="seal">ساماندهی</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot__bar">
+      <span>© ۱۴۰۵ کارخانهٔ آجر نسوز آذرخش · تمام حقوق محفوظ است.</span>
+      <span>قیمت‌ها درب کارخانه و بدون احتساب مالیات بر ارزش افزوده است.</span>
+    </div>
+  </div>
+</footer>
+<!-- /az:footer -->
+
+<!-- az:dock -->
+<nav class="dock" aria-label="ناوبری سریع">
+  <a href="index.html" data-nav="home"><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-home"/></svg>خانه</a>
+  <a href="shop.html" data-nav="shop"><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-grid"/></svg>کلکسیون</a>
+  <a href="search.html" data-nav="search"><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-search"/></svg>جست‌وجو</a>
+  <button type="button" data-open-advisor><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-spark"/></svg>مشاور</button>
+  <button type="button" data-open-cart><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-bag"/></svg>سبد<span class="cart-dot">۰</span></button>
+</nav>
+<!-- /az:dock -->
+
+<!-- az:sheets -->
+<sl-drawer id="menuSheet" label="فهرست" placement="end">
+  <div class="sheet-grip"></div>
+  <nav class="menu-list">
+    <a href="shop.html">کلکسیون <span>۱۰ کد</span></a>
+    <a href="projects.html">پروژه‌ها <span>۱٬۲۴۰</span></a>
+    <a href="blog.html">دفترچهٔ نما <span>مقاله</span></a>
+    <a href="index.html#calc">محاسبهٔ متراژ <span>ابزار</span></a>
+    <a href="connect.html">دربارهٔ ما <span>کارخانه</span></a>
+    <a href="contact.html">تماس با ما <span>راهنما</span></a>
+    <a href="search.html">جست‌وجو <span>در همهٔ صفحه‌ها</span></a>
+  </nav>
+  <div slot="footer">
+    <a class="btn btn-wide" href="tel:+984133821140">
+      <svg width="16" height="16"><use href="#i-phone"/></svg>
+      ۰۴۱-۳۳۸۲۱۱۴۰
+    </a>
+  </div>
+</sl-drawer>
+
+<sl-drawer id="cartSheet" label="سبد سفارش" placement="end">
+  <div id="cartPane"></div>
+
+  <div id="orderPane" hidden>
+    <div class="sheet-grip"></div>
+    <button class="link-more" type="button" id="backToCart" style="margin-bottom:1.2rem">
+      <svg width="15" height="15"><use href="#i-arrow"/></svg>
+      بازگشت به سبد
+    </button>
+    <h3 class="h3" style="margin-bottom:.5rem">اطلاعات تماس</h3>
+    <p class="small" style="margin-bottom:1.4rem">
+      پیش‌فاکتور رسمی به‌همراه هزینهٔ باربری برایتان ارسال می‌شود. در این مرحله پرداختی انجام نمی‌شود.
+    </p>
+    <form id="orderForm" novalidate>
+      <div style="display:grid;gap:1rem">
+        <sl-input id="ordName" label="نام و نام خانوادگی" placeholder="نام کامل"></sl-input>
+        <sl-input id="ordPhone" label="شمارهٔ موبایل" placeholder="۰۹۱۲۳۴۵۶۷۸۹" inputmode="numeric"></sl-input>
+        <sl-input id="ordCity" label="شهر پروژه" placeholder="مثلاً کرج"></sl-input>
+        <sl-textarea id="ordNote" label="توضیح (اختیاری)" placeholder="نوع پروژه، زمان اجرا، نکتهٔ خاص…" rows="3"></sl-textarea>
+        <button class="btn btn-wide" type="submit">
+          ثبت نهایی سفارش
+          <svg width="16" height="16"><use href="#i-arrow"/></svg>
+        </button>
+        <p class="small" style="text-align:center" id="orderSum"></p>
+      </div>
+    </form>
+  </div>
+
+  <div id="donePane" hidden>
+    <div class="sheet-grip"></div>
+    <div style="text-align:center;padding:2.5rem 0">
+      <span class="orb" style="margin-inline:auto"><i></i><b></b></span>
+      <h3 class="h3" style="margin-top:1rem">سفارش ثبت شد</h3>
+      <p class="small" style="margin-top:.7rem">
+        شمارهٔ پیگیری <b class="num" id="doneRef" style="color:var(--accent)"></b><br>
+        <span id="doneSum"></span>
+      </p>
+      <p class="small" style="margin-top:.9rem">
+        کارشناس فروش برای تأیید موجودی، هزینهٔ باربری و زمان بارگیری تماس می‌گیرد.
+      </p>
+      <button class="btn-ghost btn-sm" type="button" id="doneClose" style="margin-top:1.6rem">بستن</button>
+    </div>
+  </div>
+
+  <div slot="footer" id="cartFoot">
+    <div class="cart-sum">
+      <div class="cart-sum__row"><span>جمع کل، درب کارخانه</span><span id="cartUnits">—</span></div>
+      <div class="cart-sum__big num" id="cartTotal">۰ تومان</div>
+    </div>
+    <button class="btn btn-wide" type="button" id="toOrder" style="margin-top:1rem">
+      ثبت سفارش و دریافت پیش‌فاکتور
+      <svg width="16" height="16"><use href="#i-arrow"/></svg>
+    </button>
+  </div>
+</sl-drawer>
+
+<sl-drawer id="productSheet" label="جزئیات محصول" placement="end">
+  <div id="productBody"></div>
+</sl-drawer>
+
+<div class="pop" id="advisorPop" aria-hidden="true">
+  <div class="pop__scrim" data-pop-close></div>
+  <div class="pop__panel noir" role="dialog" aria-modal="true" aria-labelledby="popTitle">
+    <span class="pop__beam" aria-hidden="true"></span>
+    <header class="pop__head" id="popHead">
+      <span class="pop__grip"></span>
+      <span class="orb orb--sm"><i></i><b></b></span>
+      <div>
+        <b id="popTitle">مشاور نما</b>
+        <span class="sub">پاسخ فوری · بدون انتظار</span>
+      </div>
+      <button class="btn-round" type="button" data-pop-close aria-label="بستن گفتگو">
+        <svg width="17" height="17"><use href="#i-close"/></svg>
+      </button>
+    </header>
+<div class="chat">
+    <div class="chat__scroll" id="chatScroll">
+      <div class="chat__intro" id="chatIntro">
+        <span class="orb"><i></i><i></i><i></i><b></b></span>
+        <h3 class="h3">سلام، من مشاور نمای آذرخش هستم</h3>
+        <p>
+          در انتخاب رنگ، محاسبهٔ متراژ و شرایط سفارش کمکتان می‌کنم.
+          یکی از پیشنهادهای پایین را بزنید یا سوالتان را بنویسید.
+        </p>
+      </div>
+      <div id="chatFeed"></div>
+    </div>
+
+    <div class="chat__chips"><div class="chips" id="chatChips"></div></div>
+
+    <div class="composer">
+      <div class="composer__box">
+        <textarea id="chatInput" rows="1" placeholder="سوالتان را بنویسید…" aria-label="پیام"></textarea>
+      </div>
+      <button class="composer__send" id="chatSend" type="button" aria-label="ارسال" disabled>
+        <svg width="17" height="17"><use href="#i-send"/></svg>
+      </button>
+    </div>
+
+    <div class="chat__legal">
+      پاسخ‌ها بر پایهٔ اطلاعات کارخانه و به‌صورت خودکار تولید می‌شود؛ برای سفارش نهایی با کارشناس ما تأیید بگیرید.
+      · <button class="chat__reset" type="button" id="chatReset">پاک‌کردن گفتگو</button>
+    </div>
+  </div>
+  </div>
+</div>
+<!-- /az:sheets -->
+
+<!-- az:overlay -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="تصویر پروژه">
+  <button class="btn-round lightbox__x" type="button" id="lbClose" aria-label="بستن">
+    <svg width="18" height="18"><use href="#i-close"/></svg>
+  </button>
+  <figure>
+    <img id="lbImg" src="" alt="">
+    <figcaption id="lbCap"></figcaption>
+  </figure>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg width="17" height="17"><use href="#i-check"/></svg>
+  <span id="toastText"></span>
+</div>
+<!-- /az:overlay -->
+
+<script type="module" src="js/sl.js"></script>
+<script src="vendor/gsap/gsap.min.js"></script>
+<script src="vendor/gsap/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis/lenis.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/core.js"></script>
+<script src="js/advisor.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/motion.js"></script>
+<script src="js/pages/contact.js"></script>
+<script>
+  (function () {
+    function boot() {
+      AZUI.init();
+      AZMotion.start();
+      AZContact.init();
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+  })();
+</script>
+</body>
+</html>

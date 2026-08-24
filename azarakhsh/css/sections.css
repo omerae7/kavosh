@@ -450,12 +450,20 @@ sl-select::part(form-control-label) { font-size: .8rem; margin-bottom: .45rem; }
 
 .voice-nav { display: flex; gap: .5rem; margin-top: 2.2rem; }
 .voice-nav button {
-  width: 30px; height: 2px;
-  background: var(--hair-2);
+  width: 44px; height: 26px;   /* سطح لمسی استاندارد، نوار کوچک درونش */
+  display: grid;
+  place-items: center;
+  background: none;
+}
+.voice-nav button::before {
+  content: '';
+  display: block;
+  width: 28px; height: 2px;
   border-radius: 99px;
+  background: var(--hair-2);
   transition: background-color .4s, width .5s var(--spring);
 }
-.voice-nav button.is-on { background: var(--accent); width: 46px; }
+.voice-nav button.is-on::before { background: var(--accent); width: 40px; }
 
 sl-details {
   --sl-panel-background-color: rgba(var(--text-rgb), .025);
@@ -499,7 +507,7 @@ sl-details::part(content) { padding: 0 1.25rem 1.2rem; }
 .payoff {
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid var(--hair);
+  background: var(--bg-2);
   text-align: center;
   padding-block: clamp(3.4rem, 8vw, 6.5rem);
 }
@@ -509,7 +517,7 @@ sl-details::part(content) { padding: 0 1.25rem 1.2rem; }
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(60% 70% at 50% 50%, transparent 10%, var(--bg-2) 88%);
+  background: radial-gradient(62% 72% at 50% 50%, transparent 8%, var(--bg-2) 90%);
 }
 .payoff p {
   position: relative;
@@ -629,3 +637,9 @@ sl-select::part(combobox) {
 sl-input::part(base):hover,
 sl-textarea::part(base):hover,
 sl-select::part(combobox):hover { border-color: var(--hair-3); }
+
+/* پیوندهای پابرگ روی دستگاه لمسی */
+@media (pointer: coarse) {
+  .foot ul a { display: inline-block; padding-block: .32rem; }
+  .foot ul { gap: .45rem; }
+}

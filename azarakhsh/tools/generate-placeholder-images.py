@@ -230,6 +230,41 @@ def cinematic(img, lift=(16, 13, 11), gain=1.06, vignette=0.55, warm=(1.03, 0.99
     return img
 
 
+# ---------------------------------------------------------------- صفحه‌های داخلی
+BLOG = [
+    ("post-01", "#8d4a30", dict(bw=210, bh=56)),
+    ("post-02", "#a6a099", dict(bw=250, bh=62, speckle=0.9)),
+    ("post-03", "#c9a05c", dict(bw=196, bh=52)),
+    ("post-04", "#e6e1d8", dict(bw=230, bh=58, speckle=1.2, mortar="#191617")),
+    ("post-05", "#573323", dict(bw=214, bh=78, gap=15, variance=26)),
+    ("post-06", "#2f2c2a", dict(bw=240, bh=60, mortar="#0d0c0c")),
+    ("post-07", "#a96b41", dict(bw=200, bh=64)),
+]
+
+PLANT = [
+    ("clay",  "#8f5236", dict(bw=280, bh=90, gap=16, variance=30)),
+    ("kiln",  "#5e3a20", dict(bw=190, bh=48)),
+    ("line",  "#a6a099", dict(bw=240, bh=58)),
+    ("yard",  "#8d4a30", dict(bw=220, bh=64)),
+]
+
+
+def inner_pages():
+    """تصاویر صفحه‌های وبلاگ، پروژه و کارخانه."""
+    for name, colour, kw in BLOG:
+        save(cinematic(brick_wall((1600, 900), colour, **kw), vignette=0.62),
+             "blog", f"{name}.jpg")
+
+    for i, (name, colour, op) in enumerate(GALLERY, start=1):
+        for suffix, shift_op in (("b", [(0.24, 0.30, 0.24, 0.36)]), ("c", [])):
+            save(cinematic(facade((1200, 900), colour, shift_op, bw=176, bh=48)),
+                 "gallery", f"project-{i:02d}-{suffix}.jpg")
+
+    for name, colour, kw in PLANT:
+        save(cinematic(brick_wall((1400, 1000), colour, **kw), vignette=0.7),
+             "plant", f"{name}.jpg")
+
+
 # code, colour, glazed, wall geometry tweaks
 PRODUCTS = [
     ("az-r110-nasooz-ghermez",  "#8d4a30", False, {}),
@@ -262,5 +297,6 @@ if __name__ == "__main__":
     for name, colour, op in GALLERY:
         save(cinematic(facade((1400, 1050), colour, op)), "gallery", f"{name}.jpg")
 
+    inner_pages()
     print("done.")
     print("یادآوری: تصویر تالار (assets/intro/) عکس واقعی است و اینجا ساخته نمی‌شود.")

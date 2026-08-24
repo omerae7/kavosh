@@ -161,6 +161,7 @@ window.AZMotion = (function () {
   }
 
   function heroIn() {
+    if (!$('#heroTitle')) return;
     const words = splitWords($('#heroTitle'));
     if (REDUCED) {
       gsap.set(['#heroTitle .w', '.hero [data-in]'], { opacity: 1, y: 0 });

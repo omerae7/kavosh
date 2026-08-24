@@ -34,7 +34,7 @@
 <link rel="stylesheet" href="css/advisor.css">
 </head>
 
-<body class="is-frozen">
+<body class="is-frozen" data-page="home">
 
 <!-- ========================== پردهٔ ورود ========================== -->
 <div class="veil" id="veil" role="presentation">
@@ -73,6 +73,7 @@
 <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
 
 <!-- ============================ آیکون‌ها ============================ -->
+<!-- az:sprite -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
@@ -97,15 +98,23 @@
   <symbol id="i-drag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6 8 12l6 6"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.2A8.6 8.6 0 0 1 9.8 3.5a8.6 8.6 0 1 0 10.7 10.7z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2.5H7a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7.5z"/><path d="M14 2.5v5h5M8.5 12.5h7M8.5 16.5h5"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2.5 9 4.8-9 4.8-9-4.8z"/><path d="m3 12.2 9 4.8 9-4.8M3 16.9l9 4.8 9-4.8"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.9-3.6 3.9-6 7.5-6s6.6 2.4 7.5 6"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12.5V4.5a1.5 1.5 0 0 1 1.5-1.5h8l8.5 8.5-9.5 9.5z"/><circle cx="8" cy="8" r="1.4"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13.5a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.6 1.6"/><path d="M14 10.5a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.6-1.6"/></symbol>
   <symbol id="i-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-telegram" viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.3 18.9 19c-.2 1-.8 1.2-1.7.8l-4.6-3.4-2.2 2.1c-.3.3-.5.5-1 .5l.4-4.9 9-8.1c.4-.3-.1-.5-.6-.2L7.1 12.8 2.6 11.4c-1-.3-1-1 .2-1.4l18-6.9c.8-.3 1.5.2 1.1 1.2z"/></symbol>
   <symbol id="i-whatsapp" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 1.9a8.1 8.1 0 1 1-4.2 15l-.3-.2-3 .8.8-2.9-.2-.3A8.1 8.1 0 0 1 12 3.9zm-3.3 4c-.2 0-.5 0-.7.4-.3.4-.9 1-.9 2.3s.9 2.6 1 2.8c.2.2 1.8 2.9 4.5 3.9 2.2.9 2.7.7 3.2.6.5 0 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3-1.7-.8c-.2 0-.4-.1-.6.2l-.8 1c-.2.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4 0-.5.2-.7l.4-.5.3-.5v-.5l-.8-1.9c-.2-.5-.4-.4-.6-.5h-.5z"/></symbol>
 </svg>
+<!-- /az:sprite -->
 
 <!-- =========================== نوار فرمان =========================== -->
+<!-- az:bar -->
 <header class="bar" id="bar">
   <div class="bar__in">
-    <a class="brand" href="#top" data-go aria-label="آذرخش">
+    <a class="brand" href="index.html" aria-label="آذرخش، صفحهٔ نخست">
       <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
         <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="var(--accent)"/>
         <rect x="19" y="5"    width="20" height="8.4" rx="1.6" fill="currentColor"/>
@@ -121,11 +130,11 @@
     </a>
 
     <nav class="bar__nav" aria-label="فهرست اصلی">
-      <a href="#collection" data-go data-spy>کلکسیون</a>
-      <a href="#calc" data-go data-spy>محاسبهٔ متراژ</a>
-      <a href="#projects" data-go data-spy>پروژه‌ها</a>
-      <a href="#craft" data-go data-spy>از معدن تا نما</a>
-      <a href="#help" data-go data-spy>پرسش‌ها</a>
+        <a href="shop.html" data-nav="shop">کلکسیون</a>
+        <a href="projects.html" data-nav="projects">پروژه‌ها</a>
+        <a href="blog.html" data-nav="blog">دفترچهٔ نما</a>
+        <a href="connect.html" data-nav="connect">دربارهٔ ما</a>
+        <a href="contact.html" data-nav="contact">تماس</a>
     </nav>
 
     <div class="bar__acts">
@@ -133,6 +142,9 @@
         <span class="ai-btn__orb"></span>
         مشاور نما
       </button>
+      <a class="btn-round" href="search.html" aria-label="جست‌وجو">
+        <svg width="18" height="18"><use href="#i-search"/></svg>
+      </a>
       <button class="btn-round cart-btn" type="button" data-open-cart aria-label="سبد سفارش">
         <svg width="18" height="18"><use href="#i-bag"/></svg>
         <span class="cart-dot">۰</span>
@@ -147,6 +159,7 @@
     </div>
   </div>
 </header>
+<!-- /az:bar -->
 
 <main id="top">
 
@@ -533,7 +546,7 @@
       <div>
         <span class="label label--ch" data-in><i>۰۸</i>پرسش‌های رایج</span>
         <h2 class="h2" data-in style="margin:.8rem 0 1.8rem">هرچه پیش از سفارش باید بدانید</h2>
-        <div id="faq" data-in></div>
+        <div id="faqList" data-in></div>
 
         <div class="reach">
           <a href="tel:+984133821140">
@@ -590,29 +603,31 @@
   </div>
 </section>
 
+<!-- بازگشت به قاب نخست — همان تالاری که سفر از آن شروع شد -->
+<section class="payoff noir">
+  <div class="payoff__shot" aria-hidden="true">
+    <picture>
+      <source media="(max-width: 760px)" srcset="assets/intro/gallery-tall.jpg">
+      <img src="assets/intro/gallery-wide.jpg" alt="">
+    </picture>
+  </div>
+  <div class="shell">
+    <p data-in>نما را یک بار می‌سازید.<br><em>سی سال بعد، هنوز درست است.</em></p>
+    <span data-in>همان تالاری که از آن شروع کردیم — با نمایی که هنوز تازه است.</span>
+  </div>
+</section>
+
 </main>
 
 <!-- ============================== پابرگ ============================ -->
+<!-- az:footer -->
 <footer class="foot noir">
-  <div class="payoff">
-    <div class="payoff__shot" aria-hidden="true">
-      <picture>
-        <source media="(max-width: 760px)" srcset="assets/intro/gallery-tall.jpg">
-        <img src="assets/intro/gallery-wide.jpg" alt="">
-      </picture>
-    </div>
-    <div class="shell">
-      <p data-in>نما را یک بار می‌سازید.<br><em>سی سال بعد، هنوز درست است.</em></p>
-      <span data-in>همان تالاری که از آن شروع کردیم — با نمایی که هنوز تازه است.</span>
-    </div>
-  </div>
-
   <div class="shell">
     <div class="foot__word" aria-hidden="true">آذرخش</div>
 
     <div class="foot__grid">
       <div class="foot__about">
-        <a class="brand" href="#top" data-go>
+        <a class="brand" href="index.html">
           <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
             <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="var(--accent)"/>
             <rect x="19" y="5"    width="20" height="8.4" rx="1.6" fill="currentColor"/>
@@ -637,19 +652,19 @@
       <div>
         <h4>کلکسیون</h4>
         <ul>
-          <li><a href="#collection" data-go>نمای نسوز</a></li>
-          <li><a href="#collection" data-go>دست‌ساز قزاقی</a></li>
-          <li><a href="#collection" data-go>پلاک نازک</a></li>
-          <li><a href="#collection" data-go>کنج و فرش کف</a></li>
+          <li><a href="shop.html?family=nasooz">نمای نسوز</a></li>
+          <li><a href="shop.html?family=dastsaz">دست‌ساز قزاقی</a></li>
+          <li><a href="shop.html?family=plak">پلاک نازک</a></li>
+          <li><a href="shop.html?family=ghataat">کنج و فرش کف</a></li>
         </ul>
       </div>
 
       <div>
         <h4>راهنما</h4>
         <ul>
-          <li><a href="#calc" data-go>محاسبهٔ متراژ</a></li>
-          <li><a href="#craft" data-go>مراحل سفارش</a></li>
-          <li><a href="#help" data-go>پرسش‌های رایج</a></li>
+          <li><a href="index.html#calc">محاسبهٔ متراژ</a></li>
+          <li><a href="connect.html#craft">مراحل سفارش</a></li>
+          <li><a href="contact.html#faq">پرسش‌های رایج</a></li>
           <li><a href="#" data-open-advisor>مشاور نما</a></li>
         </ul>
       </div>
@@ -674,26 +689,31 @@
     </div>
   </div>
 </footer>
+<!-- /az:footer -->
 
 <!-- ============================ داک موبایل ========================= -->
+<!-- az:dock -->
 <nav class="dock" aria-label="ناوبری سریع">
-  <a href="#top" data-go data-spy><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-home"/></svg>خانه</a>
-  <a href="#collection" data-go data-spy><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-grid"/></svg>کلکسیون</a>
-  <a href="#calc" data-go data-spy><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-calc"/></svg>محاسبه</a>
+  <a href="index.html" data-nav="home"><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-home"/></svg>خانه</a>
+  <a href="shop.html" data-nav="shop"><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-grid"/></svg>کلکسیون</a>
+  <a href="search.html" data-nav="search"><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-search"/></svg>جست‌وجو</a>
   <button type="button" data-open-advisor><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-spark"/></svg>مشاور</button>
   <button type="button" data-open-cart><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-bag"/></svg>سبد<span class="cart-dot">۰</span></button>
 </nav>
+<!-- /az:dock -->
 
 <!-- =============================== شیت‌ها ========================== -->
+<!-- az:sheets -->
 <sl-drawer id="menuSheet" label="فهرست" placement="end">
   <div class="sheet-grip"></div>
   <nav class="menu-list">
-    <a href="#collection" data-go>کلکسیون <span>۱۰ کد</span></a>
-    <a href="#advisor" data-go>مشاور نما <span>پاسخ فوری</span></a>
-    <a href="#calc" data-go>محاسبهٔ متراژ <span>ابزار</span></a>
-    <a href="#projects" data-go>پروژه‌ها <span>۱٬۲۴۰</span></a>
-    <a href="#craft" data-go>از معدن تا نما <span>۴ قدم</span></a>
-    <a href="#help" data-go>پرسش‌ها و تماس <span>راهنما</span></a>
+    <a href="shop.html">کلکسیون <span>۱۰ کد</span></a>
+    <a href="projects.html">پروژه‌ها <span>۱٬۲۴۰</span></a>
+    <a href="blog.html">دفترچهٔ نما <span>مقاله</span></a>
+    <a href="index.html#calc">محاسبهٔ متراژ <span>ابزار</span></a>
+    <a href="connect.html">دربارهٔ ما <span>کارخانه</span></a>
+    <a href="contact.html">تماس با ما <span>راهنما</span></a>
+    <a href="search.html">جست‌وجو <span>در همهٔ صفحه‌ها</span></a>
   </nav>
   <div slot="footer">
     <a class="btn btn-wide" href="tel:+984133821140">
@@ -809,8 +829,10 @@
   </div>
   </div>
 </div>
+<!-- /az:sheets -->
 
 <!-- ============================= لایت‌باکس ========================= -->
+<!-- az:overlay -->
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="تصویر پروژه">
   <button class="btn-round lightbox__x" type="button" id="lbClose" aria-label="بستن">
     <svg width="18" height="18"><use href="#i-close"/></svg>
@@ -825,6 +847,7 @@
   <svg width="17" height="17"><use href="#i-check"/></svg>
   <span id="toastText"></span>
 </div>
+<!-- /az:overlay -->
 
 <script type="module" src="js/sl.js"></script>
 <script src="vendor/gsap/gsap.min.js"></script>

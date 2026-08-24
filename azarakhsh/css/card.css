@@ -510,3 +510,14 @@
   font-weight: 500;
   color: var(--text);
 }
+
+/* روی دستگاه لمسی، نمونه‌های رنگ به کف اندازهٔ هدف لمسی می‌رسند */
+@media (pointer: coarse) {
+  .tone { width: 28px; height: 28px; }
+  .pc__tones { gap: .55rem; }
+}
+
+/* پیوند تصویر کارت به برگهٔ کامل اثر — زیر بج‌ها و کد می‌نشیند */
+.pc__open { position: absolute; inset: 0; z-index: 2; }
+.pc__name a { color: inherit; }
+.pc__name a:hover { color: var(--accent-2); }

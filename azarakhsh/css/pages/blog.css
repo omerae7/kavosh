@@ -1,0 +1,52 @@
+/* ===================== دفترچهٔ نما (وبلاگ) ===================== */
+.feature {
+  position: relative;
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--hair);
+  border-radius: var(--r4);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: 0 1px 2px var(--shade), 0 30px 60px -46px var(--shade-2);
+  transition: border-color .45s, transform .6s var(--spring);
+}
+@media (min-width: 900px) { .feature { grid-template-columns: 1.15fr .85fr; } }
+@media (hover: hover) { .feature:hover { border-color: var(--hair-3); transform: translateY(-6px); } }
+.feature__media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--surface-3);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .3);
+}
+@media (min-width: 900px) { .feature__media { aspect-ratio: auto; height: 100%; min-height: 380px; } }
+.feature__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.4s var(--out); }
+.feature:hover .feature__media img { transform: scale(1.05); }
+.feature__body { padding: clamp(1.6rem, 3.2vw, 2.8rem); display: flex; flex-direction: column; justify-content: center; }
+.feature__body h2 {
+  font-family: 'Estedad', sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+  line-height: 1.55;
+  margin-top: .8rem;
+}
+.feature__body p { margin-top: .9rem; color: var(--text-2); font-size: .96rem; line-height: 2.05; }
+.feature__foot { display: flex; align-items: center; gap: .8rem; margin-top: 1.6rem; font-size: .8rem; color: var(--text-4); }
+.feature__link { position: absolute; inset: 0; z-index: 2; }
+
+.post .tile__media { aspect-ratio: 16 / 10; }
+
+.news { position: relative; display: flex; gap: .6rem; flex-wrap: wrap; }
+.news input {
+  flex: 1 1 220px;
+  height: 52px;
+  padding-inline: 1.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--hair-2);
+  background: rgba(var(--text-rgb), .06);
+  color: var(--text);
+  font: inherit;
+  font-size: .92rem;
+}
+.news input::placeholder { color: var(--text-4); }
+.news input:focus { outline: 0; border-color: var(--accent); }

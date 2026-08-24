@@ -493,3 +493,8 @@ li { list-style: none; }
   }
   .film__grain { animation: none; }
 }
+
+/* پیوند «بیشتر» روی دستگاه لمسی */
+@media (pointer: coarse) {
+  .link-more { padding-block: .3rem; }
+}
