@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="fa" dir="rtl" class="sl-theme-dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>آذرخش | آجر نسوز نما، مستقیم از کوره</title>
+<meta name="description" content="کلکسیون آجر نسوز نمای آذرخش؛ ده کد از یک خط تولید، قیمت درب کارخانه، ضمانت کتبی ۲۵ ساله و مشاور هوشمند انتخاب نما.">
+<meta name="theme-color" content="#0b0a08">
+<meta property="og:title" content="آذرخش | آجر نسوز نما، مستقیم از کوره">
+<meta property="og:description" content="نما را یک بار می‌سازید. درست بسازید.">
+<meta property="og:image" content="assets/hero/hero-facade.jpg">
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+
+<link rel="preload" href="assets/fonts/Estedad-Arabic-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="assets/hero/hero-facade.jpg">
+
+<link rel="stylesheet" href="vendor/shoelace/themes/dark.css">
+<link rel="stylesheet" href="css/core.css">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/card.css">
+<link rel="stylesheet" href="css/sections.css">
+<link rel="stylesheet" href="css/advisor.css">
+</head>
+
+<body class="is-frozen">
+
+<!-- ========================== پردهٔ ورود ========================== -->
+<div class="veil" id="veil">
+  <div class="veil__in">
+    <svg class="veil__mark" viewBox="0 0 40 40" aria-hidden="true">
+      <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="#d9c28e"/>
+      <rect x="19" y="5"    width="20" height="8.4" rx="1.6" fill="#f3eee5"/>
+      <rect x="1"  y="15.8" width="24" height="8.4" rx="1.6" fill="#f3eee5"/>
+      <rect x="27" y="15.8" width="12" height="8.4" rx="1.6" fill="#d9c28e"/>
+      <rect x="1"  y="26.6" width="12" height="8.4" rx="1.6" fill="#f3eee5"/>
+      <rect x="15" y="26.6" width="24" height="8.4" rx="1.6" fill="#d9c28e"/>
+    </svg>
+    <div class="veil__word">آذرخش</div>
+    <div class="veil__sub">کارخانهٔ آجر نسوز نما · از ۱۳۶۷</div>
+    <div class="veil__bar"><span></span></div>
+    <div class="veil__pct">۰٪</div>
+  </div>
+</div>
+
+<div class="film" aria-hidden="true">
+  <div class="film__grain"></div>
+  <div class="film__vignette"></div>
+</div>
+
+<div class="rail-progress" id="railProgress"></div>
+
+<div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__label" id="cursorLabel"></span></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+
+<!-- ============================ آیکون‌ها ============================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6-11 11L4 12"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 8h16M4 16h16"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.1 6 5.9 1.8-5.9 1.9L12 18l-2.1-6.3L4 9.8 9.9 8z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4 3 11l7 3 3 7z"/><path d="m10 14 5-5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 4.5h14v12h-14z"/><path d="M15.5 8.5h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.3"/><circle cx="18.5" cy="18.5" r="2.3"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a6 6 0 0 0 6-6c0-4-6-9.5-6-9.5S6 12 6 16a6 6 0 0 0 6 6z"/><path d="M12 18a2.2 2.2 0 0 0 2.2-2.2c0-1.5-2.2-3.6-2.2-3.6s-2.2 2.1-2.2 3.6A2.2 2.2 0 0 0 12 18z"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M2.5 12h19M12 4.5v15"/></symbol>
+  <symbol id="i-calc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="2.5" width="15" height="19" rx="2.5"/><path d="M8.5 6.5h7M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.8h.01M12 14.8h.01M15.5 14.8h.01M8.5 18.4h7"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20z"/><path d="M9.5 21.5v-7h5v7"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m2.5 7.5 9.5 6 9.5-6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 1.9"/></symbol>
+  <symbol id="i-drag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6 8 12l6 6"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-telegram" viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.3 18.9 19c-.2 1-.8 1.2-1.7.8l-4.6-3.4-2.2 2.1c-.3.3-.5.5-1 .5l.4-4.9 9-8.1c.4-.3-.1-.5-.6-.2L7.1 12.8 2.6 11.4c-1-.3-1-1 .2-1.4l18-6.9c.8-.3 1.5.2 1.1 1.2z"/></symbol>
+  <symbol id="i-whatsapp" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 1.9a8.1 8.1 0 1 1-4.2 15l-.3-.2-3 .8.8-2.9-.2-.3A8.1 8.1 0 0 1 12 3.9zm-3.3 4c-.2 0-.5 0-.7.4-.3.4-.9 1-.9 2.3s.9 2.6 1 2.8c.2.2 1.8 2.9 4.5 3.9 2.2.9 2.7.7 3.2.6.5 0 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.6-.3-1.7-.8c-.2 0-.4-.1-.6.2l-.8 1c-.2.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4 0-.5.2-.7l.4-.5.3-.5v-.5l-.8-1.9c-.2-.5-.4-.4-.6-.5h-.5z"/></symbol>
+</svg>
+
+<!-- =========================== نوار فرمان =========================== -->
+<header class="bar" id="bar">
+  <div class="bar__in">
+    <a class="brand" href="#top" data-go aria-label="آذرخش">
+      <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
+        <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="#d9c28e"/>
+        <rect x="19" y="5"    width="20" height="8.4" rx="1.6" fill="currentColor"/>
+        <rect x="1"  y="15.8" width="24" height="8.4" rx="1.6" fill="currentColor"/>
+        <rect x="27" y="15.8" width="12" height="8.4" rx="1.6" fill="#d9c28e"/>
+        <rect x="1"  y="26.6" width="12" height="8.4" rx="1.6" fill="currentColor"/>
+        <rect x="15" y="26.6" width="24" height="8.4" rx="1.6" fill="#d9c28e"/>
+      </svg>
+      <span class="brand__txt">
+        <span class="brand__name">آذرخش</span>
+        <span class="brand__role">آجر نسوز نما</span>
+      </span>
+    </a>
+
+    <nav class="bar__nav" aria-label="فهرست اصلی">
+      <a href="#collection" data-go data-spy>کلکسیون</a>
+      <a href="#calc" data-go data-spy>محاسبهٔ متراژ</a>
+      <a href="#projects" data-go data-spy>پروژه‌ها</a>
+      <a href="#craft" data-go data-spy>از معدن تا نما</a>
+      <a href="#help" data-go data-spy>پرسش‌ها</a>
+    </nav>
+
+    <div class="bar__acts">
+      <button class="ai-btn" type="button" data-open-advisor data-cursor="بپرس">
+        <span class="ai-btn__orb"></span>
+        مشاور نما
+      </button>
+      <button class="btn-round cart-btn" type="button" data-open-cart aria-label="سبد سفارش">
+        <svg width="18" height="18"><use href="#i-bag"/></svg>
+        <span class="cart-dot">۰</span>
+      </button>
+      <button class="btn-round menu-btn" type="button" data-open-menu aria-label="فهرست">
+        <svg width="18" height="18"><use href="#i-menu"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============================== هیرو ============================== -->
+<section class="hero">
+  <div class="hero__bg" id="heroBg">
+    <img src="assets/hero/hero-facade.jpg" alt="نمای آجری ساختمان با آجر نسوز آذرخش" fetchpriority="high">
+  </div>
+  <div class="hero__scrim"></div>
+
+  <div class="hero__in shell">
+    <div class="hero__grid">
+      <div>
+        <span class="label">کارخانهٔ آجر نسوز آذرخش · از ۱۳۶۷</span>
+        <h1 class="display" id="heroTitle">نما را یک بار می‌سازید. <em>درست</em> بسازید.</h1>
+
+        <p class="lede hero__lede">
+          آجر نسوز نمای آذرخش از خاک معدن سهند و پخت تونلی ۱۱۸۰ درجه بیرون می‌آید؛
+          جذب آب زیر شش درصد، بدون شوره، با ضمانت کتبی بیست‌وپنج ساله.
+          بدون واسطه، مستقیم از کوره تا پای کار شما.
+        </p>
+
+        <div class="hero__cta">
+          <a class="btn" href="#collection" data-go>
+            دیدن کلکسیون
+            <svg width="16" height="16"><use href="#i-arrow"/></svg>
+          </a>
+          <button class="btn-ghost" type="button" data-open-advisor>
+            <svg width="16" height="16"><use href="#i-spark"/></svg>
+            از مشاور نما بپرس
+          </button>
+        </div>
+
+        <ul class="hero__notes">
+          <li><svg width="15" height="15"><use href="#i-shield"/></svg> ضمانت کتبی ۲۵ ساله</li>
+          <li><svg width="15" height="15"><use href="#i-flame"/></svg> پخت ۱۱۸۰ درجه</li>
+          <li><svg width="15" height="15"><use href="#i-truck"/></svg> ارسال مستقیم به ۹ استان</li>
+          <li><svg width="15" height="15"><use href="#i-clock"/></svg> نمونهٔ رایگان در ۴۸ ساعت</li>
+        </ul>
+      </div>
+
+      <div class="stage" id="heroStage">
+        <span class="stage__chip">پرفروش‌ترین کد کارخانه</span>
+        <div class="stage__card">
+          <button class="stage__frame" type="button" id="stageOpen" data-cursor="جزئیات" aria-label="مشاهدهٔ محصول">
+            <img id="stageImg" src="" alt="" data-slot>
+            <span class="stage__glow"></span>
+          </button>
+          <div class="stage__foot">
+            <div>
+              <div class="stage__name" id="stageName"></div>
+              <div class="stage__meta" id="stageMeta"></div>
+            </div>
+            <div class="stage__price" id="stagePrice"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="creds">
+      <div><b class="num" data-count="37" data-suffix=" سال">۰</b><span>تولید بی‌وقفه از ۱۳۶۷</span></div>
+      <div><b class="num" data-count="1240" data-prefix="+">۰</b><span>پروژهٔ اجراشده</span></div>
+      <div><b class="num" data-count="9" data-suffix=" استان">۰</b><span>پوشش ارسال مستقیم</span></div>
+      <div><b class="num" data-count="6" data-suffix=" درصد">۰</b><span>جذب آب، حداکثر</span></div>
+    </div>
+  </div>
+
+  <div class="scroll-hint"><span>اسکرول</span><i></i></div>
+</section>
+
+<div class="ticker-strip" aria-hidden="true"><div class="ticker" id="ticker"></div></div>
+
+<!-- ============================= بیانیه ============================= -->
+<section class="band" id="story">
+  <div class="shell shell--tight">
+    <span class="label" data-in>فلسفهٔ کارخانه</span>
+    <p class="mf__text" id="manifesto" style="margin-top:1.4rem">
+      ما آجر نمی‌فروشیم؛ <em>چهل سال دوام</em> می‌فروشیم.
+      هر پارت از یک معدن، یک کوره و یک فرمول بیرون می‌آید تا نمای شما
+      بعد از سی زمستان همان باشد که روز اول بود.
+    </p>
+
+    <div class="pillars">
+      <div class="pillar" data-in>
+        <b>۰۱</b>
+        <h3 class="h3">یک معدن، یک رنگ</h3>
+        <p>خاک همهٔ کدها از یک معدن در دامنهٔ سهند می‌آید. برای همین وقتی دو سال بعد سفارش تکمیلی بدهید، رنگ با نمای اجراشده می‌خواند.</p>
+      </div>
+      <div class="pillar" data-in>
+        <b>۰۲</b>
+        <h3 class="h3">پخت ۱۱۸۰ درجه</h3>
+        <p>کورهٔ تونلی با منحنی پخت کنترل‌شده. نتیجه‌اش جذب آب زیر شش درصد است؛ یعنی یخبندان زمستان کاری با نما ندارد.</p>
+      </div>
+      <div class="pillar" data-in>
+        <b>۰۳</b>
+        <h3 class="h3">ضمانت کتبی</h3>
+        <p>برگهٔ ضمانت با شمارهٔ پارت تولید همراه بار تحویل می‌شود. بیست‌وپنج سال روی رنگ، شوره و پوسته‌شدن سطح.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ کلکسیون ============================ -->
+<section class="band" id="collection">
+  <div class="shell">
+    <div class="band-head band-head--split">
+      <div>
+        <span class="label" data-in>کلکسیون</span>
+        <h2 class="h2" data-in style="margin-top:.8rem">ده کد، <em>یک</em> خط تولید</h2>
+        <p class="lede" data-in style="margin-top:1rem">
+          همهٔ کدها هم‌ابعاد و هم‌کیفیت‌اند؛ یعنی می‌توانید بدون نگرانی ترکیبشان کنید.
+          قیمت‌ها درب کارخانه و برای هر متر مربع نمای اجراشده است.
+        </p>
+      </div>
+      <div data-in>
+        <button class="btn-ghost btn-sm" type="button" data-ask="کدام کد برای نمای من مناسب است؟">
+          <svg width="15" height="15"><use href="#i-spark"/></svg>
+          نمی‌دانم کدام را بگیرم
+        </button>
+      </div>
+    </div>
+
+    <div class="filters" id="filters" data-in></div>
+
+    <div class="rail" id="rail" style="margin-top:1.6rem">
+      <div class="rail__viewport" id="railView">
+        <div class="rail__track" id="railTrack"></div>
+      </div>
+
+      <div class="rail__hud">
+        <span class="rail__count"><b id="railNow">۰۱</b> / <span id="railTotal">۱۰</span></span>
+        <span class="rail__bar"><span id="railBar"></span></span>
+        <span class="rail__hint">
+          <svg width="14" height="14"><use href="#i-drag"/></svg>
+          بکشید یا از دکمه‌ها استفاده کنید
+        </span>
+        <span class="rail__nav">
+          <button type="button" id="railPrev" aria-label="کارت قبلی"><svg width="16" height="16"><use href="#i-drag"/></svg></button>
+          <button type="button" id="railNext" aria-label="کارت بعدی"><svg width="16" height="16"><use href="#i-drag"/></svg></button>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================== مشاور نما =========================== -->
+<section class="band advisor-band" id="advisor">
+  <div class="shell">
+    <div class="advisor-grid">
+      <div>
+        <div style="display:flex;align-items:center;gap:1rem" data-in>
+          <span class="orb"><i></i><i></i><i></i><b></b></span>
+          <div>
+            <span class="label label--bare">مشاور نما</span>
+            <h2 class="h2" style="margin-top:.3rem">نمی‌دانید از کجا شروع کنید؟</h2>
+          </div>
+        </div>
+
+        <p class="lede" data-in style="margin-top:1.2rem">
+          رنگ را بگویید تا کد پیشنهاد بدهم، ابعاد دیوار را بدهید تا متراژ و تعداد آجر را حساب کنم،
+          یا از شرایط ارسال و ضمانت بپرسید. هر چیزی که یک کارشناس فروش بلد است.
+        </p>
+
+        <div class="chips chips--wrap" data-in style="margin-top:1.6rem">
+          <button class="chip" type="button" data-ask="برای نمای مدرن چه رنگی پیشنهاد می‌دهید؟">برای نمای مدرن چه رنگی؟</button>
+          <button class="chip" type="button" data-ask="۱۲ در ۳">دیوار ۱۲ در ۳ چقدر آجر می‌خواهد؟</button>
+          <button class="chip" type="button" data-ask="ارزان‌ترین گزینه‌تان کدام است؟">ارزان‌ترین گزینه</button>
+          <button class="chip" type="button" data-ask="ضمانت شامل چه چیزهایی می‌شود؟">ضمانت شامل چیست؟</button>
+        </div>
+
+        <div class="hero__cta" data-in style="margin-top:1.8rem">
+          <button class="btn" type="button" data-open-advisor>
+            شروع گفتگو
+            <svg width="16" height="16"><use href="#i-arrow"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="chat-peek" data-in>
+        <div class="chat-peek__head">
+          <span class="orb orb--sm"><i></i><b></b></span>
+          <div>
+            <b>مشاور نمای آذرخش</b>
+            <span>پاسخ فوری · بدون انتظار</span>
+          </div>
+        </div>
+
+        <div class="msg msg--me">
+          <div class="msg__body">
+            <div class="bubble">نمای شمالی دارم، سفید می‌خواهم ولی می‌ترسم خاکستری شود.</div>
+          </div>
+        </div>
+
+        <div class="msg">
+          <span class="msg__av"><b></b></span>
+          <div class="msg__body">
+            <div class="bubble">
+              نگرانی درستی است. کد <b>AZ-W220</b> لعاب ندارد و رنگش از خودِ خاک کائولن می‌آید،
+              برای همین تا عمق آجر یکدست است و با UV تغییر نمی‌کند.
+              برای نمای شمالی بند تیره پیشنهاد می‌کنم تا بافت دیده شود.
+            </div>
+          </div>
+        </div>
+
+        <div class="msg">
+          <span class="msg__av"><b></b></span>
+          <div class="msg__body">
+            <span class="typing"><i></i><i></i><i></i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================== محاسبه‌گر =========================== -->
+<section class="band" id="calc">
+  <div class="shell">
+    <div class="band-head">
+      <div>
+        <span class="label" data-in>ابزار برآورد</span>
+        <h2 class="h2" data-in style="margin-top:.8rem">چقدر آجر لازم دارید؟</h2>
+        <p class="lede" data-in style="margin-top:1rem">
+          ابعاد دیوار را با اسلایدرها تنظیم کنید تا متراژ خالص، تعداد آجر، تعداد پالت و برآورد هزینه
+          هم‌زمان به‌روز شود. هفت درصد پرت اجرا از پیش لحاظ شده است.
+        </p>
+      </div>
+    </div>
+
+    <div class="calc" data-in>
+      <div class="calc__side">
+        <div class="calc__field">
+          <div class="calc__row"><span>طول دیوار</span><b id="calcWv">۱۲٫۰ متر</b></div>
+          <sl-range id="calcW" min="1" max="60" step="0.5" value="12" tooltip="none"></sl-range>
+        </div>
+        <div class="calc__field">
+          <div class="calc__row"><span>ارتفاع دیوار</span><b id="calcHv">۳٫۲ متر</b></div>
+          <sl-range id="calcH" min="1" max="20" step="0.1" value="3.2" tooltip="none"></sl-range>
+        </div>
+        <div class="calc__field">
+          <div class="calc__row"><span>سهم بازشوها</span><b id="calcOv">۱۵٪</b></div>
+          <sl-range id="calcO" min="0" max="60" step="1" value="15" tooltip="none"></sl-range>
+        </div>
+
+        <div class="calc__field">
+          <sl-select id="calcProduct" label="کد محصول" value="r110" hoist></sl-select>
+        </div>
+
+        <div class="calc__field">
+          <sl-select id="calcJ" label="ضخامت بند" value="1" hoist>
+            <sl-option value="1">استاندارد ۱۰ میلی‌متر</sl-option>
+            <sl-option value="1.06">بند نازک ۶ میلی‌متر</sl-option>
+            <sl-option value="0.94">بند پهن ۱۵ میلی‌متر</sl-option>
+          </sl-select>
+        </div>
+      </div>
+
+      <div class="calc__out">
+        <span class="label label--bare">برآورد سفارش</span>
+        <ul class="calc__list">
+          <li><span>مساحت خالص نما</span><b class="num" id="outArea">—</b></li>
+          <li><span>تعداد آجر (با ۷٪ پرت)</span><b class="num" id="outBricks">—</b></li>
+          <li><span>تعداد پالت</span><b class="num" id="outPallets">—</b></li>
+          <li><span>وزن تقریبی بار</span><b class="num" id="outWeight">—</b></li>
+          <li><span>قیمت واحد انتخابی</span><b class="num" id="outUnit">—</b></li>
+        </ul>
+
+        <div class="calc__total">
+          <span class="small">برآورد هزینهٔ آجر، درب کارخانه</span>
+          <b class="num" id="outPrice">—</b>
+          <div style="display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.2rem">
+            <button class="btn" type="button" id="calcAdd" style="flex:1">
+              <svg width="16" height="16"><use href="#i-bag"/></svg>
+              افزودن به سبد
+            </button>
+            <button class="btn-ghost" type="button" id="calcAsk" aria-label="پرسیدن از مشاور">
+              <svg width="16" height="16"><use href="#i-spark"/></svg>
+            </button>
+          </div>
+          <p class="calc__note">هزینهٔ باربری، ملات و دستمزد اجرا در این عدد نیست. برای پیش‌فاکتور رسمی، نقشهٔ نما را بفرستید.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ پروژه‌ها ============================ -->
+<section class="band" id="projects">
+  <div class="shell">
+    <div class="band-head band-head--split">
+      <div>
+        <span class="label" data-in>کارنامه</span>
+        <h2 class="h2" data-in style="margin-top:.8rem">آجر ما، روی این نماها</h2>
+        <p class="lede" data-in style="margin-top:1rem">
+          از برج مسکونی تهران تا بازسازی خانه‌ای قجری در تبریز. روی هر تصویر بزنید تا بزرگ ببینید.
+        </p>
+      </div>
+      <div data-in><span class="tag tag--gold"><svg width="14" height="14"><use href="#i-spark"/></svg> ۱٬۲۴۰ پروژه تا امروز</span></div>
+    </div>
+
+    <div class="gal" id="gallery" data-in></div>
+  </div>
+</section>
+
+<!-- ============================== صنعت ============================= -->
+<section class="band" id="craft">
+  <div class="shell">
+    <div class="band-head">
+      <div>
+        <span class="label" data-in>از معدن تا نما</span>
+        <h2 class="h2" data-in style="margin-top:.8rem">چهار قدم تا نمای تمام‌شده</h2>
+      </div>
+    </div>
+
+    <div class="craft">
+      <ol class="steps" id="steps">
+        <div class="steps__spine"><i></i></div>
+        <li class="step">
+          <b>۰۱</b>
+          <h3 class="h3">انتخاب و نمونه</h3>
+          <p>کد موردنظر را انتخاب می‌کنید و جعبهٔ نمونهٔ رایگان ظرف ۴۸ ساعت به دستتان می‌رسد. کارشناس فنی دربارهٔ رنگ بند و الگوی چیدمان پیشنهاد می‌دهد.</p>
+        </li>
+        <li class="step">
+          <b>۰۲</b>
+          <h3 class="h3">اندازه‌گیری و پیش‌فاکتور</h3>
+          <p>نقشهٔ نما یا ابعاد دیوارها را می‌فرستید؛ متراژ خالص، تعداد قطعات کنج و پرت اجرا محاسبه و پیش‌فاکتور رسمی صادر می‌شود.</p>
+        </li>
+        <li class="step">
+          <b>۰۳</b>
+          <h3 class="h3">تولید و بسته‌بندی</h3>
+          <p>سفارش از یک پارت تولید تأمین می‌شود تا اختلاف رنگ نداشته باشید. پالت‌ها شرینک و لبه‌محافظ‌گذاری می‌شوند.</p>
+        </li>
+        <li class="step">
+          <b>۰۴</b>
+          <h3 class="h3">ارسال و پشتیبانی اجرا</h3>
+          <p>بار با باربری طرف قرارداد به پای کار می‌رسد و تا پایان اجرا، پشتیبانی فنی تلفنی برای اکیپ نصب برقرار است.</p>
+        </li>
+      </ol>
+
+      <aside class="datasheet" data-in>
+        <span class="label label--bare">برگهٔ فنی · خانوادهٔ نسوز</span>
+        <dl class="spec-rows" style="margin-top:1.1rem">
+          <div><dt>ابعاد استاندارد</dt><dd>۲۴۰ × ۷۰ × ۲۰ میلی‌متر</dd></div>
+          <div><dt>جذب آب</dt><dd>زیر ۶ درصد</dd></div>
+          <div><dt>مقاومت فشاری</dt><dd>۳۵۰ تا ۴۲۰ kg/cm²</dd></div>
+          <div><dt>دمای پخت</dt><dd>۱۱۸۰ درجهٔ سانتی‌گراد</dd></div>
+          <div><dt>مقاومت یخبندان</dt><dd>۵۰ سیکل، بدون افت</dd></div>
+          <div><dt>استاندارد</dt><dd>ملی ایران ۷ و ۲۵۱۰</dd></div>
+        </dl>
+
+        <div class="pledges">
+          <div class="pledge">
+            <svg width="17" height="17"><use href="#i-shield"/></svg>
+            <div><b>ضمانت کتبی ۲۵ ساله</b><span>روی رنگ، شوره و پوسته‌شدن سطح</span></div>
+          </div>
+          <div class="pledge">
+            <svg width="17" height="17"><use href="#i-truck"/></svg>
+            <div><b>ارسال رایگان بالای ۳۰۰ متر مربع</b><span>به مراکز نه استان، مستقیم از کارخانه</span></div>
+          </div>
+          <div class="pledge">
+            <svg width="17" height="17"><use href="#i-flame"/></svg>
+            <div><b>یک پارت برای کل سفارش</b><span>تا اختلاف رنگ بین پالت‌ها نداشته باشید</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== نظرها ============================ -->
+<section class="band band--short">
+  <div class="shell shell--tight">
+    <span class="label" data-in>حرف مشتری‌ها</span>
+    <div class="voices" id="voices" data-in style="margin-top:1.8rem"></div>
+    <div class="voice-nav" id="voiceNav"></div>
+  </div>
+</section>
+
+<!-- ========================= پرسش‌ها و تماس ========================= -->
+<section class="band" id="help">
+  <div class="shell">
+    <div class="contact">
+      <div>
+        <span class="label" data-in>پرسش‌های رایج</span>
+        <h2 class="h2" data-in style="margin:.8rem 0 1.8rem">هرچه پیش از سفارش باید بدانید</h2>
+        <div id="faq" data-in></div>
+
+        <div class="reach">
+          <a href="tel:+984133821140">
+            <svg width="17" height="17"><use href="#i-phone"/></svg>
+            <div><b>تلفن کارخانه</b><span class="ltr">۰۴۱-۳۳۸۲۱۱۴۰</span></div>
+          </a>
+          <a href="mailto:sales@azarakhsh.shop">
+            <svg width="17" height="17"><use href="#i-mail"/></svg>
+            <div><b>ایمیل فروش</b><span class="ltr">sales@azarakhsh.shop</span></div>
+          </a>
+          <div>
+            <svg width="17" height="17"><use href="#i-pin"/></svg>
+            <div><b>نشانی کارخانه</b><span>تبریز، کیلومتر ۱۲ جادهٔ آذرشهر، شهرک صنعتی غرب، خیابان صنعت ۴</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact__panel" id="contactPanel" data-in>
+        <span class="label label--bare">مشاورهٔ فنی رایگان</span>
+        <h3 class="h3" style="margin:.5rem 0 .6rem">شماره‌تان را بگذارید، ما زنگ می‌زنیم</h3>
+        <p class="small" style="margin-bottom:1.6rem">
+          کارشناس فنی در ساعات کاری تماس می‌گیرد؛ دربارهٔ انتخاب کد، متراژ و ارسال صحبت می‌کنیم
+          و در صورت تمایل جعبهٔ نمونه را می‌فرستیم.
+        </p>
+
+        <form id="leadForm" novalidate>
+          <div style="display:grid;gap:1rem">
+            <sl-input id="leadName" label="نام و نام خانوادگی" placeholder="مثلاً رضا کیانی" autocomplete="name"></sl-input>
+            <sl-input id="leadPhone" label="شمارهٔ موبایل" placeholder="۰۹۱۲۳۴۵۶۷۸۹" inputmode="numeric" autocomplete="tel"></sl-input>
+            <sl-input id="leadArea" label="متراژ تقریبی نما" placeholder="۲۵۰" inputmode="numeric"></sl-input>
+            <sl-select id="leadTopic" label="موضوع" value="sample" hoist>
+              <sl-option value="sample">درخواست جعبهٔ نمونه</sl-option>
+              <sl-option value="quote">دریافت پیش‌فاکتور</sl-option>
+              <sl-option value="advice">مشاورهٔ انتخاب کد</sl-option>
+              <sl-option value="agency">همکاری و نمایندگی</sl-option>
+            </sl-select>
+            <button class="btn btn-wide" type="submit">
+              ثبت درخواست تماس
+              <svg width="16" height="16"><use href="#i-arrow"/></svg>
+            </button>
+          </div>
+        </form>
+
+        <div class="contact__ok">
+          <span class="orb" style="margin-inline:auto"><i></i><b></b></span>
+          <h3 class="h3" style="margin-top:1rem">درخواستتان ثبت شد</h3>
+          <p class="small" style="margin-top:.6rem">
+            شمارهٔ پیگیری <b class="num" id="leadRef" style="color:var(--champagne)"></b> برای شما صادر شد.
+            کارشناس ما در اولین ساعت کاری تماس می‌گیرد.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================== پابرگ ============================ -->
+<footer class="foot">
+  <div class="shell">
+    <div class="foot__word" aria-hidden="true">آذرخش</div>
+
+    <div class="foot__grid">
+      <div class="foot__about">
+        <a class="brand" href="#top" data-go>
+          <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
+            <rect x="1"  y="5"    width="16" height="8.4" rx="1.6" fill="#d9c28e"/>
+            <rect x="19" y="5"    width="20" height="8.4" rx="1.6" fill="currentColor"/>
+            <rect x="1"  y="15.8" width="24" height="8.4" rx="1.6" fill="currentColor"/>
+            <rect x="27" y="15.8" width="12" height="8.4" rx="1.6" fill="#d9c28e"/>
+            <rect x="1"  y="26.6" width="12" height="8.4" rx="1.6" fill="currentColor"/>
+            <rect x="15" y="26.6" width="24" height="8.4" rx="1.6" fill="#d9c28e"/>
+          </svg>
+          <span class="brand__txt">
+            <span class="brand__name">آذرخش</span>
+            <span class="brand__role">کارخانهٔ آجر نسوز نما</span>
+          </span>
+        </a>
+        <p>از سال ۱۳۶۷ در شهرک صنعتی غرب تبریز آجر نسوز نما تولید می‌کنیم. فروش بدون واسطه، قیمت درب کارخانه و ضمانت کتبی.</p>
+        <div class="socials">
+          <a href="#" aria-label="اینستاگرام"><svg width="17" height="17"><use href="#i-instagram"/></svg></a>
+          <a href="#" aria-label="تلگرام"><svg width="17" height="17"><use href="#i-telegram"/></svg></a>
+          <a href="#" aria-label="واتساپ"><svg width="17" height="17"><use href="#i-whatsapp"/></svg></a>
+        </div>
+      </div>
+
+      <div>
+        <h4>کلکسیون</h4>
+        <ul>
+          <li><a href="#collection" data-go>نمای نسوز</a></li>
+          <li><a href="#collection" data-go>دست‌ساز قزاقی</a></li>
+          <li><a href="#collection" data-go>پلاک نازک</a></li>
+          <li><a href="#collection" data-go>کنج و فرش کف</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>راهنما</h4>
+        <ul>
+          <li><a href="#calc" data-go>محاسبهٔ متراژ</a></li>
+          <li><a href="#craft" data-go>مراحل سفارش</a></li>
+          <li><a href="#help" data-go>پرسش‌های رایج</a></li>
+          <li><a href="#" data-open-advisor>مشاور نما</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>تماس</h4>
+        <ul>
+          <li class="ltr" style="text-align:start">۰۴۱-۳۳۸۲۱۱۴۰</li>
+          <li class="ltr" style="text-align:start">sales@azarakhsh.shop</li>
+          <li>شنبه تا چهارشنبه، ۸ تا ۱۷</li>
+        </ul>
+        <div class="seals">
+          <span class="seal">نماد اعتماد الکترونیکی</span>
+          <span class="seal">ساماندهی</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot__bar">
+      <span>© ۱۴۰۵ کارخانهٔ آجر نسوز آذرخش · تمام حقوق محفوظ است.</span>
+      <span>قیمت‌ها درب کارخانه و بدون احتساب مالیات بر ارزش افزوده است.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================ داک موبایل ========================= -->
+<nav class="dock" aria-label="ناوبری سریع">
+  <a href="#top" data-go data-spy><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-home"/></svg>خانه</a>
+  <a href="#collection" data-go data-spy><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-grid"/></svg>کلکسیون</a>
+  <a href="#calc" data-go data-spy><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-calc"/></svg>محاسبه</a>
+  <button type="button" data-open-advisor><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-spark"/></svg>مشاور</button>
+  <button type="button" data-open-cart><span class="dock__pip"></span><svg width="19" height="19"><use href="#i-bag"/></svg>سبد<span class="cart-dot">۰</span></button>
+</nav>
+
+<!-- =============================== شیت‌ها ========================== -->
+<sl-drawer id="menuSheet" label="فهرست" placement="end">
+  <div class="sheet-grip"></div>
+  <nav class="menu-list">
+    <a href="#collection" data-go>کلکسیون <span>۱۰ کد</span></a>
+    <a href="#advisor" data-go>مشاور نما <span>پاسخ فوری</span></a>
+    <a href="#calc" data-go>محاسبهٔ متراژ <span>ابزار</span></a>
+    <a href="#projects" data-go>پروژه‌ها <span>۱٬۲۴۰</span></a>
+    <a href="#craft" data-go>از معدن تا نما <span>۴ قدم</span></a>
+    <a href="#help" data-go>پرسش‌ها و تماس <span>راهنما</span></a>
+  </nav>
+  <div slot="footer">
+    <a class="btn btn-wide" href="tel:+984133821140">
+      <svg width="16" height="16"><use href="#i-phone"/></svg>
+      ۰۴۱-۳۳۸۲۱۱۴۰
+    </a>
+  </div>
+</sl-drawer>
+
+<sl-drawer id="cartSheet" label="سبد سفارش" placement="end">
+  <div id="cartPane"></div>
+
+  <div id="orderPane" hidden>
+    <div class="sheet-grip"></div>
+    <button class="link-more" type="button" id="backToCart" style="margin-bottom:1.2rem">
+      <svg width="15" height="15"><use href="#i-arrow"/></svg>
+      بازگشت به سبد
+    </button>
+    <h3 class="h3" style="margin-bottom:.5rem">اطلاعات تماس</h3>
+    <p class="small" style="margin-bottom:1.4rem">
+      پیش‌فاکتور رسمی به‌همراه هزینهٔ باربری برایتان ارسال می‌شود. در این مرحله پرداختی انجام نمی‌شود.
+    </p>
+    <form id="orderForm" novalidate>
+      <div style="display:grid;gap:1rem">
+        <sl-input id="ordName" label="نام و نام خانوادگی" placeholder="نام کامل"></sl-input>
+        <sl-input id="ordPhone" label="شمارهٔ موبایل" placeholder="۰۹۱۲۳۴۵۶۷۸۹" inputmode="numeric"></sl-input>
+        <sl-input id="ordCity" label="شهر پروژه" placeholder="مثلاً کرج"></sl-input>
+        <sl-textarea id="ordNote" label="توضیح (اختیاری)" placeholder="نوع پروژه، زمان اجرا، نکتهٔ خاص…" rows="3"></sl-textarea>
+        <button class="btn btn-wide" type="submit">
+          ثبت نهایی سفارش
+          <svg width="16" height="16"><use href="#i-arrow"/></svg>
+        </button>
+        <p class="small" style="text-align:center" id="orderSum"></p>
+      </div>
+    </form>
+  </div>
+
+  <div id="donePane" hidden>
+    <div class="sheet-grip"></div>
+    <div style="text-align:center;padding:2.5rem 0">
+      <span class="orb" style="margin-inline:auto"><i></i><b></b></span>
+      <h3 class="h3" style="margin-top:1rem">سفارش ثبت شد</h3>
+      <p class="small" style="margin-top:.7rem">
+        شمارهٔ پیگیری <b class="num" id="doneRef" style="color:var(--champagne)"></b><br>
+        <span id="doneSum"></span>
+      </p>
+      <p class="small" style="margin-top:.9rem">
+        کارشناس فروش برای تأیید موجودی، هزینهٔ باربری و زمان بارگیری تماس می‌گیرد.
+      </p>
+      <button class="btn-ghost btn-sm" type="button" id="doneClose" style="margin-top:1.6rem">بستن</button>
+    </div>
+  </div>
+
+  <div slot="footer" id="cartFoot">
+    <div class="cart-sum">
+      <div class="cart-sum__row"><span>جمع کل، درب کارخانه</span><span id="cartUnits">—</span></div>
+      <div class="cart-sum__big num" id="cartTotal">۰ تومان</div>
+    </div>
+    <button class="btn btn-wide" type="button" id="toOrder" style="margin-top:1rem">
+      ثبت سفارش و دریافت پیش‌فاکتور
+      <svg width="16" height="16"><use href="#i-arrow"/></svg>
+    </button>
+  </div>
+</sl-drawer>
+
+<sl-drawer id="productSheet" label="جزئیات محصول" placement="end">
+  <div id="productBody"></div>
+</sl-drawer>
+
+<sl-drawer id="advisorSheet" label="مشاور نما" placement="end">
+  <div class="chat">
+    <div class="chat__scroll" id="chatScroll">
+      <div class="chat__intro" id="chatIntro">
+        <span class="orb"><i></i><i></i><i></i><b></b></span>
+        <h3 class="h3">سلام، من مشاور نمای آذرخش هستم</h3>
+        <p>
+          در انتخاب رنگ، محاسبهٔ متراژ و شرایط سفارش کمکتان می‌کنم.
+          یکی از پیشنهادهای پایین را بزنید یا سوالتان را بنویسید.
+        </p>
+      </div>
+      <div id="chatFeed"></div>
+    </div>
+
+    <div class="chat__chips"><div class="chips" id="chatChips"></div></div>
+
+    <div class="composer">
+      <div class="composer__box">
+        <textarea id="chatInput" rows="1" placeholder="سوالتان را بنویسید…" aria-label="پیام"></textarea>
+      </div>
+      <button class="composer__send" id="chatSend" type="button" aria-label="ارسال" disabled>
+        <svg width="17" height="17"><use href="#i-send"/></svg>
+      </button>
+    </div>
+
+    <div class="chat__legal">
+      پاسخ‌ها بر پایهٔ اطلاعات کارخانه و به‌صورت خودکار تولید می‌شود؛ برای سفارش نهایی با کارشناس ما تأیید بگیرید.
+      · <button class="chat__reset" type="button" id="chatReset">پاک‌کردن گفتگو</button>
+    </div>
+  </div>
+</sl-drawer>
+
+<!-- ============================= لایت‌باکس ========================= -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="تصویر پروژه">
+  <button class="btn-round lightbox__x" type="button" id="lbClose" aria-label="بستن">
+    <svg width="18" height="18"><use href="#i-close"/></svg>
+  </button>
+  <figure>
+    <img id="lbImg" src="" alt="">
+    <figcaption id="lbCap"></figcaption>
+  </figure>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg width="17" height="17"><use href="#i-check"/></svg>
+  <span id="toastText"></span>
+</div>
+
+<script type="module" src="js/sl.js"></script>
+<script src="vendor/gsap/gsap.min.js"></script>
+<script src="vendor/gsap/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis/lenis.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/core.js"></script>
+<script src="js/advisor.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/motion.js"></script>
+<script>
+  (function () {
+    function boot() { AZUI.init(); AZMotion.start(); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+  })();
+</script>
+</body>
+</html>

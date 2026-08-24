@@ -1,0 +1,420 @@
+/* =========================================================================
+   آذرخش · هستهٔ طراحی
+   پالت «ابسیدین و شامپاین» — توکن‌ها، تایپوگرافی، اجزای پایه
+   ========================================================================= */
+
+/* ------------------------------ قلم‌ها ------------------------------ */
+@font-face {
+  font-family: 'Estedad';
+  src: url('../assets/fonts/Estedad-Arabic-Variable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+200C-200E, U+2010-2011, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Estedad';
+  src: url('../assets/fonts/Estedad-Latin-Variable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+2000-206F, U+2190-21BB, U+2212;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../assets/fonts/Vazirmatn-Variable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* ------------------------------ توکن‌ها ----------------------------- */
+:root {
+  /* سطوح — ابسیدین گرم */
+  --ink-900: #0b0a08;
+  --ink-850: #100e0c;
+  --ink-800: #151310;
+  --ink-750: #1a1815;
+  --ink-700: #211e1a;
+  --ink-600: #2b2723;
+  --ink-500: #38332d;
+
+  /* متن — چینی */
+  --porcelain:   #f3eee5;
+  --porcelain-2: rgba(243, 238, 229, .70);
+  --porcelain-3: rgba(243, 238, 229, .46);
+  --porcelain-4: rgba(243, 238, 229, .26);
+
+  /* لهجهٔ یگانه — شامپاین مات */
+  --champagne:      #d9c28e;
+  --champagne-lit:  #f0e0b6;
+  --champagne-deep: #a3874f;
+  --champagne-glow: rgba(217, 194, 142, .22);
+
+  /* خطوط مو — همیشه با ته‌رنگ شامپاین، هرگز خاکستری خنثی */
+  --hair:   rgba(217, 194, 142, .13);
+  --hair-2: rgba(217, 194, 142, .26);
+  --hair-3: rgba(217, 194, 142, .42);
+
+  --glass:      rgba(21, 19, 16, .58);
+  --glass-lit:  rgba(33, 30, 26, .74);
+
+  /* شکل */
+  --r1: 12px;
+  --r2: 18px;
+  --r3: 26px;
+  --r4: 36px;
+
+  /* حرکت */
+  --spring: cubic-bezier(.22, 1.16, .36, 1);
+  --out:    cubic-bezier(.16, .84, .44, 1);
+  --io:     cubic-bezier(.62, .02, .34, 1);
+
+  /* فضا */
+  --pad:   clamp(1.15rem, 3.6vw, 4rem);
+  --shell: 1460px;
+  --gap-y: clamp(5rem, 11vh, 10rem);
+
+  --bar-h: 66px;
+  --dock-h: 68px;
+}
+
+/* --------------------- هم‌ترازی با Shoelace ------------------------- */
+:root,
+:root.sl-theme-dark {
+  --sl-font-sans: 'Vazirmatn', system-ui, sans-serif;
+  --sl-font-size-medium: .95rem;
+  --sl-color-primary-500: var(--champagne-deep);
+  --sl-color-primary-600: var(--champagne);
+  --sl-color-primary-700: var(--champagne-lit);
+  --sl-panel-background-color: var(--ink-850);
+  --sl-panel-border-color: var(--hair);
+  --sl-overlay-background-color: rgba(6, 5, 4, .74);
+  --sl-input-background-color: rgba(243, 238, 229, .04);
+  --sl-input-background-color-hover: rgba(243, 238, 229, .06);
+  --sl-input-background-color-focus: rgba(243, 238, 229, .07);
+  --sl-input-border-color: var(--hair-2);
+  --sl-input-border-color-hover: var(--hair-3);
+  --sl-input-border-color-focus: var(--champagne);
+  --sl-input-color: var(--porcelain);
+  --sl-input-color-hover: var(--porcelain);
+  --sl-input-color-focus: var(--porcelain);
+  --sl-input-placeholder-color: var(--porcelain-4);
+  --sl-input-label-color: var(--porcelain-3);
+  --sl-input-help-text-color: var(--porcelain-4);
+  --sl-input-border-radius-medium: 14px;
+  --sl-input-border-radius-large: 16px;
+  --sl-input-height-medium: 50px;
+  --sl-input-height-large: 56px;
+  --sl-focus-ring-color: var(--champagne-glow);
+  --sl-focus-ring-width: 3px;
+  --sl-border-radius-medium: 14px;
+  --sl-border-radius-large: 20px;
+  --sl-border-radius-x-large: 28px;
+  --sl-transition-fast: 180ms;
+  --sl-transition-medium: 320ms;
+  --sl-shadow-large: 0 40px 90px rgba(0, 0, 0, .65);
+  --sl-tooltip-background-color: var(--ink-600);
+  --sl-tooltip-color: var(--porcelain);
+  --sl-tooltip-font-size: .78rem;
+  --sl-tooltip-border-radius: 10px;
+  --sl-spacing-medium: 1rem;
+  --sl-z-index-drawer: 1000;
+  --sl-z-index-dialog: 1000;
+  --sl-z-index-dropdown: 1050;
+  --sl-z-index-tooltip: 1100;
+}
+
+/* -------------------------------- پایه ------------------------------ */
+*,
+*::before,
+*::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html { scroll-behavior: auto; }
+
+body {
+  margin: 0;
+  background: var(--ink-900);
+  color: var(--porcelain);
+  font-family: 'Vazirmatn', system-ui, 'Segoe UI', Tahoma, sans-serif;
+  font-size: 1rem;
+  line-height: 2;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body.is-frozen { overflow: hidden; }
+
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+h1, h2, h3, h4, p, ul, ol, figure { margin: 0; padding: 0; }
+li { list-style: none; }
+
+::selection { background: var(--champagne); color: var(--ink-900); }
+
+:focus-visible {
+  outline: 2px solid var(--champagne);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* نوار اسکرول باریک و هم‌رنگ */
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: var(--ink-900); }
+::-webkit-scrollbar-thumb { background: var(--ink-600); border-radius: 99px; border: 2px solid var(--ink-900); }
+::-webkit-scrollbar-thumb:hover { background: var(--champagne-deep); }
+
+/* ----------------------------- تایپوگرافی --------------------------- */
+/* یادداشت: روی متن فارسی هیچ letter-spacing منفی اعمال نمی‌شود تا اتصال حروف حفظ شود. */
+.display,
+.h2, .h3 {
+  font-family: 'Estedad', 'Vazirmatn', system-ui, sans-serif;
+  font-optical-sizing: auto;
+}
+
+.display {
+  font-weight: 300;                       /* درشت و سبک — امضای طراحی */
+  font-size: clamp(2.6rem, 6.6vw, 6.2rem);
+  line-height: 1.32;
+}
+.display b, .display strong { font-weight: 600; }
+.display em { font-style: normal; color: var(--champagne); }
+
+.h2 {
+  font-weight: 350;
+  font-size: clamp(1.85rem, 3.9vw, 3.5rem);
+  line-height: 1.4;
+}
+.h2 em { font-style: normal; color: var(--champagne); }
+
+.h3 {
+  font-weight: 500;
+  font-size: clamp(1.08rem, 1.5vw, 1.4rem);
+  line-height: 1.6;
+}
+
+.lede {
+  color: var(--porcelain-2);
+  font-size: clamp(.96rem, 1.05vw, 1.08rem);
+  line-height: 2.15;
+  max-width: 54ch;
+}
+
+.small { font-size: .84rem; line-height: 1.95; color: var(--porcelain-3); }
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--champagne);
+}
+.label::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background: currentColor;
+  transform: rotate(45deg);
+  flex: none;
+}
+.label--bare::before { display: none; }
+.label--rule::before {
+  width: 30px;
+  height: 1px;
+  transform: none;
+  opacity: .6;
+}
+
+.num,
+.pc__price, .pc__was, .stage__price, .calc__total b, .cart-sum__big,
+.rail__count, .creds b, .spec-rows dd, .pc__specs dd {
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+}
+.ltr { direction: ltr; unicode-bidi: isolate; }
+
+/* ------------------------------ چیدمان ------------------------------ */
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+.shell--tight { max-width: 1080px; }
+
+.band { position: relative; padding-block: var(--gap-y); }
+.band--short { padding-block: clamp(3.2rem, 7vh, 6rem); }
+
+.band-head {
+  display: grid;
+  gap: 1.1rem;
+  margin-bottom: clamp(2.4rem, 5vw, 4.2rem);
+}
+.band-head--split {
+  grid-template-columns: 1fr;
+  align-items: end;
+  gap: 1.6rem;
+}
+@media (min-width: 940px) {
+  .band-head--split { grid-template-columns: minmax(0, 1fr) auto; }
+}
+
+.hair-line { height: 1px; background: var(--hair); border: 0; }
+
+/* ------------------------------ دکمه‌ها ----------------------------- */
+.btn,
+.btn-ghost {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  padding: 1rem 1.75rem;
+  border-radius: 999px;
+  font-size: .93rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform .45s var(--spring), background-color .35s, color .35s,
+              border-color .35s, box-shadow .45s var(--out);
+  will-change: transform;
+}
+
+.btn {
+  background: var(--champagne);
+  color: var(--ink-900);
+  box-shadow: 0 14px 34px -18px rgba(217, 194, 142, .75);
+}
+.btn:hover {
+  background: var(--champagne-lit);
+  box-shadow: 0 0 0 1px var(--champagne-lit), 0 22px 48px -20px rgba(217, 194, 142, .8);
+}
+.btn:active { transform: scale(.975); }
+
+.btn-ghost {
+  border: 1px solid var(--hair-2);
+  color: var(--porcelain);
+}
+.btn-ghost:hover {
+  border-color: var(--champagne);
+  color: var(--champagne-lit);
+  background: rgba(217, 194, 142, .05);
+}
+.btn-ghost:active { transform: scale(.975); }
+
+.btn-sm { padding: .72rem 1.2rem; font-size: .84rem; }
+.btn-wide { width: 100%; }
+
+.btn-round {
+  width: 46px;
+  height: 46px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--hair-2);
+  color: var(--porcelain-2);
+  transition: color .3s, border-color .3s, background-color .3s, transform .45s var(--spring);
+}
+.btn-round:hover { color: var(--champagne); border-color: var(--hair-3); background: rgba(217, 194, 142, .06); }
+.btn-round:active { transform: scale(.92); }
+
+.link-more {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  color: var(--champagne);
+  font-size: .9rem;
+  font-weight: 600;
+}
+.link-more svg { transition: transform .45s var(--spring); }
+.link-more:hover svg { transform: translateX(-6px); }
+
+/* ------------------------------ ریزاجزا ----------------------------- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .4rem .85rem;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  background: rgba(243, 238, 229, .03);
+  font-size: .76rem;
+  font-weight: 500;
+  color: var(--porcelain-2);
+}
+.tag--gold { border-color: var(--hair-3); color: var(--champagne); background: rgba(217, 194, 142, .07); }
+
+.spark {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--champagne);
+  box-shadow: 0 0 0 4px var(--champagne-glow);
+  flex: none;
+}
+.spark--dim { background: var(--porcelain-4); box-shadow: 0 0 0 4px rgba(243, 238, 229, .07); }
+
+/* پوشش‌های فیلمی — دانه و وینیت روی کل صفحه */
+.film {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  pointer-events: none;
+}
+.film__grain {
+  position: absolute;
+  inset: -50%;
+  opacity: .035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 7s steps(6) infinite;
+}
+.film__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(130% 100% at 50% 42%, transparent 52%, rgba(6, 5, 4, .55) 100%);
+}
+@keyframes grain {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-3%, 2%); }
+  40%  { transform: translate(2%, -3%); }
+  60%  { transform: translate(-2%, -2%); }
+  80%  { transform: translate(3%, 1%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* جای‌گذاری تصویر تا وقتی عکس واقعی نرسیده */
+.img-slot {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: .45rem;
+  text-align: center;
+  padding: 1.2rem;
+  background:
+    repeating-linear-gradient(0deg, rgba(217,194,142,.05) 0 30px, transparent 30px 32px),
+    repeating-linear-gradient(90deg, rgba(217,194,142,.05) 0 88px, transparent 88px 90px),
+    var(--ink-700);
+  color: var(--porcelain-3);
+  font-size: .72rem;
+  line-height: 1.8;
+  direction: ltr;
+  word-break: break-all;
+}
+.img-slot b { display: block; color: var(--champagne); font-size: .78rem; direction: rtl; font-weight: 600; }
+
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* --------------------------- حرکت کمتر ----------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .film__grain { animation: none; }
+}
