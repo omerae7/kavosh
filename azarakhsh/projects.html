@@ -13,8 +13,11 @@
 <meta property="og:image" content="assets/intro/gallery-wide.jpg">
 <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
 
+<!-- az:head -->
 <link rel="preload" href="assets/fonts/Estedad-Arabic-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="assets/intro/gallery-wide.jpg" media="(min-width: 761px)">
+<link rel="preload" as="image" href="assets/intro/gallery-tall.jpg" media="(max-width: 760px)">
 
 <script>
   (function () {
@@ -31,6 +34,7 @@
 <link rel="stylesheet" href="css/card.css">
 <link rel="stylesheet" href="css/sections.css">
 <link rel="stylesheet" href="css/advisor.css">
+<!-- /az:head -->
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/pages/projects.css">
 </head>
@@ -165,10 +169,135 @@
 <section class="band band--short">
   <div class="shell">
     <div class="toolbar">
-      <div class="chips" id="prjTypes"></div>
+      <div class="chips" id="prjTypes">
+<!-- az:prjtypes -->
+        <button class="chip is-on" type="button" data-type="همه">همه</button>
+        <button class="chip" type="button" data-type="مسکونی">مسکونی</button>
+        <button class="chip" type="button" data-type="اداری">اداری</button>
+        <button class="chip" type="button" data-type="ویلایی">ویلایی</button>
+        <button class="chip" type="button" data-type="مرمت">مرمت</button>
+        <button class="chip" type="button" data-type="اقامتی">اقامتی</button>
+        <button class="chip" type="button" data-type="فرهنگی">فرهنگی</button>
+<!-- /az:prjtypes -->
+      </div>
       <span class="toolbar__count" id="prjCount">—</span>
     </div>
-    <div class="grid-3" id="prjGrid"></div>
+    <div class="grid-3" id="prjGrid">
+<!-- az:prjgrid -->
+      <article class="tile prj-card" data-type="مسکونی">
+        <a class="tile__link" href="project-niavaran.html" aria-label="برج مسکونی نیاوران"></a>
+        <div class="tile__media">
+          <span class="tile__tag">مسکونی</span>
+          <img src="assets/gallery/project-01.jpg" alt="برج مسکونی نیاوران" loading="lazy" data-slot>
+        </div>
+        <div class="tile__body">
+          <div class="tile__kicker"><b>تهران</b><span>·</span><span>۱۴۰۴</span></div>
+          <h3>برج مسکونی نیاوران</h3>
+          <p>یک برج دوازده طبقه در شیب شمالی تهران که کارفرما می‌خواست نمایش بدون تغییر رنگ، دههٔ بعد را هم رد کند.</p>
+          <div class="tile__foot">
+            <span class="prj-meta">
+              <span><svg width="13" height="13"><use href="#i-grid"/></svg>۲٬۴۰۰ متر مربع</span>
+            </span>
+            <span class="ltr" style="font-size:.72rem">AZ-R110 · AZ-L710</span>
+          </div>
+        </div>
+      </article>
+      <article class="tile prj-card" data-type="اداری">
+        <a class="tile__link" href="project-sadaf.html" aria-label="مجتمع اداری صدف"></a>
+        <div class="tile__media">
+          <span class="tile__tag">اداری</span>
+          <img src="assets/gallery/project-02.jpg" alt="مجتمع اداری صدف" loading="lazy" data-slot>
+        </div>
+        <div class="tile__body">
+          <div class="tile__kicker"><b>اصفهان</b><span>·</span><span>۱۴۰۴</span></div>
+          <h3>مجتمع اداری صدف</h3>
+          <p>نمای اداری مینیمال با ترکیب آجر سفید و بازشوهای بزرگ آلومینیومی.</p>
+          <div class="tile__foot">
+            <span class="prj-meta">
+              <span><svg width="13" height="13"><use href="#i-grid"/></svg>۱٬۱۰۰ متر مربع</span>
+            </span>
+            <span class="ltr" style="font-size:.72rem">AZ-W220 · AZ-G330</span>
+          </div>
+        </div>
+      </article>
+      <article class="tile prj-card" data-type="ویلایی">
+        <a class="tile__link" href="project-kordan.html" aria-label="ویلای جنگلی کردان"></a>
+        <div class="tile__media">
+          <span class="tile__tag">ویلایی</span>
+          <img src="assets/gallery/project-03.jpg" alt="ویلای جنگلی کردان" loading="lazy" data-slot>
+        </div>
+        <div class="tile__body">
+          <div class="tile__kicker"><b>البرز</b><span>·</span><span>۱۴۰۳</span></div>
+          <h3>ویلای جنگلی کردان</h3>
+          <p>ویلایی میان درختان که باید در زمستان هم گرم به‌نظر می‌رسید و در تابستان با سبزی اطراف نمی‌جنگید.</p>
+          <div class="tile__foot">
+            <span class="prj-meta">
+              <span><svg width="13" height="13"><use href="#i-grid"/></svg>۶۲۰ متر مربع</span>
+            </span>
+            <span class="ltr" style="font-size:.72rem">AZ-G330 · AZ-F810</span>
+          </div>
+        </div>
+      </article>
+      <article class="tile prj-card" data-type="مرمت">
+        <a class="tile__link" href="project-ghajari.html" aria-label="بازسازی خانهٔ قجری"></a>
+        <div class="tile__media">
+          <span class="tile__tag">مرمت</span>
+          <img src="assets/gallery/project-04.jpg" alt="بازسازی خانهٔ قجری" loading="lazy" data-slot>
+        </div>
+        <div class="tile__body">
+          <div class="tile__kicker"><b>تبریز</b><span>·</span><span>۱۴۰۳</span></div>
+          <h3>بازسازی خانهٔ قجری</h3>
+          <p>مرمت نمای یک خانهٔ قجری که بخش‌هایی از آجرکاری اصلی‌اش از بین رفته بود.</p>
+          <div class="tile__foot">
+            <span class="prj-meta">
+              <span><svg width="13" height="13"><use href="#i-grid"/></svg>۴۸۰ متر مربع</span>
+            </span>
+            <span class="ltr" style="font-size:.72rem">AZ-K410 · AZ-B140</span>
+          </div>
+        </div>
+      </article>
+      <article class="tile prj-card" data-type="اقامتی">
+        <a class="tile__link" href="project-kahroba.html" aria-label="هتل بوتیک کهربا"></a>
+        <div class="tile__media">
+          <span class="tile__tag">اقامتی</span>
+          <img src="assets/gallery/project-05.jpg" alt="هتل بوتیک کهربا" loading="lazy" data-slot>
+        </div>
+        <div class="tile__body">
+          <div class="tile__kicker"><b>یزد</b><span>·</span><span>۱۴۰۵</span></div>
+          <h3>هتل بوتیک کهربا</h3>
+          <p>هتلی کوچک در بافت تاریخی یزد که باید با خاکِ شهر هم‌رنگ می‌شد ولی امروزی می‌ماند.</p>
+          <div class="tile__foot">
+            <span class="prj-meta">
+              <span><svg width="13" height="13"><use href="#i-grid"/></svg>۹۳۰ متر مربع</span>
+            </span>
+            <span class="ltr" style="font-size:.72rem">AZ-Y150 · AZ-P510</span>
+          </div>
+        </div>
+      </article>
+      <article class="tile prj-card" data-type="فرهنگی">
+        <a class="tile__link" href="project-mashhad-gallery.html" aria-label="گالری شهر مشهد"></a>
+        <div class="tile__media">
+          <span class="tile__tag">فرهنگی</span>
+          <img src="assets/gallery/project-06.jpg" alt="گالری شهر مشهد" loading="lazy" data-slot>
+        </div>
+        <div class="tile__body">
+          <div class="tile__kicker"><b>مشهد</b><span>·</span><span>۱۴۰۵</span></div>
+          <h3>گالری شهر مشهد</h3>
+          <p>یک گالری عمومی که حجمش باید مثل یک تودهٔ یکپارچه خوانده می‌شد.</p>
+          <div class="tile__foot">
+            <span class="prj-meta">
+              <span><svg width="13" height="13"><use href="#i-grid"/></svg>۱٬۵۰۰ متر مربع</span>
+            </span>
+            <span class="ltr" style="font-size:.72rem">AZ-D620 · AZ-L710</span>
+          </div>
+        </div>
+      </article>
+<!-- /az:prjgrid -->
+    </div>
+    <div class="empty" id="prjEmpty" hidden>
+      <svg width="34" height="34"><use href="#i-layers"/></svg>
+      <h3>در این دسته پروژه‌ای ثبت نشده</h3><p>دستهٔ دیگری را امتحان کنید.</p>
+    </div>
   </div>
 </section>
 

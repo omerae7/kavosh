@@ -13,8 +13,11 @@
 <meta property="og:image" content="assets/intro/gallery-wide.jpg">
 <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
 
+<!-- az:head -->
 <link rel="preload" href="assets/fonts/Estedad-Arabic-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="assets/intro/gallery-wide.jpg" media="(min-width: 761px)">
+<link rel="preload" as="image" href="assets/intro/gallery-tall.jpg" media="(max-width: 760px)">
 
 <script>
   (function () {
@@ -31,6 +34,7 @@
 <link rel="stylesheet" href="css/card.css">
 <link rel="stylesheet" href="css/sections.css">
 <link rel="stylesheet" href="css/advisor.css">
+<!-- /az:head -->
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/pages/search.css">
 </head>
@@ -157,7 +161,242 @@
 <section class="band band--short">
   <div class="shell">
     <div class="srch-tabs" id="srchTabs"></div>
-    <div id="srchResults"></div>
+
+    <div class="empty" id="srchIdle">
+      <svg width="34" height="34"><use href="#i-search"/></svg>
+      <h3>چیزی بنویسید تا بگردیم</h3>
+      <p>می‌توانید نام محصول، کد، نام شهر یا موضوع مقاله را جست‌وجو کنید.</p>
+    </div>
+
+    <div class="empty" id="srchNone" hidden>
+      <svg width="34" height="34"><use href="#i-search"/></svg>
+      <h3>نتیجه‌ای پیدا نشد</h3>
+      <p>املای عبارت را بررسی کنید یا از مشاور نما بپرسید.</p>
+      <button class="btn-ghost btn-sm" type="button" style="margin-top:1.2rem" data-open-advisor>
+        <svg width="15" height="15"><use href="#i-spark"/></svg> پرسش از مشاور
+      </button>
+    </div>
+
+    <div id="srchResults">
+<!-- az:rows -->
+      <section class="srch-group" data-group="product" hidden>
+        <h2>محصولات <i data-count>۰ نتیجه</i></h2>
+      <div class="srch-row" data-kind="product" data-search="نسوز قرمز شفق رنگ آجریِ گرم با بافت مات و یکدست؛ پرفروش‌ترین کد کارخانه. az-r110 نمای نسوز قرمز آجری گرم نارنجی سنتی کلاسیک">
+        <a class="stretch" href="product-r110.html" aria-label="نسوز قرمز شفق"></a>
+        <span class="srch-row__img"><img src="assets/products/az-r110-nasooz-ghermez-wall.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>نسوز قرمز شفق</b>
+          <p>رنگ آجریِ گرم با بافت مات و یکدست؛ پرفروش‌ترین کد کارخانه. AZ-R110 نمای نسوز قرمز آجری گرم نارنجی سنتی کلاسیک</p>
+          <div class="srch-row__meta">AZ-R110 · ۱٬۱۸۰٬۰۰۰ تومان</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="product" data-search="نسوز سفید صدف سفید گرم با دانه‌های ریز تیره؛ انتخاب اول نماهای مینیمال. az-w220 نمای نسوز سفید روشن مینیمال مدرن کرم شیری">
+        <a class="stretch" href="product-w220.html" aria-label="نسوز سفید صدف"></a>
+        <span class="srch-row__img"><img src="assets/products/az-w220-nasooz-sefid-wall.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>نسوز سفید صدف</b>
+          <p>سفید گرم با دانه‌های ریز تیره؛ انتخاب اول نماهای مینیمال. AZ-W220 نمای نسوز سفید روشن مینیمال مدرن کرم شیری</p>
+          <div class="srch-row__meta">AZ-W220 · ۱٬۵۴۰٬۰۰۰ تومان</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="product" data-search="نسوز طوسی دود خاکستری خنثی با ته‌رنگ دودی؛ روی نماهای مدرن می‌نشیند. az-g330 نمای نسوز طوسی خاکستری دودی مدرن سرد نقره">
+        <a class="stretch" href="product-g330.html" aria-label="نسوز طوسی دود"></a>
+        <span class="srch-row__img"><img src="assets/products/az-g330-nasooz-toosi-wall.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>نسوز طوسی دود</b>
+          <p>خاکستری خنثی با ته‌رنگ دودی؛ روی نماهای مدرن می‌نشیند. AZ-G330 نمای نسوز طوسی خاکستری دودی مدرن سرد نقره</p>
+          <div class="srch-row__meta">AZ-G330 · ۱٬۳۹۰٬۰۰۰ تومان</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="product" data-search="نسوز شکلاتی تیره قهوه‌ای عمیق با پخت طولانی‌تر؛ برای نماهای کلاسیک و ویلایی. az-b140 نمای نسوز قهوه‌ای شکلاتی تیره ویلا کلاسیک گرم">
+        <a class="stretch" href="product-b140.html" aria-label="نسوز شکلاتی تیره"></a>
+        <span class="srch-row__img"><img src="assets/products/az-b140-nasooz-shokolati-wall.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>نسوز شکلاتی تیره</b>
+          <p>قهوه‌ای عمیق با پخت طولانی‌تر؛ برای نماهای کلاسیک و ویلایی. AZ-B140 نمای نسوز قهوه‌ای شکلاتی تیره ویلا کلاسیک گرم</p>
+          <div class="srch-row__meta">AZ-B140 · ۱٬۲۶۰٬۰۰۰ تومان</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="product" data-search="قزاقی دست‌ساز کهن قالب چوبی، لبهٔ نامنظم و رنگ ناهمگون؛ حال‌وهوای بناهای قدیمی. az-k410 دست‌ساز دست‌ساز قزاقی سنتی قدیمی بازسازی تاریخی">
+        <a class="stretch" href="product-k410.html" aria-label="قزاقی دست‌ساز کهن"></a>
+        <span class="srch-row__img"><img src="assets/products/az-r110-nasooz-ghermez-wall.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>قزاقی دست‌ساز کهن</b>
+          <p>قالب چوبی، لبهٔ نامنظم و رنگ ناهمگون؛ حال‌وهوای بناهای قدیمی. AZ-K410 دست‌ساز دست‌ساز قزاقی سنتی قدیمی بازسازی تاریخی</p>
+          <div class="srch-row__meta">AZ-K410 · ۱٬۶۹۰٬۰۰۰ تومان</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="product" data-search="پلاک نازک لعاب‌دار ضخامت ۱۲ میلی‌متر با لعاب براق؛ برای نمای داخلی و بازسازی سریع. az-p510 پلاک نازک پلاک نازک لعاب داخلی بازسازی سبک ارزان">
+        <a class="stretch" href="product-p510.html" aria-label="پلاک نازک لعاب‌دار"></a>
+        <span class="srch-row__img"><img src="assets/products/az-r110-nasooz-ghermez-wall.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>پلاک نازک لعاب‌دار</b>
+          <p>ضخامت ۱۲ میلی‌متر با لعاب براق؛ برای نمای داخلی و بازسازی سریع. AZ-P510 پلاک نازک پلاک نازک لعاب داخلی بازسازی سبک ارزان</p>
+          <div class="srch-row__meta">AZ-P510 · ۹۸۰٬۰۰۰ تومان</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="product" data-search="نسوز زرد کهربا زردِ خاکی با رگه‌های روشن؛ زیر نور بعدازظهر عالی می‌شود. az-y150 نمای نسوز زرد کهربا طلایی کرم گرم خاکی">
+        <a class="stretch" href="product-y150.html" aria-label="نسوز زرد کهربا"></a>
+        <span class="srch-row__img"><img src="assets/products/az-y150-nasooz-zard-wall.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>نسوز زرد کهربا</b>
+          <p>زردِ خاکی با رگه‌های روشن؛ زیر نور بعدازظهر عالی می‌شود. AZ-Y150 نمای نسوز زرد کهربا طلایی کرم گرم خاکی</p>
+          <div class="srch-row__meta">AZ-Y150 · ۱٬۳۲۰٬۰۰۰ تومان</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="product" data-search="نمای مشکی مات مشکی کاملاً مات، بدون بازتاب؛ برای نماهای گرافیکی و شاخص. az-d620 نمای نسوز مشکی سیاه تیره مدرن گرافیکی لاکچری">
+        <a class="stretch" href="product-d620.html" aria-label="نمای مشکی مات"></a>
+        <span class="srch-row__img"><img src="assets/products/az-d620-nama-meshki-wall.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>نمای مشکی مات</b>
+          <p>مشکی کاملاً مات، بدون بازتاب؛ برای نماهای گرافیکی و شاخص. AZ-D620 نمای نسوز مشکی سیاه تیره مدرن گرافیکی لاکچری</p>
+          <div class="srch-row__meta">AZ-D620 · ۱٬۷۸۰٬۰۰۰ تومان</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="product" data-search="آجر کنج (اِل) نسوز کنج یکپارچهٔ ۹۰ درجه؛ گوشهٔ نما بدون درز و بدون برش. az-l710 قطعات ویژه کنج ال گوشه نبشی قطعه">
+        <a class="stretch" href="product-l710.html" aria-label="آجر کنج (اِل) نسوز"></a>
+        <span class="srch-row__img"><img src="assets/products/az-r110-nasooz-ghermez-wall.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>آجر کنج (اِل) نسوز</b>
+          <p>کنج یکپارچهٔ ۹۰ درجه؛ گوشهٔ نما بدون درز و بدون برش. AZ-L710 قطعات ویژه کنج ال گوشه نبشی قطعه</p>
+          <div class="srch-row__meta">AZ-L710 · ۲٬۱۵۰٬۰۰۰ تومان</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="product" data-search="آجر فرش کف صنعتی کف‌پوش ۲۵ میلی‌متری ضدسایش؛ محوطه، تراس و پیاده‌رو. az-f810 قطعات ویژه کف فرش محوطه تراس پیاده‌رو حیاط">
+        <a class="stretch" href="product-f810.html" aria-label="آجر فرش کف صنعتی"></a>
+        <span class="srch-row__img"><img src="assets/products/az-r110-nasooz-ghermez-wall.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>آجر فرش کف صنعتی</b>
+          <p>کف‌پوش ۲۵ میلی‌متری ضدسایش؛ محوطه، تراس و پیاده‌رو. AZ-F810 قطعات ویژه کف فرش محوطه تراس پیاده‌رو حیاط</p>
+          <div class="srch-row__meta">AZ-F810 · ۱٬۰۹۰٬۰۰۰ تومان</div>
+        </div>
+      </div>
+      </section>
+      <section class="srch-group" data-group="project" hidden>
+        <h2>پروژه‌ها <i data-count>۰ نتیجه</i></h2>
+      <div class="srch-row" data-kind="project" data-search="برج مسکونی نیاوران یک برج دوازده طبقه در شیب شمالی تهران که کارفرما می‌خواست نمایش بدون تغییر رنگ، دههٔ بعد را هم رد کند. تهران مسکونی دفتر معماری پیرنیا گروه ساختمانی آرمان">
+        <a class="stretch" href="project-niavaran.html" aria-label="برج مسکونی نیاوران"></a>
+        <span class="srch-row__img"><img src="assets/gallery/project-01.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>برج مسکونی نیاوران</b>
+          <p>یک برج دوازده طبقه در شیب شمالی تهران که کارفرما می‌خواست نمایش بدون تغییر رنگ، دههٔ بعد را هم رد کند. تهران مسکونی دفتر</p>
+          <div class="srch-row__meta">تهران · ۲٬۴۰۰ متر مربع · ۱۴۰۴</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="project" data-search="مجتمع اداری صدف نمای اداری مینیمال با ترکیب آجر سفید و بازشوهای بزرگ آلومینیومی. اصفهان اداری استودیو خط هلدینگ صدف">
+        <a class="stretch" href="project-sadaf.html" aria-label="مجتمع اداری صدف"></a>
+        <span class="srch-row__img"><img src="assets/gallery/project-02.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>مجتمع اداری صدف</b>
+          <p>نمای اداری مینیمال با ترکیب آجر سفید و بازشوهای بزرگ آلومینیومی. اصفهان اداری استودیو خط هلدینگ صدف</p>
+          <div class="srch-row__meta">اصفهان · ۱٬۱۰۰ متر مربع · ۱۴۰۴</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="project" data-search="ویلای جنگلی کردان ویلایی میان درختان که باید در زمستان هم گرم به‌نظر می‌رسید و در تابستان با سبزی اطراف نمی‌جنگید. البرز ویلایی دفتر معماری سرو کارفرمای خصوصی">
+        <a class="stretch" href="project-kordan.html" aria-label="ویلای جنگلی کردان"></a>
+        <span class="srch-row__img"><img src="assets/gallery/project-03.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>ویلای جنگلی کردان</b>
+          <p>ویلایی میان درختان که باید در زمستان هم گرم به‌نظر می‌رسید و در تابستان با سبزی اطراف نمی‌جنگید. البرز ویلایی دفتر معمار</p>
+          <div class="srch-row__meta">البرز · ۶۲۰ متر مربع · ۱۴۰۳</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="project" data-search="بازسازی خانهٔ قجری مرمت نمای یک خانهٔ قجری که بخش‌هایی از آجرکاری اصلی‌اش از بین رفته بود. تبریز مرمت گروه مرمت آذر سازمان میراث فرهنگی">
+        <a class="stretch" href="project-ghajari.html" aria-label="بازسازی خانهٔ قجری"></a>
+        <span class="srch-row__img"><img src="assets/gallery/project-04.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>بازسازی خانهٔ قجری</b>
+          <p>مرمت نمای یک خانهٔ قجری که بخش‌هایی از آجرکاری اصلی‌اش از بین رفته بود. تبریز مرمت گروه مرمت آذر سازمان میراث فرهنگی</p>
+          <div class="srch-row__meta">تبریز · ۴۸۰ متر مربع · ۱۴۰۳</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="project" data-search="هتل بوتیک کهربا هتلی کوچک در بافت تاریخی یزد که باید با خاکِ شهر هم‌رنگ می‌شد ولی امروزی می‌ماند. یزد اقامتی استودیو خشت گروه گردشگری کهربا">
+        <a class="stretch" href="project-kahroba.html" aria-label="هتل بوتیک کهربا"></a>
+        <span class="srch-row__img"><img src="assets/gallery/project-05.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>هتل بوتیک کهربا</b>
+          <p>هتلی کوچک در بافت تاریخی یزد که باید با خاکِ شهر هم‌رنگ می‌شد ولی امروزی می‌ماند. یزد اقامتی استودیو خشت گروه گردشگری که</p>
+          <div class="srch-row__meta">یزد · ۹۳۰ متر مربع · ۱۴۰۵</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="project" data-search="گالری شهر مشهد یک گالری عمومی که حجمش باید مثل یک تودهٔ یکپارچه خوانده می‌شد. مشهد فرهنگی دفتر معماری نقش شهرداری مشهد">
+        <a class="stretch" href="project-mashhad-gallery.html" aria-label="گالری شهر مشهد"></a>
+        <span class="srch-row__img"><img src="assets/gallery/project-06.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>گالری شهر مشهد</b>
+          <p>یک گالری عمومی که حجمش باید مثل یک تودهٔ یکپارچه خوانده می‌شد. مشهد فرهنگی دفتر معماری نقش شهرداری مشهد</p>
+          <div class="srch-row__meta">مشهد · ۱٬۵۰۰ متر مربع · ۱۴۰۵</div>
+        </div>
+      </div>
+      </section>
+      <section class="srch-group" data-group="article" hidden>
+        <h2>مقاله‌ها <i data-count>۰ نتیجه</i></h2>
+      <div class="srch-row" data-kind="article" data-search="چرا نمای آجری بعد از سه زمستان شوره می‌زند شوره‌زدگی تقصیر آجر نیست، تقصیر آبی است که راه خروج پیدا نکرده. سه دلیل اصلی و راه‌حل هرکدام. فنی مهندس نادر روحی شوره جذب آب اجرا">
+        <a class="stretch" href="article-shoure-zadegi.html" aria-label="چرا نمای آجری بعد از سه زمستان شوره می‌زند"></a>
+        <span class="srch-row__img"><img src="assets/blog/post-01.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>چرا نمای آجری بعد از سه زمستان شوره می‌زند</b>
+          <p>شوره‌زدگی تقصیر آجر نیست، تقصیر آبی است که راه خروج پیدا نکرده. سه دلیل اصلی و راه‌حل هرکدام. فنی مهندس نادر روحی شوره ج</p>
+          <div class="srch-row__meta">فنی · ۱۴ مرداد ۱۴۰۵</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="article" data-search="بند نازک یا بند پهن؟ انتخابی که کل نما را عوض می‌کند ضخامت بند فقط یک عدد اجرایی نیست؛ تعیین می‌کند نما یکپارچه دیده شود یا دانه‌دانه. اجرا سمانه فرهادی بند اجرا طراحی">
+        <a class="stretch" href="article-band-nazok-ya-pahn.html" aria-label="بند نازک یا بند پهن؟ انتخابی که کل نما را عوض می‌کند"></a>
+        <span class="srch-row__img"><img src="assets/blog/post-02.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>بند نازک یا بند پهن؟ انتخابی که کل نما را عوض می‌کند</b>
+          <p>ضخامت بند فقط یک عدد اجرایی نیست؛ تعیین می‌کند نما یکپارچه دیده شود یا دانه‌دانه. اجرا سمانه فرهادی بند اجرا طراحی</p>
+          <div class="srch-row__meta">اجرا · ۲ مرداد ۱۴۰۵</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="article" data-search="راهنمای انتخاب رنگ نما بر اساس جهت جغرافیایی نمای شمالی و جنوبی یک رنگ را دو جور نشان می‌دهند. پیش از انتخاب، جهت ساختمان را بدانید. طراحی سمانه فرهادی رنگ نور طراحی">
+        <a class="stretch" href="article-rang-nama-va-jahat.html" aria-label="راهنمای انتخاب رنگ نما بر اساس جهت جغرافیایی"></a>
+        <span class="srch-row__img"><img src="assets/blog/post-03.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>راهنمای انتخاب رنگ نما بر اساس جهت جغرافیایی</b>
+          <p>نمای شمالی و جنوبی یک رنگ را دو جور نشان می‌دهند. پیش از انتخاب، جهت ساختمان را بدانید. طراحی سمانه فرهادی رنگ نور طراحی</p>
+          <div class="srch-row__meta">طراحی · ۲۰ تیر ۱۴۰۵</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="article" data-search="آجر نسوز، آجر نما، پلاک نازک: تفاوت واقعی در چیست؟ سه محصولی که اغلب با هم اشتباه گرفته می‌شوند و هر کدام جای مشخصی دارند. فنی مهندس نادر روحی نسوز پلاک مقایسه">
+        <a class="stretch" href="article-nasooz-nama-plak.html" aria-label="آجر نسوز، آجر نما، پلاک نازک: تفاوت واقعی در چیست؟"></a>
+        <span class="srch-row__img"><img src="assets/blog/post-04.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>آجر نسوز، آجر نما، پلاک نازک: تفاوت واقعی در چیست؟</b>
+          <p>سه محصولی که اغلب با هم اشتباه گرفته می‌شوند و هر کدام جای مشخصی دارند. فنی مهندس نادر روحی نسوز پلاک مقایسه</p>
+          <div class="srch-row__meta">فنی · ۸ تیر ۱۴۰۵</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="article" data-search="هفت اشتباه رایج در سفارش آجر نما از محاسبهٔ متراژ بدون پرت تا سفارش دو پارت جدا. اشتباه‌هایی که هزینه‌شان بعداً معلوم می‌شود. سفارش واحد فروش آذرخش سفارش متراژ پالت">
+        <a class="stretch" href="article-haft-eshtebah.html" aria-label="هفت اشتباه رایج در سفارش آجر نما"></a>
+        <span class="srch-row__img"><img src="assets/blog/post-05.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>هفت اشتباه رایج در سفارش آجر نما</b>
+          <p>از محاسبهٔ متراژ بدون پرت تا سفارش دو پارت جدا. اشتباه‌هایی که هزینه‌شان بعداً معلوم می‌شود. سفارش واحد فروش آذرخش سفارش</p>
+          <div class="srch-row__meta">سفارش · ۲۵ خرداد ۱۴۰۵</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="article" data-search="از معدن سهند تا کورهٔ تونلی: یک روز در کارخانه مسیر خاک تا آجری که روی نما می‌نشیند، در پنج ایستگاه. کارخانه تحریریهٔ آذرخش تولید کوره کیفیت">
+        <a class="stretch" href="article-yek-rooz-dar-karkhane.html" aria-label="از معدن سهند تا کورهٔ تونلی: یک روز در کارخانه"></a>
+        <span class="srch-row__img"><img src="assets/blog/post-06.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>از معدن سهند تا کورهٔ تونلی: یک روز در کارخانه</b>
+          <p>مسیر خاک تا آجری که روی نما می‌نشیند، در پنج ایستگاه. کارخانه تحریریهٔ آذرخش تولید کوره کیفیت</p>
+          <div class="srch-row__meta">کارخانه · ۱۰ خرداد ۱۴۰۵</div>
+        </div>
+      </div>
+      <div class="srch-row" data-kind="article" data-search="نگهداری نمای آجری: چه کاری بکنیم و چه کاری نکنیم نمای آجری نگهداری سنگینی نمی‌خواهد، ولی چند کار ساده عمرش را دو برابر می‌کند. اجرا مهندس نادر روحی نگهداری شست‌وشو">
+        <a class="stretch" href="article-negahdari-nama.html" aria-label="نگهداری نمای آجری: چه کاری بکنیم و چه کاری نکنیم"></a>
+        <span class="srch-row__img"><img src="assets/blog/post-07.jpg" alt="" loading="lazy" data-slot></span>
+        <div>
+          <b data-title>نگهداری نمای آجری: چه کاری بکنیم و چه کاری نکنیم</b>
+          <p>نمای آجری نگهداری سنگینی نمی‌خواهد، ولی چند کار ساده عمرش را دو برابر می‌کند. اجرا مهندس نادر روحی نگهداری شست‌وشو</p>
+          <div class="srch-row__meta">اجرا · ۱ خرداد ۱۴۰۵</div>
+        </div>
+      </div>
+      </section>
+<!-- /az:rows -->
+    </div>
   </div>
 </section>
 

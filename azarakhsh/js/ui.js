@@ -16,78 +16,10 @@ window.AZUI = (function () {
     else { const el = $(sel); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   };
 
-  /* ============================ کارت محصول ========================= */
-  function card(p) {
-    const im = toneImages(p, p.tones[0].name);
-    const flag = p.flag
-      ? `<span class="pc__flag${p.flag === 'محدود' || p.flag === 'دست‌ساز' ? ' pc__flag--quiet' : ''}">${esc(p.flag)}</span>`
-      : '';
-    const was = p.was ? `<s class="pc__was">${faNum(p.was)}</s>` : '';
-
-    return `
-      <article class="pc" data-id="${p.id}" data-tone="${esc(p.tones[0].name)}">
-        <div class="pc__media">
-          <a class="pc__open" href="product.html?id=${p.id}" aria-label="برگهٔ کامل ${esc(p.name)}"></a>
-          <img class="pc__img pc__img--main" src="${im.wall}" alt="بافت ${esc(p.name)}" loading="lazy" data-slot>
-          <img class="pc__img pc__img--alt"  src="${im.single}" alt="تک آجر ${esc(p.name)}" loading="lazy" data-slot>
-          <span class="pc__shade"></span>
-          <span class="pc__sheen"></span>
-          <div class="pc__top">
-            <span class="pc__idx">${pad2(p.index)}</span>
-            <span class="pc__code">${esc(p.code)}</span>
-          </div>
-          ${flag}
-        </div>
-
-        <div class="pc__body">
-          <div class="pc__kicker">
-            <span>${esc(p.familyLabel)}</span>
-            <span class="pc__stock">
-              <span class="spark${p.stock === 'موجود در انبار' ? '' : ' spark--dim'}"></span>${esc(p.stock)}
-            </span>
-          </div>
-
-          <h3 class="pc__name"><a href="product.html?id=${p.id}">${esc(p.name)}</a></h3>
-          <p class="pc__desc">${esc(p.desc)}</p>
-
-          <div class="pc__rule"></div>
-
-          <ul class="pc__specs">
-            <li><dt>ابعاد</dt><dd>${fa(p.dims)}</dd></li>
-            <li><dt>جذب آب</dt><dd>${esc(p.absorb)}</dd></li>
-            <li><dt>در هر ${esc(p.unit)}</dt><dd>${esc(p.perLabel)}</dd></li>
-          </ul>
-
-          <div class="pc__tones">
-            <span class="pc__tones-lab">رنگ‌بندی</span>
-            ${p.tones.map((t, i) => `
-              <button class="tone${i === 0 ? ' is-on' : ''}" type="button"
-                      style="background:${t.hex}" data-tone="${esc(t.name)}"
-                      aria-label="رنگ ${esc(t.name)}" title="${esc(t.name)}"></button>`).join('')}
-          </div>
-
-          <div class="pc__foot">
-            <div>
-              <span class="pc__price-lab">قیمت هر ${esc(p.unit)} ${was}</span>
-              <span class="pc__price-row">
-                <span class="pc__price">${faNum(p.price)}</span>
-                <span class="pc__unit">تومان</span>
-              </span>
-            </div>
-            <div class="pc__acts">
-              <button class="pc__view" type="button" data-view aria-label="جزئیات ${esc(p.name)}"
-                      data-cursor="جزئیات">
-                <svg width="17" height="17"><use href="#i-eye"/></svg>
-              </button>
-              <button class="pc__add" type="button" data-add>
-                <svg width="15" height="15"><use href="#i-plus"/></svg>
-                افزودن
-              </button>
-            </div>
-          </div>
-        </div>
-      </article>`;
-  }
+  /* ============================ کارت محصول =========================
+     قالب کارت اینجا نیست: کارت‌ها مستقیم در بدنهٔ HTML نوشته می‌شوند و با
+     tools/build-static.mjs از js/data.js ساخته می‌شوند. اینجا فقط رفتارشان
+     سیم‌کشی می‌شود تا قالب دو جا تعریف نشود.                            */
 
   function wireCards(root) {
     $$('.pc', root).forEach(el => {
@@ -121,38 +53,44 @@ window.AZUI = (function () {
     });
   }
 
-  /* ============================ ریل کلکسیون ======================== */
-  function list() {
-    return state.family === 'all'
-      ? PRODUCTS.slice()
-      : PRODUCTS.filter(p => p.family === state.family);
-  }
+  /* ============================ ریل کلکسیون ========================
+     کارت‌ها در بدنهٔ HTML هستند؛ اینجا فقط سیم‌کشی و فیلتر می‌شوند. */
 
-  function renderFilters() {
+  function initFilters() {
     const box = $('#filters');
     if (!box) return;
-    box.innerHTML = FAMILIES.map(f => {
-      const n = f.id === 'all' ? PRODUCTS.length : PRODUCTS.filter(p => p.family === f.id).length;
-      return `<button class="filter${f.id === state.family ? ' is-on' : ''}" type="button"
-                data-family="${f.id}">${esc(f.label)}<i>${fa(n)}</i></button>`;
-    }).join('');
-    $$('.filter', box).forEach(b => b.addEventListener('click', () => {
-      state.family = b.dataset.family;
-      $$('.filter', box).forEach(x => x.classList.toggle('is-on', x === b));
-      renderRail();
+    $$('.filter', box).forEach(btn => btn.addEventListener('click', () => {
+      state.family = btn.dataset.family;
+      $$('.filter', box).forEach(x => x.classList.toggle('is-on', x === btn));
+      applyRailFilter();
     }));
   }
 
-  function renderRail() {
+  function applyRailFilter() {
+    const items = $$('#railTrack .rail__item');
+    if (!items.length) return;
+    let shown = 0;
+    items.forEach(it => {
+      const ok = state.family === 'all' || it.dataset.family === state.family;
+      it.hidden = !ok;
+      if (ok) shown++;
+    });
+    const view = $('#railView');
+    if (view) view.scrollLeft = 0;
+    const total = $('#railTotal');
+    if (total) total.textContent = fa(shown);
+    const now = $('#railNow');
+    if (now) now.textContent = pad2(shown ? 1 : 0);
+    document.dispatchEvent(new CustomEvent('az:rail'));
+  }
+
+  function initRail() {
     const track = $('#railTrack');
     if (!track) return;
-    const items = list();
-    track.innerHTML = items.map(p => `<div class="rail__item">${card(p)}</div>`).join('');
     wireImages(track);
     wireCards(track);
-    $('#railTotal').textContent = fa(items.length);
-    $('#railNow').textContent = pad2(1);
-    document.dispatchEvent(new CustomEvent('az:rail'));
+    const total = $('#railTotal');
+    if (total) total.textContent = fa($$('.rail__item', track).length);
   }
 
   /* =========================== شیت محصول =========================== */
@@ -160,7 +98,7 @@ window.AZUI = (function () {
     const p = byId(id);
     if (!p) return;
     /* صفحاتی که شیت محصول ندارند، به برگهٔ اثر می‌روند */
-    if (!$('#productSheet')) { window.location.href = 'product.html?id=' + encodeURIComponent(p.id); return; }
+    if (!$('#productSheet')) { window.location.href = 'product-' + p.id + '.html'; return; }
     let tone = toneName || p.tones[0].name;
     let qty = 1;
 
@@ -184,7 +122,7 @@ window.AZUI = (function () {
         <div>
           <span class="label label--bare">${esc(p.familyLabel)} · ${esc(p.code)}</span>
           <h3 class="pd__name">${esc(p.name)}</h3>
-          <a class="link-more" href="product.html?id=${p.id}" style="margin-top:.5rem">
+          <a class="link-more" href="product-${p.id}.html" style="margin-top:.5rem">
             برگهٔ کامل اثر
             <svg width="15" height="15"><use href="#i-arrow"/></svg>
           </a>
@@ -397,11 +335,9 @@ window.AZUI = (function () {
     await customElements.whenDefined('sl-range');
     await customElements.whenDefined('sl-select');
 
-    const sel = $('#calcProduct');
-    sel.innerHTML = PRODUCTS.map(p =>
-      `<sl-option value="${p.id}">${esc(p.name)} · ${esc(p.code)}</sl-option>`).join('');
+    const sel = $('#calcProduct');   /* گزینه‌ها در بدنهٔ HTML هستند */
     await customElements.whenDefined('sl-option');
-    sel.value = 'r110';
+    if (!sel.value) sel.value = 'r110';
 
     const w = $('#calcW'), h = $('#calcH'), o = $('#calcO'), j = $('#calcJ');
 
@@ -448,15 +384,9 @@ window.AZUI = (function () {
   }
 
   /* ======================== گالری، نظرها، پرسش‌ها =================== */
-  function renderGallery() {
+  function initGallery() {
     const box = $('#gallery');
     if (!box) return;
-    box.innerHTML = PROJECTS.map(p => `
-      <button class="gal__i" type="button" data-src="${p.file}" data-title="${esc(p.title)}"
-              data-meta="${esc(p.meta)}" data-cursor="بزرگ‌نمایی">
-        <img src="${p.file}" alt="${esc(p.title)}" loading="lazy" data-slot>
-        <span class="gal__cap"><b>${esc(p.title)}</b><span>${esc(p.meta)}</span></span>
-      </button>`).join('');
     wireImages(box);
 
     const lb = $('#lightbox');
@@ -473,60 +403,26 @@ window.AZUI = (function () {
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
   }
 
-  function renderVoices() {
+  function initVoices() {
     const box = $('#voices');
-    if (!box) return;
-    box.innerHTML = VOICES.map((v, i) => `
-      <figure class="voice${i === 0 ? ' is-on' : ''}">
-        <p>«${esc(v.text)}»</p>
-        <figcaption class="voice__who">
-          <span class="voice__av">${esc(v.name.trim().charAt(0))}</span>
-          <span><b>${esc(v.name)}</b><span>${esc(v.role)}</span></span>
-        </figcaption>
-      </figure>`).join('');
-
     const nav = $('#voiceNav');
-    nav.innerHTML = VOICES.map((_, i) =>
-      `<button type="button" class="${i === 0 ? 'is-on' : ''}" aria-label="نظر ${i + 1}"></button>`).join('');
+    if (!box || !nav) return;
+    const figures = $$('.voice', box);
+    const dots = $$('button', nav);
+    if (!figures.length) return;
 
     let at = 0, timer;
     const show = i => {
-      at = (i + VOICES.length) % VOICES.length;
-      $$('.voice', box).forEach((f, k) => f.classList.toggle('is-on', k === at));
-      $$('button', nav).forEach((b, k) => b.classList.toggle('is-on', k === at));
+      at = (i + figures.length) % figures.length;
+      figures.forEach((f, k) => f.classList.toggle('is-on', k === at));
+      dots.forEach((b, k) => b.classList.toggle('is-on', k === at));
     };
     const play = () => { clearInterval(timer); timer = setInterval(() => show(at + 1), 6500); };
-    $$('button', nav).forEach((b, i) => b.addEventListener('click', () => { show(i); play(); }));
+    dots.forEach((b, i) => b.addEventListener('click', () => { show(i); play(); }));
     play();
   }
 
-  async function renderFaq() {
-    const box = $('#faqList');
-    if (!box) return;
-    box.innerHTML = FAQS.map((f, i) => `
-      <sl-details ${i === 0 ? 'open' : ''} summary="${esc(f.q)}">
-        <p class="small">${esc(f.a)}</p>
-      </sl-details>`).join('');
-    await customElements.whenDefined('sl-details');
-  }
-
-  function renderTicker() {
-    if (!$('#ticker')) return;
-    const row = TICKER.map(t => `<span class="tick">${esc(t)}</span>`).join('');
-    $('#ticker').innerHTML = row + row;
-  }
-
-  function renderStage() {
-    if (!$('#stageImg')) return;
-    const p = PRODUCTS[0];
-    const im = toneImages(p, p.tones[0].name);
-    $('#stageImg').src = im.wall;
-    $('#stageName').textContent = p.name;
-    $('#stageMeta').textContent = p.code + ' · ' + p.familyLabel;
-    $('#stagePrice').innerHTML = faNum(p.price) + ' <small>تومان / ' + esc(p.unit) + '</small>';
-    $('#stageOpen').addEventListener('click', () => openProduct(p.id));
-    wireImages($('#heroStage'));
-  }
+  /* پرسش‌ها و تیکر هم در بدنهٔ HTML هستند و چیزی برای ساختن ندارند. */
 
   /* =============================== فرم‌ها ========================== */
   async function initForms() {
@@ -604,13 +500,10 @@ window.AZUI = (function () {
 
   /* ============================== شروع ============================= */
   function init() {
-    renderTicker();
-    renderStage();
-    renderFilters();
-    renderRail();
-    renderGallery();
-    renderVoices();
-    renderFaq();
+    initFilters();
+    initRail();
+    initGallery();
+    initVoices();
     initCalc();
     initForms();
     initNav();
@@ -620,5 +513,5 @@ window.AZUI = (function () {
     document.addEventListener('az:cart', renderCart);
   }
 
-  return { init, openProduct, openCart, renderCart, goTo, card, wireCards };
+  return { init, openProduct, openCart, renderCart, goTo, wireCards, applyRailFilter };
 })();

@@ -4,7 +4,8 @@
  * نوار فرمان، پابرگ، داک، شیت‌ها، اسپرایت آیکون و پوشش‌ها در همهٔ
  * صفحه‌ها یکسان‌اند و بین این نشانه‌ها قرار دارند:
  *
- *     <!-- az:bar -->  …  <!-- /az:bar -->
+ *     <!-- az:head -->  …  <!-- /az:head -->
+ *     <!-- az:bar -->   …  <!-- /az:bar -->
  *
  * index.html مرجع است. یک بار آنجا ویرایش کنید و این را اجرا کنید:
  *
@@ -19,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE = 'index.html';
-const BLOCKS = ['sprite', 'bar', 'footer', 'dock', 'sheets', 'overlay'];
+const BLOCKS = ['head', 'sprite', 'bar', 'footer', 'dock', 'sheets', 'overlay'];
 
 const slice = (html, name) => {
   const open = `<!-- az:${name} -->`;

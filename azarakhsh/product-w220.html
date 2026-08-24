@@ -3,18 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>پروندهٔ پروژه | آذرخش</title>
-<meta name="description" content="پروندهٔ کامل یک پروژهٔ اجراشده: متراژ، کد آجر، چالش اجرا و نتیجه.">
+<title>نسوز سفید صدف | آذرخش</title>
+<meta name="description" content="سفید گرم با دانه‌های ریز تیره؛ انتخاب اول نماهای مینیمال. مشخصات فنی، رنگ‌بندی، قیمت درب کارخانه و برآورد متراژ نسوز سفید صدف (AZ-W220).">
 <meta name="theme-color" content="#e6dfd6" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0c0b0a" media="(prefers-color-scheme: dark)">
-<meta property="og:title" content="پروندهٔ پروژه | آذرخش">
-<meta property="og:description" content="پروندهٔ کامل یک پروژهٔ اجراشده: متراژ، کد آجر، چالش اجرا و نتیجه.">
+<meta property="og:title" content="نسوز سفید صدف | آذرخش">
+<meta property="og:description" content="سفید گرم با دانه‌های ریز تیره؛ انتخاب اول نماهای مینیمال. مشخصات فنی، رنگ‌بندی، قیمت درب کارخانه و برآورد متراژ نسوز سفید صدف (AZ-W220).">
 <meta property="og:type" content="website">
 <meta property="og:image" content="assets/intro/gallery-wide.jpg">
 <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
 
+<!-- az:head -->
 <link rel="preload" href="assets/fonts/Estedad-Arabic-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="assets/intro/gallery-wide.jpg" media="(min-width: 761px)">
+<link rel="preload" as="image" href="assets/intro/gallery-tall.jpg" media="(max-width: 760px)">
 
 <script>
   (function () {
@@ -31,11 +34,12 @@
 <link rel="stylesheet" href="css/card.css">
 <link rel="stylesheet" href="css/sections.css">
 <link rel="stylesheet" href="css/advisor.css">
+<!-- /az:head -->
 <link rel="stylesheet" href="css/pages.css">
-<link rel="stylesheet" href="css/pages/project.css">
+<link rel="stylesheet" href="css/pages/product.css">
 </head>
 
-<body data-page="projects">
+<body data-page="shop" data-product="w220">
 
 <div class="film" aria-hidden="true">
   <div class="film__grain"></div>
@@ -136,34 +140,136 @@
 
 <main id="top">
 
-<section class="prj-hero noir">
-  <div class="prj-hero__bg"><img id="prjHeroImg" src="" alt="" data-slot></div>
-  <div class="prj-hero__scrim"></div>
-  <div class="shell prj-hero__in">
+<section class="band pdp-band">
+  <div class="shell">
     <nav class="crumbs" aria-label="مسیر">
-      <a href="index.html">خانه</a><i>—</i><a href="projects.html">پروژه‌ها</a><i>—</i>
-      <span aria-current="page" id="prjCrumb">…</span>
+      <a href="index.html">خانه</a><i>—</i><a href="shop.html">کلکسیون</a><i>—</i>
+      <span aria-current="page">نسوز سفید صدف</span>
     </nav>
-    <span class="label label--bare" id="prjKicker">—</span>
-    <h1 class="display" id="prjTitle">—</h1>
-    <p class="lede" id="prjBrief">—</p>
+
+    <div class="pdp">
+      <div class="pdp__media">
+        <div class="pdp__stage">
+          <img id="pdpMain" src="assets/products/az-w220-nasooz-sefid-wall.jpg" alt="نسوز سفید صدف" data-slot>
+          <span class="pdp__label">اثر ۰۲</span>
+        </div>
+        <div class="pdp__thumbs" id="pdpThumbs">
+          <button class="pdp__thumb is-on" type="button" data-src="assets/products/az-w220-nasooz-sefid-wall.jpg" aria-label="تصویر ۱">
+            <img src="assets/products/az-w220-nasooz-sefid-wall.jpg" alt="" data-slot>
+          </button>
+          <button class="pdp__thumb" type="button" data-src="assets/products/az-w220-nasooz-sefid-single.jpg" aria-label="تصویر ۲">
+            <img src="assets/products/az-w220-nasooz-sefid-single.jpg" alt="" data-slot>
+          </button>
+          <button class="pdp__thumb" type="button" data-src="assets/products/az-g330-nasooz-toosi-wall.jpg" aria-label="تصویر ۳">
+            <img src="assets/products/az-g330-nasooz-toosi-wall.jpg" alt="" data-slot>
+          </button>
+          <button class="pdp__thumb" type="button" data-src="assets/products/az-y150-nasooz-zard-wall.jpg" aria-label="تصویر ۴">
+            <img src="assets/products/az-y150-nasooz-zard-wall.jpg" alt="" data-slot>
+          </button>
+        </div>
+      </div>
+
+      <div class="pdp__buy" id="pdpBuy">
+        <div>
+          <span class="label label--bare">نمای نسوز · AZ-W220</span>
+          <h1 class="pdp__name">نسوز سفید صدف</h1>
+        </div>
+        <p class="pdp__tagline">سفید گرم با دانه‌های ریز تیره؛ انتخاب اول نماهای مینیمال.</p>
+
+        <div class="pdp__marks"><span class="tag">پایداری رنگ در برابر UV</span><span class="tag">مناسب نمای شمالی</span><span class="tag">بند تیره پیشنهادی</span></div>
+
+        <div class="pc__tones" style="margin:0">
+          <span class="pc__tones-lab">رنگ‌بندی</span>
+          <button class="tone is-on" type="button" style="background:#e6e1d8" data-tone="سفید صدف" title="سفید صدف" aria-label="رنگ سفید صدف"></button>
+          <button class="tone" type="button" style="background:#a6a099" data-tone="طوسی دود" title="طوسی دود" aria-label="رنگ طوسی دود"></button>
+          <button class="tone" type="button" style="background:#c9a05c" data-tone="زرد کهربا" title="زرد کهربا" aria-label="رنگ زرد کهربا"></button>
+        </div>
+
+        <div class="pdp__pricebox">
+          <div>
+            <span class="pc__price-lab">قیمت هر متر مربع </span>
+            <span class="pdp__price">۱٬۵۴۰٬۰۰۰ <small>تومان</small></span>
+          </div>
+          <span class="tag"><span class="spark"></span>موجود در انبار</span>
+        </div>
+
+        <div class="pdp__row">
+          <div class="stepper">
+            <button type="button" data-step="-1" aria-label="کاهش">−</button>
+            <input type="number" id="pdpQty" value="1" min="0.5" step="0.5" inputmode="decimal" aria-label="مقدار">
+            <button type="button" data-step="1" aria-label="افزایش">+</button>
+          </div>
+          <button class="btn" type="button" id="pdpAdd" style="flex:1">
+            <svg width="16" height="16"><use href="#i-bag"/></svg>
+            افزودن به سبد
+          </button>
+        </div>
+
+        <div class="pdp__notes">
+          <div class="pdp__note"><svg width="16" height="16"><use href="#i-shield"/></svg>
+            <span>ضمانت کتبی ۲۵ ساله روی رنگ، شوره و پوسته‌شدن سطح</span></div>
+          <div class="pdp__note"><svg width="16" height="16"><use href="#i-truck"/></svg>
+            <span>آماده‌سازی ۵ تا ۷ روز کاری · ارسال رایگان بالای ۳۰۰ متر مربع</span></div>
+          <div class="pdp__note"><svg width="16" height="16"><use href="#i-box"/></svg>
+            <span>پالت ۱۲ متر مربعی، شرینک‌شده</span></div>
+        </div>
+
+        <button class="btn-ghost btn-wide" type="button" data-ask="دربارهٔ نسوز سفید صدف بیشتر بگو">
+          <svg width="16" height="16"><use href="#i-spark"/></svg>
+          پرسش از مشاور نما دربارهٔ این کد
+        </button>
+      </div>
+    </div>
   </div>
 </section>
-
-<div class="stat-row" id="prjStats"></div>
 
 <section class="band band--short">
   <div class="shell">
     <div class="with-side">
-      <div class="prose" id="prjBody"></div>
+      <div>
+        <span class="label label--ch"><i>۰۱</i>روایت اثر</span>
+        <div class="prose" id="pdpStory" style="margin-top:1.2rem">
+          <p>برای اینکه سفید بعد از دو زمستان خاکستری نشود، لعاب نمی‌زنیم؛ رنگ از خودِ خاک کائولن می‌آید و تا عمق آجر یکدست است.</p>
+          <h2>کجا خوب می‌نشیند</h2>
+          <p>سفید گرم با دانه‌های ریز تیره؛ انتخاب اول نماهای مینیمال. این کد در خانوادهٔ «نمای نسوز» قرار دارد و با تمام کدهای هم‌خانواده هم‌ابعاد است؛
+             یعنی می‌توانید در یک نما ترکیبش کنید بدون اینکه بند و ردیف‌ها به هم بخورد.</p>
+          <ul><li>پایداری رنگ در برابر UV</li><li>مناسب نمای شمالی</li><li>بند تیره پیشنهادی</li></ul>
+          <blockquote>اجرا با ملات ماسه‌سیمان ۱:۴ و بندکشی با دوغاب آب‌بندشده. برای پلاک نازک، چسب پودری کاشی‌کاری کافی است. سه نکته: بند را بعد از ۲۴ ساعت بکشید، آجر را پیش از نصب خیس نکنید، و در دمای زیر ۵ درجه اجرا نکنید.</blockquote>
+          <h2>پیش از سفارش</h2>
+          <p>پیشنهاد ما این است که نمونه را از نزدیک ببینید. جعبهٔ نمونه رایگان است و ظرف ۴۸ ساعت می‌رسد؛
+             کنار نمای فعلی بگذارید و در سه ساعت مختلف روز نگاهش کنید.</p>
+        </div>
+      </div>
+
       <aside class="side">
         <div class="side__box">
-          <h4>شناسنامهٔ پروژه</h4>
-          <dl class="spec-rows" id="prjMeta"></dl>
+          <h4>برگهٔ فنی</h4>
+          <dl class="spec-rows" id="pdpSpecs">
+            <div><dt>ابعاد</dt><dd>۲۴۰×۷۰×۲۰ میلی‌متر</dd></div>
+            <div><dt>جذب آب</dt><dd>زیر ۵٪</dd></div>
+            <div><dt>مقاومت فشاری</dt><dd>۳۸۰ kg/cm²</dd></div>
+            <div><dt>تعداد در هر متر مربع</dt><dd>۵۲ عدد</dd></div>
+            <div><dt>وزن</dt><dd>۲۹ کیلوگرم در متر مربع</dd></div>
+            <div><dt>بسته‌بندی</dt><dd>پالت ۱۲ متر مربعی، شرینک‌شده</dd></div>
+            <div><dt>آماده‌سازی</dt><dd>۵ تا ۷ روز کاری</dd></div>
+          </dl>
         </div>
-        <div class="side__box">
-          <h4>آجرهای استفاده‌شده</h4>
-          <div class="side__list" id="prjCodes"></div>
+        <div class="side__box noir">
+          <h4>برآورد سریع متراژ</h4>
+          <label class="pdp__calc">
+            <span>مساحت نما (متر مربع)</span>
+            <input type="number" id="pdpArea" value="100" min="1" step="1" inputmode="numeric">
+          </label>
+          <dl class="spec-rows" id="pdpEstimate" style="margin-top:.9rem">
+            <div><dt>با ۷٪ پرت</dt><dd>۱۰۷ متر مربع</dd></div>
+            <div><dt>تعداد آجر</dt><dd>۵٬۵۶۴ عدد</dd></div>
+            <div><dt>تعداد پالت</dt><dd>۹ پالت</dd></div>
+            <div><dt>برآورد هزینه</dt><dd>۱۶۴٬۷۸۰٬۰۰۰ تومان</dd></div>
+          </dl>
+          <button class="btn btn-wide btn-sm" type="button" id="pdpCalcAdd" style="margin-top:1rem">
+            <svg width="15" height="15"><use href="#i-bag"/></svg>
+            افزودن این مقدار به سبد
+          </button>
         </div>
       </aside>
     </div>
@@ -172,24 +278,204 @@
 
 <section class="band band--short">
   <div class="shell">
-    <div class="band-head"><span class="label label--ch"><i>۰۲</i>قاب‌های پروژه</span></div>
-    <div class="gal" id="prjGallery"></div>
-  </div>
-</section>
-
-<section class="band band--short">
-  <div class="shell">
-    <div class="prj-quote noir" data-in>
-      <svg width="26" height="26"><use href="#i-quote"/></svg>
-      <p id="prjQuote">—</p>
-      <span id="prjQuoteBy">—</span>
+    <div class="band-head band-head--split">
+      <div>
+        <span class="label label--ch"><i>۰۲</i>هم‌خانواده‌ها</span>
+        <h2 class="h2" style="margin-top:.7rem">شاید این‌ها هم به کارتان بیاید</h2>
+      </div>
+      <div><a class="link-more" href="shop.html">همهٔ کلکسیون <svg width="16" height="16"><use href="#i-arrow"/></svg></a></div>
     </div>
-  </div>
-</section>
+    <div class="pgrid" id="pdpRelated">
+      <article class="pc" data-id="r110" data-tone="قرمز شفق"
+               data-family="nasooz" data-price="1180000" data-stock="1"
+               data-tones="قرمز شفق|شکلاتی|زرد کهربا"
+               data-search="نسوز قرمز شفق az-r110 نمای نسوز رنگ آجریِ گرم با بافت مات و یکدست؛ پرفروش‌ترین کد کارخانه. قرمز آجری گرم نارنجی سنتی کلاسیک">
+        <div class="pc__media">
+          <a class="pc__open" href="product-r110.html" aria-label="برگهٔ کامل نسوز قرمز شفق"></a>
+          <img class="pc__img pc__img--main" src="assets/products/az-r110-nasooz-ghermez-wall.jpg" alt="بافت نسوز قرمز شفق" loading="lazy" data-slot>
+          <img class="pc__img pc__img--alt" src="assets/products/az-r110-nasooz-ghermez-single.jpg" alt="تک آجر نسوز قرمز شفق" loading="lazy" data-slot>
+          <span class="pc__shade"></span>
+          <span class="pc__sheen"></span>
+          <div class="pc__top">
+            <span class="pc__idx">۰۱</span>
+            <span class="pc__code">AZ-R110</span>
+          </div>
+          <span class="pc__flag">پرفروش</span>
+        </div>
 
-<section class="band band--short">
-  <div class="shell">
-    <div class="prj-nav" id="prjNav"></div>
+        <div class="pc__body">
+          <div class="pc__kicker">
+            <span>نمای نسوز</span>
+            <span class="pc__stock">
+              <span class="spark"></span>موجود در انبار
+            </span>
+          </div>
+
+          <h3 class="pc__name"><a href="product-r110.html">نسوز قرمز شفق</a></h3>
+          <p class="pc__desc">رنگ آجریِ گرم با بافت مات و یکدست؛ پرفروش‌ترین کد کارخانه.</p>
+
+          <div class="pc__rule"></div>
+
+          <ul class="pc__specs">
+            <li><dt>ابعاد</dt><dd>۲۴۰×۷۰×۲۰</dd></li>
+            <li><dt>جذب آب</dt><dd>زیر ۶٪</dd></li>
+            <li><dt>در هر متر مربع</dt><dd>۵۲ عدد</dd></li>
+          </ul>
+
+          <div class="pc__tones">
+            <span class="pc__tones-lab">رنگ‌بندی</span>
+            <button class="tone is-on" type="button" style="background:#8d4a30" data-tone="قرمز شفق" aria-label="رنگ قرمز شفق" title="قرمز شفق"></button>
+            <button class="tone" type="button" style="background:#573323" data-tone="شکلاتی" aria-label="رنگ شکلاتی" title="شکلاتی"></button>
+            <button class="tone" type="button" style="background:#c9a05c" data-tone="زرد کهربا" aria-label="رنگ زرد کهربا" title="زرد کهربا"></button>
+          </div>
+
+          <div class="pc__foot">
+            <div>
+              <span class="pc__price-lab">قیمت هر متر مربع <s class="pc__was">۱٬۳۴۰٬۰۰۰</s></span>
+              <span class="pc__price-row">
+                <span class="pc__price">۱٬۱۸۰٬۰۰۰</span>
+                <span class="pc__unit">تومان</span>
+              </span>
+            </div>
+            <div class="pc__acts">
+              <button class="pc__view" type="button" data-view aria-label="نمای سریع نسوز قرمز شفق" data-cursor="نمای سریع">
+                <svg width="17" height="17"><use href="#i-eye"/></svg>
+              </button>
+              <button class="pc__add" type="button" data-add>
+                <svg width="15" height="15"><use href="#i-plus"/></svg>
+                افزودن
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article class="pc" data-id="g330" data-tone="طوسی دود"
+               data-family="nasooz" data-price="1390000" data-stock="1"
+               data-tones="طوسی دود|مشکی مات|سفید صدف"
+               data-search="نسوز طوسی دود az-g330 نمای نسوز خاکستری خنثی با ته‌رنگ دودی؛ روی نماهای مدرن می‌نشیند. طوسی خاکستری دودی مدرن سرد نقره">
+        <div class="pc__media">
+          <a class="pc__open" href="product-g330.html" aria-label="برگهٔ کامل نسوز طوسی دود"></a>
+          <img class="pc__img pc__img--main" src="assets/products/az-g330-nasooz-toosi-wall.jpg" alt="بافت نسوز طوسی دود" loading="lazy" data-slot>
+          <img class="pc__img pc__img--alt" src="assets/products/az-g330-nasooz-toosi-single.jpg" alt="تک آجر نسوز طوسی دود" loading="lazy" data-slot>
+          <span class="pc__shade"></span>
+          <span class="pc__sheen"></span>
+          <div class="pc__top">
+            <span class="pc__idx">۰۳</span>
+            <span class="pc__code">AZ-G330</span>
+          </div>
+          
+        </div>
+
+        <div class="pc__body">
+          <div class="pc__kicker">
+            <span>نمای نسوز</span>
+            <span class="pc__stock">
+              <span class="spark"></span>موجود در انبار
+            </span>
+          </div>
+
+          <h3 class="pc__name"><a href="product-g330.html">نسوز طوسی دود</a></h3>
+          <p class="pc__desc">خاکستری خنثی با ته‌رنگ دودی؛ روی نماهای مدرن می‌نشیند.</p>
+
+          <div class="pc__rule"></div>
+
+          <ul class="pc__specs">
+            <li><dt>ابعاد</dt><dd>۲۴۰×۷۰×۲۰</dd></li>
+            <li><dt>جذب آب</dt><dd>زیر ۶٪</dd></li>
+            <li><dt>در هر متر مربع</dt><dd>۵۲ عدد</dd></li>
+          </ul>
+
+          <div class="pc__tones">
+            <span class="pc__tones-lab">رنگ‌بندی</span>
+            <button class="tone is-on" type="button" style="background:#a6a099" data-tone="طوسی دود" aria-label="رنگ طوسی دود" title="طوسی دود"></button>
+            <button class="tone" type="button" style="background:#2f2c2a" data-tone="مشکی مات" aria-label="رنگ مشکی مات" title="مشکی مات"></button>
+            <button class="tone" type="button" style="background:#e6e1d8" data-tone="سفید صدف" aria-label="رنگ سفید صدف" title="سفید صدف"></button>
+          </div>
+
+          <div class="pc__foot">
+            <div>
+              <span class="pc__price-lab">قیمت هر متر مربع <s class="pc__was">۱٬۴۹۰٬۰۰۰</s></span>
+              <span class="pc__price-row">
+                <span class="pc__price">۱٬۳۹۰٬۰۰۰</span>
+                <span class="pc__unit">تومان</span>
+              </span>
+            </div>
+            <div class="pc__acts">
+              <button class="pc__view" type="button" data-view aria-label="نمای سریع نسوز طوسی دود" data-cursor="نمای سریع">
+                <svg width="17" height="17"><use href="#i-eye"/></svg>
+              </button>
+              <button class="pc__add" type="button" data-add>
+                <svg width="15" height="15"><use href="#i-plus"/></svg>
+                افزودن
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article class="pc" data-id="b140" data-tone="شکلاتی"
+               data-family="nasooz" data-price="1260000" data-stock="1"
+               data-tones="شکلاتی|قرمز شفق|مشکی مات"
+               data-search="نسوز شکلاتی تیره az-b140 نمای نسوز قهوه‌ای عمیق با پخت طولانی‌تر؛ برای نماهای کلاسیک و ویلایی. قهوه‌ای شکلاتی تیره ویلا کلاسیک گرم">
+        <div class="pc__media">
+          <a class="pc__open" href="product-b140.html" aria-label="برگهٔ کامل نسوز شکلاتی تیره"></a>
+          <img class="pc__img pc__img--main" src="assets/products/az-b140-nasooz-shokolati-wall.jpg" alt="بافت نسوز شکلاتی تیره" loading="lazy" data-slot>
+          <img class="pc__img pc__img--alt" src="assets/products/az-b140-nasooz-shokolati-single.jpg" alt="تک آجر نسوز شکلاتی تیره" loading="lazy" data-slot>
+          <span class="pc__shade"></span>
+          <span class="pc__sheen"></span>
+          <div class="pc__top">
+            <span class="pc__idx">۰۴</span>
+            <span class="pc__code">AZ-B140</span>
+          </div>
+          
+        </div>
+
+        <div class="pc__body">
+          <div class="pc__kicker">
+            <span>نمای نسوز</span>
+            <span class="pc__stock">
+              <span class="spark"></span>موجود در انبار
+            </span>
+          </div>
+
+          <h3 class="pc__name"><a href="product-b140.html">نسوز شکلاتی تیره</a></h3>
+          <p class="pc__desc">قهوه‌ای عمیق با پخت طولانی‌تر؛ برای نماهای کلاسیک و ویلایی.</p>
+
+          <div class="pc__rule"></div>
+
+          <ul class="pc__specs">
+            <li><dt>ابعاد</dt><dd>۲۴۰×۷۰×۲۰</dd></li>
+            <li><dt>جذب آب</dt><dd>زیر ۶٪</dd></li>
+            <li><dt>در هر متر مربع</dt><dd>۵۲ عدد</dd></li>
+          </ul>
+
+          <div class="pc__tones">
+            <span class="pc__tones-lab">رنگ‌بندی</span>
+            <button class="tone is-on" type="button" style="background:#573323" data-tone="شکلاتی" aria-label="رنگ شکلاتی" title="شکلاتی"></button>
+            <button class="tone" type="button" style="background:#8d4a30" data-tone="قرمز شفق" aria-label="رنگ قرمز شفق" title="قرمز شفق"></button>
+            <button class="tone" type="button" style="background:#2f2c2a" data-tone="مشکی مات" aria-label="رنگ مشکی مات" title="مشکی مات"></button>
+          </div>
+
+          <div class="pc__foot">
+            <div>
+              <span class="pc__price-lab">قیمت هر متر مربع </span>
+              <span class="pc__price-row">
+                <span class="pc__price">۱٬۲۶۰٬۰۰۰</span>
+                <span class="pc__unit">تومان</span>
+              </span>
+            </div>
+            <div class="pc__acts">
+              <button class="pc__view" type="button" data-view aria-label="نمای سریع نسوز شکلاتی تیره" data-cursor="نمای سریع">
+                <svg width="17" height="17"><use href="#i-eye"/></svg>
+              </button>
+              <button class="pc__add" type="button" data-add>
+                <svg width="15" height="15"><use href="#i-plus"/></svg>
+                افزودن
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -426,18 +712,17 @@
 <script src="vendor/gsap/ScrollTrigger.min.js"></script>
 <script src="vendor/lenis/lenis.min.js"></script>
 <script src="js/data.js"></script>
-<script src="js/content.js"></script>
 <script src="js/core.js"></script>
 <script src="js/advisor.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/motion.js"></script>
-<script src="js/pages/project.js"></script>
+<script src="js/pages/product.js"></script>
 <script>
   (function () {
     function boot() {
       AZUI.init();
       AZMotion.start();
-      AZProject.init();
+      AZProduct.init();
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
     else boot();

@@ -1,21 +1,18 @@
 /* ===================== صفحهٔ ۴۰۴ ===================== */
 window.AZNotFound = (function () {
   'use strict';
-  const { $, wireImages } = AZ;
+  const { $ } = AZ;
 
   function init() {
-    const form = $('#nfForm');
-    form.addEventListener('submit', e => {
+    $('#nfForm').addEventListener('submit', e => {
       e.preventDefault();
       const q = $('#nfQ').value.trim();
       location.href = 'search.html' + (q ? '?q=' + encodeURIComponent(q) : '');
     });
 
-    /* سه پیشنهاد تصادفی از کلکسیون */
-    const picks = PRODUCTS.slice().sort(() => Math.random() - 0.5).slice(0, 3);
+    /* سه پیشنهاد در بدنهٔ صفحه هستند؛ فقط رفتارشان سیم‌کشی می‌شود */
     const box = $('#nfPicks');
-    box.innerHTML = picks.map(p => AZUI.card(p)).join('');
-    wireImages(box);
+    AZ.wireImages(box);
     AZUI.wireCards(box);
   }
 

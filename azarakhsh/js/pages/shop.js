@@ -1,5 +1,7 @@
 /* =========================================================================
-   صفحهٔ کلکسیون — فیلتر، مرتب‌سازی و همگام‌سازی با آدرس صفحه
+   صفحهٔ کلکسیون
+   کارت‌ها در بدنهٔ HTML هستند؛ اینجا فقط نمایش داده یا پنهان می‌شوند.
+   مرتب‌سازی هم با order انجام می‌شود تا خودِ عنصرها جابه‌جا نشوند.
    ========================================================================= */
 window.AZShop = (function () {
   'use strict';
@@ -8,6 +10,7 @@ window.AZShop = (function () {
   const PER = 9;
 
   const state = { q: '', family: 'all', tone: '', max: 2200000, stock: false, sort: 'featured', shown: PER };
+  let cards = [];
 
   /* ---------------------- خواندن و نوشتن آدرس ---------------------- */
   function readURL() {
@@ -27,96 +30,86 @@ window.AZShop = (function () {
     history.replaceState(null, '', qs ? '?' + qs : location.pathname);
   }
 
-  /* ------------------------------ فیلتر --------------------------- */
-  function match(p) {
-    if (state.family !== 'all' && p.family !== state.family) return false;
-    if (state.stock && p.stock !== 'موجود در انبار') return false;
-    if (p.price > state.max) return false;
-    if (state.tone && !p.tones.some(t => t.name === state.tone)) return false;
+  /* -------------------------- تطبیق با فیلتر ---------------------- */
+  function match(el) {
+    if (state.family !== 'all' && el.dataset.family !== state.family) return false;
+    if (state.stock && el.dataset.stock !== '1') return false;
+    if (Number(el.dataset.price) > state.max) return false;
+    if (state.tone && !(el.dataset.tones || '').split('|').includes(state.tone)) return false;
     if (state.q) {
       const q = state.q.trim().toLowerCase();
-      const hay = [p.name, p.code, p.familyLabel, p.desc, (p.keys || []).join(' ')].join(' ').toLowerCase();
-      if (!hay.includes(q)) return false;
+      if (!(el.dataset.search || '').includes(q)) return false;
     }
     return true;
   }
 
-  function sorted(list) {
-    const l = list.slice();
-    if (state.sort === 'cheap') l.sort((a, b) => a.price - b.price);
-    else if (state.sort === 'expensive') l.sort((a, b) => b.price - a.price);
-    else if (state.sort === 'name') l.sort((a, b) => a.name.localeCompare(b.name, 'fa'));
-    return l;
-  }
+  const nameOf = el => el.querySelector('.pc__name').textContent.trim();
 
-  /* ------------------------------ رندر ---------------------------- */
-  function render() {
-    const grid = $('#shopGrid');
-    const all = sorted(PRODUCTS.filter(match));
-    const view = all.slice(0, state.shown);
+  function apply() {
+    const passed = cards.filter(match);
+    const ordered = passed.slice();
 
-    grid.innerHTML = view.length
-      ? view.map(p => AZUI.card(p)).join('')
-      : `<div class="empty">
-           <svg width="34" height="34"><use href="#i-search"/></svg>
-           <h3>چیزی با این فیلترها پیدا نشد</h3>
-           <p>فیلترها را ساده‌تر کنید یا از مشاور نما بپرسید کدام کد به کارتان می‌آید.</p>
-           <button class="btn-ghost btn-sm" type="button" style="margin-top:1.2rem" data-open-advisor>
-             <svg width="15" height="15"><use href="#i-spark"/></svg> پرسش از مشاور
-           </button>
-         </div>`;
+    if (state.sort === 'cheap')          ordered.sort((a, b) => Number(a.dataset.price) - Number(b.dataset.price));
+    else if (state.sort === 'expensive') ordered.sort((a, b) => Number(b.dataset.price) - Number(a.dataset.price));
+    else if (state.sort === 'name')      ordered.sort((a, b) => nameOf(a).localeCompare(nameOf(b), 'fa'));
+    /* «پیشنهاد کارخانه» یعنی همان ترتیبی که در HTML نوشته شده */
 
-    AZ.wireImages(grid);
-    AZUI.wireCards(grid);
-    $$('[data-open-advisor]', grid).forEach(b => b.addEventListener('click', () => Advisor.open(null, b)));
+    cards.forEach(el => { el.hidden = true; el.style.order = ''; });
+    ordered.forEach((el, i) => {
+      el.hidden = i >= state.shown;
+      el.style.order = i;
+    });
 
-    $('#shopCount').textContent = all.length
-      ? 'نمایش ' + fa(Math.min(state.shown, all.length)) + ' از ' + fa(all.length) + ' کد'
+    const n = ordered.length;
+    $('#shopCount').textContent = n
+      ? 'نمایش ' + fa(Math.min(state.shown, n)) + ' از ' + fa(n) + ' کد'
       : 'بدون نتیجه';
-
-    const pager = $('#shopPager');
-    pager.hidden = all.length <= state.shown;
+    $('#shopEmpty').hidden = n > 0;
+    $('#shopPager').hidden = n <= state.shown;
 
     $$('.shop__fam').forEach(b => b.classList.toggle('is-on', b.dataset.family === state.family));
     $$('.shop__tone').forEach(b => b.classList.toggle('is-on', b.dataset.tone === state.tone));
     writeURL();
   }
 
-  /* ---------------------------- کنترل‌ها -------------------------- */
-  function buildFilters() {
-    $('#shopFams').innerHTML = FAMILIES.map(f => {
-      const n = f.id === 'all' ? PRODUCTS.length : PRODUCTS.filter(p => p.family === f.id).length;
-      return `<button class="shop__fam" type="button" data-family="${f.id}">${f.label}<i>${fa(n)}</i></button>`;
-    }).join('');
+  function paintPrice() {
+    const el = $('#shopPriceLabel');
+    if (el) el.textContent = faNum(state.max) + ' تومان';
+  }
+
+  /* ------------------------------ شروع ---------------------------- */
+  async function init() {
+    cards = $$('#shopGrid .pc');
+    AZ.wireImages($('#shopGrid'));
+    AZUI.wireCards($('#shopGrid'));
+    $$('#shopEmpty [data-open-advisor]').forEach(b =>
+      b.addEventListener('click', () => Advisor.open(null, b)));
+
+    readURL();
+
     $$('.shop__fam').forEach(b => b.addEventListener('click', () => {
       state.family = b.dataset.family;
       state.shown = PER;
-      render();
+      apply();
     }));
 
-    $('#shopTones').innerHTML = TONES.map(t =>
-      `<button class="shop__tone" type="button" style="background:${t.hex}" data-tone="${t.name}" title="${t.name}" aria-label="رنگ ${t.name}"></button>`).join('');
     $$('.shop__tone').forEach(b => b.addEventListener('click', () => {
       state.tone = state.tone === b.dataset.tone ? '' : b.dataset.tone;
       state.shown = PER;
-      render();
+      apply();
     }));
-  }
-
-  async function init() {
-    readURL();
-    buildFilters();
 
     const q = $('#shopQ');
     q.value = state.q;
     let t;
     q.addEventListener('input', () => {
       clearTimeout(t);
-      t = setTimeout(() => { state.q = q.value; state.shown = PER; render(); }, 180);
+      t = setTimeout(() => { state.q = q.value; state.shown = PER; apply(); }, 180);
     });
 
-    $('#shopStock').addEventListener('change', e => { state.stock = e.target.checked; state.shown = PER; render(); });
-    $('#shopMore').addEventListener('click', () => { state.shown += PER; render(); });
+    $('#shopStock').addEventListener('change', e => { state.stock = e.target.checked; state.shown = PER; apply(); });
+    $('#shopMore').addEventListener('click', () => { state.shown += PER; apply(); });
+
     $('#shopReset').addEventListener('click', () => {
       Object.assign(state, { q: '', family: 'all', tone: '', max: 2200000, stock: false, sort: 'featured', shown: PER });
       q.value = '';
@@ -124,34 +117,28 @@ window.AZShop = (function () {
       const r = $('#shopPrice'); if (r) r.value = 2200000;
       const s = $('#shopSort'); if (s) s.value = 'featured';
       paintPrice();
-      render();
+      apply();
       toast('فیلترها پاک شد');
     });
 
     const toggle = $('#shopToggle');
     toggle.addEventListener('click', () => {
       const side = $('#shopFilters');
-      const open = side.classList.toggle('is-open');
-      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-expanded', String(side.classList.toggle('is-open')));
     });
 
     await customElements.whenDefined('sl-range');
     await customElements.whenDefined('sl-select');
 
     const range = $('#shopPrice');
-    range.addEventListener('sl-input', () => { state.max = Number(range.value); state.shown = PER; paintPrice(); render(); });
+    range.addEventListener('sl-input', () => { state.max = Number(range.value); state.shown = PER; paintPrice(); apply(); });
 
     const sort = $('#shopSort');
     sort.value = state.sort;
-    sort.addEventListener('sl-change', () => { state.sort = sort.value; render(); });
+    sort.addEventListener('sl-change', () => { state.sort = sort.value; apply(); });
 
     paintPrice();
-    render();
-  }
-
-  function paintPrice() {
-    const el = $('#shopPriceLabel');
-    if (el) el.textContent = faNum(state.max) + ' تومان';
+    apply();
   }
 
   return { init };
