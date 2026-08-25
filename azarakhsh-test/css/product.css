@@ -1,0 +1,164 @@
+/* =========================================================================
+   آذرخش · شناسنامهٔ محصول
+   صفحه یک برگهٔ رسمی است: نمونه زیر نور، هویتِ کد، برگهٔ آزمون، مشخصات.
+   ========================================================================= */
+
+.cert {
+  display: grid;
+  gap: clamp(1.4rem, 3.4vw, 3rem);
+  margin-block-start: clamp(.6rem, 2vh, 1.2rem);
+}
+@media (min-width: 1000px) {
+  .cert { grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); align-items: start; }
+}
+
+/* ------------------------ ستونِ نمونه زیر نور ----------------------- */
+.cert__booth {
+  background: #070a09;
+  border: 1px solid rgba(221, 230, 225, .14);
+  border-radius: var(--r3);
+  padding: clamp(.9rem, 2.6vw, 1.3rem);
+  color: #dde6e1;
+}
+.cert__booth .stage { max-height: min(52vh, 460px); }
+.cert__booth .lights { margin-block-start: .7rem; }
+.cert__booth .rig__note { margin-block-start: .55rem; min-height: 3.4em; }
+
+.cert__shots {
+  display: grid; gap: .7rem;
+  grid-template-columns: 1.35fr 1fr;
+  margin-block-start: .7rem;
+}
+.cert__shot {
+  position: relative;
+  border: 1px solid var(--rule);
+  border-radius: var(--r2);
+  overflow: hidden;
+  background: var(--sheet-3);
+  aspect-ratio: 4 / 3;
+}
+.cert__shot img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s var(--plot); }
+.cert__shot:hover img { transform: scale(1.04); }
+.cert__shot figcaption {
+  position: absolute; inset-block-end: 0; inset-inline: 0;
+  padding: .5rem .6rem;
+  background: linear-gradient(to top, rgba(4,8,7,.92) 20%, rgba(4,8,7,.55) 62%, transparent);
+  color: rgba(238, 245, 241, .96);
+}
+
+/* ---------------------------- ستونِ شناسنامه ------------------------ */
+.cert__file { position: relative; }
+@media (min-width: 1000px) {
+  .cert__file { position: sticky; top: calc(var(--bar-h) + 1.4rem); }
+}
+.cert__stamp {
+  display: flex; align-items: center; gap: .7rem;
+  padding-block-end: .8rem;
+  border-block-end: 1px solid var(--rule);
+}
+.cert__ok {
+  margin-inline-start: auto;
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .22rem .55rem;
+  border: 1px solid var(--rule-3);
+  border-radius: var(--r1);
+  font-size: .7rem;
+  color: var(--seal);
+}
+.cert__ok svg { width: 13px; height: 13px; }
+
+.cert__id { display: flex; align-items: baseline; gap: .6rem; margin-block-start: 1rem; }
+.cert__name {
+  font-family: 'Kufi', sans-serif; font-weight: 600;
+  font-size: clamp(1.7rem, 1.15rem + 2.2vw, 2.7rem);
+  line-height: 1.28; letter-spacing: -.01em;
+  margin-block: .5rem .7rem;
+}
+.cert__desc { color: var(--ink-2); font-size: .94rem; line-height: 1.95; max-width: 52ch; }
+
+.cert__price {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem;
+  margin-block: 1.3rem;
+  padding-block: .9rem;
+  border-block: 1px solid var(--rule);
+}
+.cert__price b { font-family: 'Kufi', sans-serif; font-weight: 600; font-size: clamp(1.4rem, 1.1rem + 1.2vw, 1.9rem); }
+.cert__price span { font-size: .78rem; color: var(--ink-3); }
+.cert__price s { font-size: .78rem; color: var(--ink-4); text-decoration-color: var(--stamp); }
+
+.cert__tones { display: grid; gap: .5rem; margin-block-end: 1.3rem; }
+.cert__tones .swatch { border-color: var(--rule-2); }
+.cert__tones .swatch::after { border-color: var(--seal); }
+
+.cert__buy { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.cert__buy .row__qty { height: 46px; }
+.cert__buy .row__qty button { height: 44px; width: 44px; }
+.cert__buy .row__qty input { height: 44px; width: 58px; }
+.cert__buy #buyNote { flex: 1 1 100%; }
+
+.cert__marks { display: grid; gap: .5rem; margin-block-start: 1.4rem; }
+.cert__marks li {
+  display: flex; align-items: flex-start; gap: .55rem;
+  font-size: .86rem; color: var(--ink-2);
+}
+.cert__marks svg { width: 15px; height: 15px; flex: none; margin-block-start: .35rem; color: var(--seal); }
+
+/* ---------------------------- برگهٔ آزمون --------------------------- */
+.tests {
+  display: grid; gap: .7rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 205px), 1fr));
+}
+.test {
+  position: relative;
+  display: grid; gap: .2rem;
+  padding: 1rem 1.05rem 1.1rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--r2);
+  background: var(--sheet);
+}
+.test b {
+  font-family: 'Kufi', sans-serif; font-weight: 600;
+  font-size: clamp(1.25rem, 1.05rem + .8vw, 1.6rem);
+  line-height: 1.4;
+}
+.test__lim { font-size: .74rem; color: var(--ink-4); }
+.test__mark {
+  display: inline-flex; align-items: center; gap: .3rem;
+  margin-block-start: .55rem;
+  font-size: .68rem;
+  color: var(--seal);
+}
+.test__mark svg { width: 13px; height: 13px; }
+.test.is-note .test__mark { color: var(--ink-4); }
+
+.origin {
+  display: grid; gap: 0;
+  margin-block-start: .8rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--r2);
+  overflow: hidden;
+  background: var(--sheet-2);
+}
+@media (min-width: 700px) { .origin { grid-template-columns: repeat(3, 1fr); } }
+.origin__cell { padding: .9rem 1.05rem; display: grid; gap: .25rem; }
+.origin__cell + .origin__cell { border-block-start: 1px solid var(--rule); }
+@media (min-width: 700px) {
+  .origin__cell + .origin__cell { border-block-start: 0; border-inline-end: 1px solid var(--rule); }
+}
+.origin__cell b { font-family: 'Kufi', sans-serif; font-weight: 600; font-size: 1rem; }
+.origin__cell b.mono { font-family: 'Mono', 'Shabnam', monospace; font-size: .86rem; letter-spacing: -.04em; }
+
+/* ---------------------------- جدول مشخصات -------------------------- */
+.specs {
+  border-block-start: 1px solid var(--rule);
+}
+@media (min-width: 760px) {
+  .specs { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(1.4rem, 4vw, 3.4rem); }
+}
+.specs__row {
+  display: flex; align-items: baseline; gap: .9rem;
+  padding-block: .85rem;
+  border-block-end: 1px solid var(--rule);
+}
+.specs__row span { color: var(--ink-3); font-size: .86rem; }
+.specs__row b { margin-inline-start: auto; font-weight: 500; font-size: .9rem; text-align: end; }

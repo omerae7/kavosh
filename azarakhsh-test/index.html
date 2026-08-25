@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+<!-- az:head -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#dfe4de" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#090f0e" media="(prefers-color-scheme: dark)">
+<meta name="description" content="آذرخش، کارخانهٔ آجر نمای نسوز تبریز. هر پارتِ تولید یک شناسنامه دارد: شمارهٔ پارت، مبدأ خاک و برگهٔ آزمون. نمونه را زیر سه صحنهٔ نور ببینید و بعد سفارش بدهید.">
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/NotoKufiArabic-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Shabnam.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/booth.css">
+<link rel="stylesheet" href="css/card.css">
+<link rel="stylesheet" href="css/advisor.css">
+<link rel="stylesheet" href="css/pages.css">
+<!-- /az:head -->
+<title>آذرخش · شناسنامهٔ پارت</title>
+<link rel="stylesheet" href="css/home.css">
+</head>
+
+<body class="is-frozen" data-page="home">
+<!--
+  ══════════════════════════════════════════════════════════════════════════
+  DIRECTION CONTRACT — «شناسنامهٔ پارت» / The Batch Record   [seed 46aaea05]
+
+  THESIS      این سایت یک ویترین نیست؛ یک آزمایشگاهِ کنترلِ کیفیت است که
+              درش را به روی مشتری باز کرده. جای عکسِ تبلیغاتی، عددِ
+              اندازه‌گرفته‌شده می‌گذارد و جای شعار، برگهٔ آزمون.
+
+  OWN-WORLD   جهانِ آزمایشگاه در سال ۲۰۳۶: میزِ سنگیِ سرد، کاغذِ فرمِ سبزِ
+              کم‌رنگ، جوهرِ بایگانی، و مهرِ سبزِ چاپِ اوراق بهادار. تنها
+              رنگِ گرمِ صفحه، خودِ آجر است — هر جا گرم شد، یعنی محصول.
+              حروف: کوفیِ هندسی برای عنوان، شبنم برای متن، مونوی مریخی
+              فقط برای عدد و کدِ لاتین. گوشه‌ها تیز، مرزها یک‌پیکسل و
+              «رسم‌شده»، نه سایه‌دار.
+
+  STORY       بازدید از سایت = یک جلسهٔ کنترلِ کیفیت. پردهٔ ورود روی تالار
+              زوم می‌کند و ما پشتِ میزِ آزمون می‌ایستیم؛ اتاقکِ نور روشن
+              می‌شود (۱)، رفِ نمونه‌ها باز می‌شود (۲)، خطِ تولید ایستگاه به
+              ایستگاه خوانده می‌شود (۳)، شواهدِ کارگاهی بایگانی می‌شود (۴)،
+              و در پایان شناسنامهٔ سفارشِ خودِ کاربر صادر می‌شود (۵).
+
+  FIRST       اتاقکِ نور: یک نمونهٔ آجرِ واقعیِ سه‌بعدی که با انگشت
+  VIEWPORT    می‌چرخد، زیر سه صحنهٔ نورِ روز (ظهر/عصر/سایه)، با خوانشِ
+              زندهٔ دمای رنگ، زاویهٔ تابش و کدِ رنگ. کاربردی است چون رنگِ
+              نما را ساعت تعیین می‌کند، نه کاتالوگ.
+
+  FORM        سطح = برگهٔ آزمایشگاهی. حرکت = قلمِ رسمِ دستگاهِ ثبت: اول خط
+              کشیده می‌شود، بعد محتوا می‌نشیند. تنها لحظهٔ نمایشی، روشن
+              شدنِ چراغِ اتاقک است.
+
+  FINISH      unreviewed and undocumented is unfinished; this build ends
+              with the finish review, the verdict, and DESIGN.md
+  ══════════════════════════════════════════════════════════════════════════
+-->
+
+<!-- ============================ پردهٔ ورود ============================ -->
+<div class="veil" id="veil" role="presentation">
+  <div class="veil__shot" id="veilShot">
+    <picture>
+      <source media="(max-width: 760px)" srcset="assets/intro/gallery-tall.jpg">
+      <img src="assets/intro/gallery-wide.jpg" alt="" fetchpriority="high">
+    </picture>
+  </div>
+  <div class="veil__wash"></div>
+  <div class="veil__grid" id="veilGrid"></div>
+  <div class="veil__cross" id="veilCross"></div>
+  <div class="veil__in">
+    <svg class="veil__mark" viewBox="0 0 40 40" aria-hidden="true">
+      <rect x="1"  y="5"    width="16" height="8.4" rx="1" fill="#2fbf8b"/>
+      <rect x="19" y="5"    width="20" height="8.4" rx="1" fill="#dde6e1"/>
+      <rect x="1"  y="15.8" width="24" height="8.4" rx="1" fill="#dde6e1"/>
+      <rect x="27" y="15.8" width="12" height="8.4" rx="1" fill="#2fbf8b"/>
+      <rect x="1"  y="26.6" width="12" height="8.4" rx="1" fill="#dde6e1"/>
+      <rect x="15" y="26.6" width="24" height="8.4" rx="1" fill="#2fbf8b"/>
+    </svg>
+    <div class="veil__word">آذرخش</div>
+    <div class="veil__line">BATCH RECORD · AZ 1404</div>
+    <div class="veil__rule"></div>
+  </div>
+  <div class="veil__skip"><span class="only-fine">برای ورود کلیک کنید</span><span class="only-touch">برای ورود لمس کنید</span></div>
+</div>
+
+<div class="film" aria-hidden="true"><div class="film__grain"></div></div>
+<div class="tape" id="tape" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__ring"></span><span class="cursor__label" id="cursorLabel"></span></div>
+
+<!-- ============================== آیکون‌ها ============================= -->
+<!-- az:sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <g id="ico" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></g>
+  </defs>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 15a2 2 0 0 1-2 2H8l-4 3V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/><path d="M8.5 9.5h7M8.5 12.5h4"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5L12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19z"/><path d="M9.5 20.5v-6h5v6"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5h15M9.5 6.5V4.8A1.3 1.3 0 0 1 10.8 3.5h2.4a1.3 1.3 0 0 1 1.3 1.3v1.7"/><path d="M6.5 6.5l.8 12.2A1.6 1.6 0 0 0 8.9 20.2h6.2a1.6 1.6 0 0 0 1.6-1.5l.8-12.2"/></symbol>
+  <symbol id="i-rotate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v4.5h-4.5"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4L3.5 10.4l6.6 2.6 2.6 6.6z"/><path d="M20 4l-9.9 9.9"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5h3l1.5 4-2 1.4a11 11 0 0 0 5.1 5.1l1.4-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.6 6.8l8.4 6 8.4-6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8.5" width="19" height="7" rx="1"/><path d="M7 8.5v3M12 8.5v4M17 8.5v3"/></symbol>
+  <symbol id="i-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M8.5 14.5h7"/></symbol>
+</svg>
+<!-- /az:sprite -->
+
+<!-- ============================== سربرگ ============================== -->
+<!-- az:bar -->
+<header class="bar" id="bar">
+  <a class="bar__brand" href="index.html" aria-label="آذرخش · صفحهٔ نخست">
+    <svg class="bar__mark" viewBox="0 0 40 40" aria-hidden="true">
+      <rect x="1"  y="5"    width="16" height="8.4" rx="1" fill="var(--seal)"/>
+      <rect x="19" y="5"    width="20" height="8.4" rx="1" fill="currentColor"/>
+      <rect x="1"  y="15.8" width="24" height="8.4" rx="1" fill="currentColor"/>
+      <rect x="27" y="15.8" width="12" height="8.4" rx="1" fill="var(--seal)"/>
+      <rect x="1"  y="26.6" width="12" height="8.4" rx="1" fill="currentColor"/>
+      <rect x="15" y="26.6" width="24" height="8.4" rx="1" fill="var(--seal)"/>
+    </svg>
+    <span class="bar__name">آذرخش</span>
+  </a>
+  <span class="bar__serial" id="barSerial">FILE AZ/1404 · OPEN</span>
+
+  <nav class="bar__nav" aria-label="راهبری اصلی">
+    <a class="bar__link" href="index.html#rack">رفِ نمونه‌ها</a>
+    <a class="bar__link" href="index.html#line">خطِ تولید</a>
+    <a class="bar__link" href="index.html#field">کارگاه</a>
+    <a class="bar__link" href="shop.html">فروشگاه</a>
+  </nav>
+
+  <div class="bar__acts">
+    <button class="tool lamp" id="lamp" type="button" aria-label="تعویض روشنایی صفحه">
+      <span class="lamp__ico">
+        <svg class="lamp__sun"><use href="#i-sun"></use></svg>
+        <svg class="lamp__moon"><use href="#i-moon"></use></svg>
+      </span>
+    </button>
+    <button class="tool" id="askBtn" type="button" data-ask data-cursor="مشاور">
+      <svg><use href="#i-chat"></use></svg><span class="tool__txt">مشاورهٔ فنی</span>
+    </button>
+    <button class="tool tool--seal" id="fileBtn" type="button" aria-label="پروندهٔ سفارش">
+      <svg><use href="#i-file"></use></svg><span class="tool__txt">پرونده</span>
+      <span class="tool__count mono" id="fileCount">۰</span>
+    </button>
+    <button class="tool tool--menu" id="menuBtn" type="button" aria-label="فهرست">
+      <svg><use href="#i-menu"></use></svg>
+    </button>
+  </div>
+</header>
+<!-- /az:bar -->
+
+<main id="top">
+
+<!-- ══════════════════════ ۱ · اتاقکِ نور ══════════════════════ -->
+<section class="hero" id="booth">
+  <div class="hero__plate" id="heroPlate">
+    <picture>
+      <source media="(max-width: 760px)" srcset="assets/intro/gallery-tall.jpg">
+      <img src="assets/intro/gallery-wide.jpg" alt="تالار نمایش آذرخش، جایی که نمونه‌ها زیر نور طبیعی بررسی می‌شوند">
+    </picture>
+  </div>
+  <div class="hero__wash"></div>
+  <div class="hero__mesh" id="heroMesh"></div>
+
+  <div class="hero__inner">
+    <div class="hero__copy">
+      <span class="hero__file"><i></i>FILE AZ/1404 · OPEN</span>
+      <h1>هر پارتِ آجر، یک <em>شناسنامه</em> دارد.</h1>
+      <p class="hero__lead">
+        شمارهٔ پارت، مبدأ خاک، دمای پخت و برگهٔ آزمون — همه ثبت می‌شود و همراه بار به دستتان می‌رسد.
+        نمونهٔ روبه‌رو را بچرخانید و رنگش را زیر سه ساعتِ مختلفِ روز ببینید؛ دقیقاً همان اتفاقی که روی نمای شما می‌افتد.
+      </p>
+      <div class="hero__acts">
+        <a class="btn btn--seal" href="#rack" data-goto="#rack"><svg><use href="#i-grid"></use></svg>رفِ نمونه‌ها</a>
+        <button class="btn btn--ghost" type="button" data-ask><svg><use href="#i-chat"></use></svg>مشاورهٔ فنی</button>
+      </div>
+    </div>
+
+    <div class="hero__stage">
+      <div class="hero__cap">
+        <span class="gauge-label">SPECIMEN UNDER TEST</span>
+        <b id="boothCode">AZ-R110 · قرمز شفق</b>
+      </div>
+      <div class="stage" id="stage" data-cursor="بچرخانید">
+        <canvas class="stage__gl" id="stageGl" aria-hidden="true"></canvas>
+        <div class="stage__flat">
+          <img src="assets/products/az-r110-nasooz-ghermez-single.jpg" alt="نمونهٔ آجر نسوز قرمز شفق" id="stageFlat">
+        </div>
+        <div class="stage__pool"></div>
+        <div class="stage__deg mono">ROT <b id="boothDeg">۰۰۰°</b></div>
+        <div class="stage__hint"><span class="only-fine">DRAG TO ROTATE</span><span class="only-touch">SWIPE TO ROTATE</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero__rig">
+    <div class="rig__cell">
+      <span class="gauge-label">LIGHT SCENE · <i>صحنهٔ نور</i></span>
+      <div class="lights" id="lights" role="group" aria-label="انتخاب صحنهٔ نور"></div>
+      <p class="rig__note" id="lightNote"></p>
+    </div>
+    <div class="rig__cell">
+      <span class="gauge-label">COLOUR RANGE · <i>رنگ‌بندی خط تولید</i></span>
+      <div class="swatches" id="swatches" role="group" aria-label="انتخاب رنگ نمونه"></div>
+      <p class="rig__note" id="toneNote"></p>
+    </div>
+    <div class="rig__cell">
+      <span class="gauge-label">LIVE READING · <i>خوانش</i></span>
+      <div class="reads" id="reads"></div>
+    </div>
+  </div>
+
+  <span class="hero__cue">SCROLL</span>
+</section>
+
+<!-- ══════════════════════ ۲ · رفِ نمونه‌ها ══════════════════════ -->
+<section class="act shell" id="rack">
+  <div class="act__head">
+    <div>
+      <div class="act__no"><b>۰۲</b>SPECIMEN RACK</div>
+      <h2 class="act__ttl">رفِ نمونه‌ها</h2>
+    </div>
+    <p class="act__say">
+      ده کدِ فعالِ خط تولید. هر برگه، سه عددِ اندازه‌گرفته‌شدهٔ همان پارت را نشان می‌دهد؛
+      عددها از برگهٔ آزمون می‌آیند، نه از بروشور.
+    </p>
+  </div>
+
+  <div class="filters" id="filters" role="group" aria-label="صافیِ خانواده"></div>
+
+  <div class="rack" id="rack-grid">
+    <!-- az:rack -->
+
+        <article class="spec" data-family="nasooz" data-id="r110"
+                 data-price="1180000" data-name="نسوز قرمز شفق" style="--warm:#8d4a30">
+          <span class="spec__tab"></span>
+          <a class="spec__frame" href="product-r110.html" aria-label="شناسنامهٔ کامل نسوز قرمز شفق">
+            <img class="spec__shot spec__shot--wall" src="assets/products/az-r110-nasooz-ghermez-wall.jpg" alt="نمای اجراشده با نسوز قرمز شفق" loading="lazy" data-slot>
+            <img class="spec__shot spec__shot--unit" src="assets/products/az-r110-nasooz-ghermez-single.jpg" alt="" loading="lazy" aria-hidden="true">
+            <span class="spec__scale"><span class="spec__ticks"></span><span class="spec__mm">۲۴۰·۷۰·۲۰ mm</span></span>
+            <span class="spec__flag spec__flag--fa">پرفروش</span>
+          </a>
+          <div class="spec__body">
+            <div class="spec__id">
+              <span class="spec__code">AZ-R110</span>
+              <span class="spec__fam">نمای نسوز</span>
+            </div>
+            <h3 class="spec__name"><a href="product-r110.html">نسوز قرمز شفق</a></h3>
+            <p class="spec__desc">رنگ آجریِ گرم با بافت مات و یکدست؛ پرفروش‌ترین کد کارخانه.</p>
+            <div class="spec__reads">
+              <div class="spec__read"><b>زیر ۶٪</b><span class="gauge-label fa">جذب آب</span></div>
+              <div class="spec__read"><b>۳۵۰</b><span class="gauge-label fa">مقاومت</span></div>
+              <div class="spec__read"><b>۲۹ <span class="mono">kg</span></b><span class="gauge-label fa">وزن</span></div>
+            </div>
+            <div class="spec__tones">
+              <span class="spec__tone" style="background:#8d4a30" title="قرمز شفق"></span><span class="spec__tone" style="background:#573323" title="شکلاتی"></span><span class="spec__tone" style="background:#c9a05c" title="زرد کهربا"></span>
+              <span class="gauge-label fa">۳ رنگ</span>
+            </div>
+          </div>
+          <div class="spec__foot">
+            <div class="spec__price">
+              <b>۱٬۱۸۰٬۰۰۰</b>
+              <span>تومان / متر مربع · <s>۱٬۳۴۰٬۰۰۰</s></span>
+            </div>
+            
+            <button class="spec__add" type="button" data-add="r110">
+              <svg><use href="#i-plus"></use></svg>ثبت
+            </button>
+          </div>
+        </article>
+
+        <article class="spec" data-family="nasooz" data-id="w220"
+                 data-price="1540000" data-name="نسوز سفید صدف" style="--warm:#e6e1d8">
+          <span class="spec__tab"></span>
+          <a class="spec__frame" href="product-w220.html" aria-label="شناسنامهٔ کامل نسوز سفید صدف">
+            <img class="spec__shot spec__shot--wall" src="assets/products/az-w220-nasooz-sefid-wall.jpg" alt="نمای اجراشده با نسوز سفید صدف" loading="lazy" data-slot>
+            <img class="spec__shot spec__shot--unit" src="assets/products/az-w220-nasooz-sefid-single.jpg" alt="" loading="lazy" aria-hidden="true">
+            <span class="spec__scale"><span class="spec__ticks"></span><span class="spec__mm">۲۴۰·۷۰·۲۰ mm</span></span>
+            <span class="spec__flag spec__flag--fa">پیشنهاد معماران</span>
+          </a>
+          <div class="spec__body">
+            <div class="spec__id">
+              <span class="spec__code">AZ-W220</span>
+              <span class="spec__fam">نمای نسوز</span>
+            </div>
+            <h3 class="spec__name"><a href="product-w220.html">نسوز سفید صدف</a></h3>
+            <p class="spec__desc">سفید گرم با دانه‌های ریز تیره؛ انتخاب اول نماهای مینیمال.</p>
+            <div class="spec__reads">
+              <div class="spec__read"><b>زیر ۵٪</b><span class="gauge-label fa">جذب آب</span></div>
+              <div class="spec__read"><b>۳۸۰</b><span class="gauge-label fa">مقاومت</span></div>
+              <div class="spec__read"><b>۲۹ <span class="mono">kg</span></b><span class="gauge-label fa">وزن</span></div>
+            </div>
+            <div class="spec__tones">
+              <span class="spec__tone" style="background:#e6e1d8" title="سفید صدف"></span><span class="spec__tone" style="background:#a6a099" title="طوسی دود"></span><span class="spec__tone" style="background:#c9a05c" title="زرد کهربا"></span>
+              <span class="gauge-label fa">۳ رنگ</span>
+            </div>
+          </div>
+          <div class="spec__foot">
+            <div class="spec__price">
+              <b>۱٬۵۴۰٬۰۰۰</b>
+              <span>تومان / متر مربع</span>
+            </div>
+            
+            <button class="spec__add" type="button" data-add="w220">
+              <svg><use href="#i-plus"></use></svg>ثبت
+            </button>
+          </div>
+        </article>
+
+        <article class="spec" data-family="nasooz" data-id="g330"
+                 data-price="1390000" data-name="نسوز طوسی دود" style="--warm:#a6a099">
+          <span class="spec__tab"></span>
+          <a class="spec__frame" href="product-g330.html" aria-label="شناسنامهٔ کامل نسوز طوسی دود">
+            <img class="spec__shot spec__shot--wall" src="assets/products/az-g330-nasooz-toosi-wall.jpg" alt="نمای اجراشده با نسوز طوسی دود" loading="lazy" data-slot>
+            <img class="spec__shot spec__shot--unit" src="assets/products/az-g330-nasooz-toosi-single.jpg" alt="" loading="lazy" aria-hidden="true">
+            <span class="spec__scale"><span class="spec__ticks"></span><span class="spec__mm">۲۴۰·۷۰·۲۰ mm</span></span>
+            
+          </a>
+          <div class="spec__body">
+            <div class="spec__id">
+              <span class="spec__code">AZ-G330</span>
+              <span class="spec__fam">نمای نسوز</span>
+            </div>
+            <h3 class="spec__name"><a href="product-g330.html">نسوز طوسی دود</a></h3>
+            <p class="spec__desc">خاکستری خنثی با ته‌رنگ دودی؛ روی نماهای مدرن می‌نشیند.</p>
+            <div class="spec__reads">
+              <div class="spec__read"><b>زیر ۶٪</b><span class="gauge-label fa">جذب آب</span></div>
+              <div class="spec__read"><b>۳۶۰</b><span class="gauge-label fa">مقاومت</span></div>
+              <div class="spec__read"><b>۲۹ <span class="mono">kg</span></b><span class="gauge-label fa">وزن</span></div>
+            </div>
+            <div class="spec__tones">
+              <span class="spec__tone" style="background:#a6a099" title="طوسی دود"></span><span class="spec__tone" style="background:#2f2c2a" title="مشکی مات"></span><span class="spec__tone" style="background:#e6e1d8" title="سفید صدف"></span>
+              <span class="gauge-label fa">۳ رنگ</span>
+            </div>
+          </div>
+          <div class="spec__foot">
+            <div class="spec__price">
+              <b>۱٬۳۹۰٬۰۰۰</b>
+              <span>تومان / متر مربع · <s>۱٬۴۹۰٬۰۰۰</s></span>
+            </div>
+            
+            <button class="spec__add" type="button" data-add="g330">
+              <svg><use href="#i-plus"></use></svg>ثبت
+            </button>
+          </div>
+        </article>
+
+        <article class="spec" data-family="nasooz" data-id="b140"
+                 data-price="1260000" data-name="نسوز شکلاتی تیره" style="--warm:#573323">
+          <span class="spec__tab"></span>
+          <a class="spec__frame" href="product-b140.html" aria-label="شناسنامهٔ کامل نسوز شکلاتی تیره">
+            <img class="spec__shot spec__shot--wall" src="assets/products/az-b140-nasooz-shokolati-wall.jpg" alt="نمای اجراشده با نسوز شکلاتی تیره" loading="lazy" data-slot>
+            <img class="spec__shot spec__shot--unit" src="assets/products/az-b140-nasooz-shokolati-single.jpg" alt="" loading="lazy" aria-hidden="true">
+            <span class="spec__scale"><span class="spec__ticks"></span><span class="spec__mm">۲۴۰·۷۰·۲۰ mm</span></span>
+            
+          </a>
+          <div class="spec__body">
+            <div class="spec__id">
+              <span class="spec__code">AZ-B140</span>
+              <span class="spec__fam">نمای نسوز</span>
+            </div>
+            <h3 class="spec__name"><a href="product-b140.html">نسوز شکلاتی تیره</a></h3>
+            <p class="spec__desc">قهوه‌ای عمیق با پخت طولانی‌تر؛ برای نماهای کلاسیک و ویلایی.</p>
+            <div class="spec__reads">
+              <div class="spec__read"><b>زیر ۶٪</b><span class="gauge-label fa">جذب آب</span></div>
+              <div class="spec__read"><b>۳۷۰</b><span class="gauge-label fa">مقاومت</span></div>
+              <div class="spec__read"><b>۲۹ <span class="mono">kg</span></b><span class="gauge-label fa">وزن</span></div>
+            </div>
+            <div class="spec__tones">
+              <span class="spec__tone" style="background:#573323" title="شکلاتی"></span><span class="spec__tone" style="background:#8d4a30" title="قرمز شفق"></span><span class="spec__tone" style="background:#2f2c2a" title="مشکی مات"></span>
+              <span class="gauge-label fa">۳ رنگ</span>
+            </div>
+          </div>
+          <div class="spec__foot">
+            <div class="spec__price">
+              <b>۱٬۲۶۰٬۰۰۰</b>
+              <span>تومان / متر مربع</span>
+            </div>
+            
+            <button class="spec__add" type="button" data-add="b140">
+              <svg><use href="#i-plus"></use></svg>ثبت
+            </button>
+          </div>
+        </article>
+
+        <article class="spec" data-family="dastsaz" data-id="k410"
+                 data-price="1690000" data-name="قزاقی دست‌ساز کهن" style="--warm:#a96b41">
+          <span class="spec__tab"></span>
+          <a class="spec__frame" href="product-k410.html" aria-label="شناسنامهٔ کامل قزاقی دست‌ساز کهن">
+            <img class="spec__shot spec__shot--wall" src="assets/products/az-k410-ghazaghi-dastsaz-wall.jpg" alt="نمای اجراشده با قزاقی دست‌ساز کهن" loading="lazy" data-slot>
+            <img class="spec__shot spec__shot--unit" src="assets/products/az-k410-ghazaghi-dastsaz-single.jpg" alt="" loading="lazy" aria-hidden="true">
+            <span class="spec__scale"><span class="spec__ticks"></span><span class="spec__mm">۲۰۰·۱۰۰·۴۰ mm</span></span>
+            <span class="spec__flag spec__flag--fa">دست‌ساز</span>
+          </a>
+          <div class="spec__body">
+            <div class="spec__id">
+              <span class="spec__code">AZ-K410</span>
+              <span class="spec__fam">دست‌ساز</span>
+            </div>
+            <h3 class="spec__name"><a href="product-k410.html">قزاقی دست‌ساز کهن</a></h3>
+            <p class="spec__desc">قالب چوبی، لبهٔ نامنظم و رنگ ناهمگون؛ حال‌وهوای بناهای قدیمی.</p>
+            <div class="spec__reads">
+              <div class="spec__read"><b>زیر ۹٪</b><span class="gauge-label fa">جذب آب</span></div>
+              <div class="spec__read"><b>۲۶۰</b><span class="gauge-label fa">مقاومت</span></div>
+              <div class="spec__read"><b>۴۶ <span class="mono">kg</span></b><span class="gauge-label fa">وزن</span></div>
+            </div>
+            <div class="spec__tones">
+              <span class="spec__tone" style="background:#8d4a30" title="قرمز شفق"></span><span class="spec__tone" style="background:#c9a05c" title="زرد کهربا"></span><span class="spec__tone" style="background:#573323" title="شکلاتی"></span>
+              <span class="gauge-label fa">۳ رنگ</span>
+            </div>
+          </div>
+          <div class="spec__foot">
+            <div class="spec__price">
+              <b>۱٬۶۹۰٬۰۰۰</b>
+              <span>تومان / متر مربع</span>
+            </div>
+            
+            <button class="spec__add" type="button" data-add="k410">
+              <svg><use href="#i-plus"></use></svg>ثبت
+            </button>
+          </div>
+        </article>
+
+        <article class="spec" data-family="plak" data-id="p510"
+                 data-price="980000" data-name="پلاک نازک لعاب‌دار" style="--warm:#c2653a">
+          <span class="spec__tab"></span>
+          <a class="spec__frame" href="product-p510.html" aria-label="شناسنامهٔ کامل پلاک نازک لعاب‌دار">
+            <img class="spec__shot spec__shot--wall" src="assets/products/az-p510-plak-laabdar-wall.jpg" alt="نمای اجراشده با پلاک نازک لعاب‌دار" loading="lazy" data-slot>
+            <img class="spec__shot spec__shot--unit" src="assets/products/az-p510-plak-laabdar-single.jpg" alt="" loading="lazy" aria-hidden="true">
+            <span class="spec__scale"><span class="spec__ticks"></span><span class="spec__mm">۲۶۰·۶۰·۱۲ mm</span></span>
+            <span class="spec__flag spec__flag--fa">جدید</span>
+          </a>
+          <div class="spec__body">
+            <div class="spec__id">
+              <span class="spec__code">AZ-P510</span>
+              <span class="spec__fam">پلاک نازک</span>
+            </div>
+            <h3 class="spec__name"><a href="product-p510.html">پلاک نازک لعاب‌دار</a></h3>
+            <p class="spec__desc">ضخامت ۱۲ میلی‌متر با لعاب براق؛ برای نمای داخلی و بازسازی سریع.</p>
+            <div class="spec__reads">
+              <div class="spec__read"><b>زیر ۴٪</b><span class="gauge-label fa">جذب آب</span></div>
+              <div class="spec__read"><b>۳۲۰</b><span class="gauge-label fa">مقاومت</span></div>
+              <div class="spec__read"><b>۱۶ <span class="mono">kg</span></b><span class="gauge-label fa">وزن</span></div>
+            </div>
+            <div class="spec__tones">
+              <span class="spec__tone" style="background:#8d4a30" title="قرمز شفق"></span><span class="spec__tone" style="background:#e6e1d8" title="سفید صدف"></span><span class="spec__tone" style="background:#2f2c2a" title="مشکی مات"></span>
+              <span class="gauge-label fa">۳ رنگ</span>
+            </div>
+          </div>
+          <div class="spec__foot">
+            <div class="spec__price">
+              <b>۹۸۰٬۰۰۰</b>
+              <span>تومان / متر مربع</span>
+            </div>
+            
+            <button class="spec__add" type="button" data-add="p510">
+              <svg><use href="#i-plus"></use></svg>ثبت
+            </button>
+          </div>
+        </article>
+
+        <article class="spec" data-family="nasooz" data-id="y150"
+                 data-price="1320000" data-name="نسوز زرد کهربا" style="--warm:#c9a05c">
+          <span class="spec__tab"></span>
+          <a class="spec__frame" href="product-y150.html" aria-label="شناسنامهٔ کامل نسوز زرد کهربا">
+            <img class="spec__shot spec__shot--wall" src="assets/products/az-y150-nasooz-zard-wall.jpg" alt="نمای اجراشده با نسوز زرد کهربا" loading="lazy" data-slot>
+            <img class="spec__shot spec__shot--unit" src="assets/products/az-y150-nasooz-zard-single.jpg" alt="" loading="lazy" aria-hidden="true">
+            <span class="spec__scale"><span class="spec__ticks"></span><span class="spec__mm">۲۴۰·۷۰·۲۰ mm</span></span>
+            
+          </a>
+          <div class="spec__body">
+            <div class="spec__id">
+              <span class="spec__code">AZ-Y150</span>
+              <span class="spec__fam">نمای نسوز</span>
+            </div>
+            <h3 class="spec__name"><a href="product-y150.html">نسوز زرد کهربا</a></h3>
+            <p class="spec__desc">زردِ خاکی با رگه‌های روشن؛ زیر نور بعدازظهر عالی می‌شود.</p>
+            <div class="spec__reads">
+              <div class="spec__read"><b>زیر ۶٪</b><span class="gauge-label fa">جذب آب</span></div>
+              <div class="spec__read"><b>۳۵۰</b><span class="gauge-label fa">مقاومت</span></div>
+              <div class="spec__read"><b>۲۹ <span class="mono">kg</span></b><span class="gauge-label fa">وزن</span></div>
+            </div>
+            <div class="spec__tones">
+              <span class="spec__tone" style="background:#c9a05c" title="زرد کهربا"></span><span class="spec__tone" style="background:#8d4a30" title="قرمز شفق"></span><span class="spec__tone" style="background:#e6e1d8" title="سفید صدف"></span>
+              <span class="gauge-label fa">۳ رنگ</span>
+            </div>
+          </div>
+          <div class="spec__foot">
+            <div class="spec__price">
+              <b>۱٬۳۲۰٬۰۰۰</b>
+              <span>تومان / متر مربع</span>
+            </div>
+            
+            <button class="spec__add" type="button" data-add="y150">
+              <svg><use href="#i-plus"></use></svg>ثبت
+            </button>
+          </div>
+        </article>
+
+        <article class="spec" data-family="nasooz" data-id="d620"
+                 data-price="1780000" data-name="نمای مشکی مات" style="--warm:#2f2c2a">
+          <span class="spec__tab"></span>
+          <a class="spec__frame" href="product-d620.html" aria-label="شناسنامهٔ کامل نمای مشکی مات">
+            <img class="spec__shot spec__shot--wall" src="assets/products/az-d620-nama-meshki-wall.jpg" alt="نمای اجراشده با نمای مشکی مات" loading="lazy" data-slot>
+            <img class="spec__shot spec__shot--unit" src="assets/products/az-d620-nama-meshki-single.jpg" alt="" loading="lazy" aria-hidden="true">
+            <span class="spec__scale"><span class="spec__ticks"></span><span class="spec__mm">۲۴۰·۷۰·۲۰ mm</span></span>
+            <span class="spec__flag spec__flag--fa">محدود</span>
+          </a>
+          <div class="spec__body">
+            <div class="spec__id">
+              <span class="spec__code">AZ-D620</span>
+              <span class="spec__fam">نمای نسوز</span>
+            </div>
+            <h3 class="spec__name"><a href="product-d620.html">نمای مشکی مات</a></h3>
+            <p class="spec__desc">مشکی کاملاً مات، بدون بازتاب؛ برای نماهای گرافیکی و شاخص.</p>
+            <div class="spec__reads">
+              <div class="spec__read"><b>زیر ۵٪</b><span class="gauge-label fa">جذب آب</span></div>
+              <div class="spec__read"><b>۳۹۰</b><span class="gauge-label fa">مقاومت</span></div>
+              <div class="spec__read"><b>۳۰ <span class="mono">kg</span></b><span class="gauge-label fa">وزن</span></div>
+            </div>
+            <div class="spec__tones">
+              <span class="spec__tone" style="background:#2f2c2a" title="مشکی مات"></span><span class="spec__tone" style="background:#a6a099" title="طوسی دود"></span><span class="spec__tone" style="background:#573323" title="شکلاتی"></span>
+              <span class="gauge-label fa">۳ رنگ</span>
+            </div>
+          </div>
+          <div class="spec__foot">
+            <div class="spec__price">
+              <b>۱٬۷۸۰٬۰۰۰</b>
+              <span>تومان / متر مربع</span>
+            </div>
+            
+            <button class="spec__add" type="button" data-add="d620">
+              <svg><use href="#i-plus"></use></svg>ثبت
+            </button>
+          </div>
+        </article>
+
+        <article class="spec" data-family="ghataat" data-id="l710"
+                 data-price="2150000" data-name="آجر کنج (اِل) نسوز" style="--warm:#8d4a30">
+          <span class="spec__tab"></span>
+          <a class="spec__frame" href="product-l710.html" aria-label="شناسنامهٔ کامل آجر کنج (اِل) نسوز">
+            <img class="spec__shot spec__shot--wall" src="assets/products/az-l710-konj-nasooz-wall.jpg" alt="نمای اجراشده با آجر کنج (اِل) نسوز" loading="lazy" data-slot>
+            <img class="spec__shot spec__shot--unit" src="assets/products/az-l710-konj-nasooz-single.jpg" alt="" loading="lazy" aria-hidden="true">
+            <span class="spec__scale"><span class="spec__ticks"></span><span class="spec__mm">۲۰۰·۱۰۰·۲۰ mm</span></span>
+            
+          </a>
+          <div class="spec__body">
+            <div class="spec__id">
+              <span class="spec__code">AZ-L710</span>
+              <span class="spec__fam">قطعات ویژه</span>
+            </div>
+            <h3 class="spec__name"><a href="product-l710.html">آجر کنج (اِل) نسوز</a></h3>
+            <p class="spec__desc">کنج یکپارچهٔ ۹۰ درجه؛ گوشهٔ نما بدون درز و بدون برش.</p>
+            <div class="spec__reads">
+              <div class="spec__read"><b>زیر ۶٪</b><span class="gauge-label fa">جذب آب</span></div>
+              <div class="spec__read"><b>۳۵۰</b><span class="gauge-label fa">مقاومت</span></div>
+              <div class="spec__read"><b>۱۱ <span class="mono">kg</span></b><span class="gauge-label fa">وزن</span></div>
+            </div>
+            <div class="spec__tones">
+              <span class="spec__tone" style="background:#8d4a30" title="قرمز شفق"></span><span class="spec__tone" style="background:#e6e1d8" title="سفید صدف"></span><span class="spec__tone" style="background:#a6a099" title="طوسی دود"></span>
+              <span class="gauge-label fa">۳ رنگ</span>
+            </div>
+          </div>
+          <div class="spec__foot">
+            <div class="spec__price">
+              <b>۲٬۱۵۰٬۰۰۰</b>
+              <span>تومان / متر طول</span>
+            </div>
+            
+            <button class="spec__add" type="button" data-add="l710">
+              <svg><use href="#i-plus"></use></svg>ثبت
+            </button>
+          </div>
+        </article>
+
+        <article class="spec" data-family="ghataat" data-id="f810"
+                 data-price="1090000" data-name="آجر فرش کف صنعتی" style="--warm:#8f5236">
+          <span class="spec__tab"></span>
+          <a class="spec__frame" href="product-f810.html" aria-label="شناسنامهٔ کامل آجر فرش کف صنعتی">
+            <img class="spec__shot spec__shot--wall" src="assets/products/az-f810-farsh-kaf-wall.jpg" alt="نمای اجراشده با آجر فرش کف صنعتی" loading="lazy" data-slot>
+            <img class="spec__shot spec__shot--unit" src="assets/products/az-f810-farsh-kaf-single.jpg" alt="" loading="lazy" aria-hidden="true">
+            <span class="spec__scale"><span class="spec__ticks"></span><span class="spec__mm">۲۴۰·۱۲۰·۲۵ mm</span></span>
+            
+          </a>
+          <div class="spec__body">
+            <div class="spec__id">
+              <span class="spec__code">AZ-F810</span>
+              <span class="spec__fam">قطعات ویژه</span>
+            </div>
+            <h3 class="spec__name"><a href="product-f810.html">آجر فرش کف صنعتی</a></h3>
+            <p class="spec__desc">کف‌پوش ۲۵ میلی‌متری ضدسایش؛ محوطه، تراس و پیاده‌رو.</p>
+            <div class="spec__reads">
+              <div class="spec__read"><b>زیر ۷٪</b><span class="gauge-label fa">جذب آب</span></div>
+              <div class="spec__read"><b>۴۲۰</b><span class="gauge-label fa">مقاومت</span></div>
+              <div class="spec__read"><b>۵۲ <span class="mono">kg</span></b><span class="gauge-label fa">وزن</span></div>
+            </div>
+            <div class="spec__tones">
+              <span class="spec__tone" style="background:#8d4a30" title="قرمز شفق"></span><span class="spec__tone" style="background:#573323" title="شکلاتی"></span><span class="spec__tone" style="background:#a6a099" title="طوسی دود"></span>
+              <span class="gauge-label fa">۳ رنگ</span>
+            </div>
+          </div>
+          <div class="spec__foot">
+            <div class="spec__price">
+              <b>۱٬۰۹۰٬۰۰۰</b>
+              <span>تومان / متر مربع</span>
+            </div>
+            
+            <button class="spec__add" type="button" data-add="f810">
+              <svg><use href="#i-plus"></use></svg>ثبت
+            </button>
+          </div>
+        </article>
+        <!-- /az:rack -->
+  </div>
+
+  <div class="rack-more">
+    <a class="btn btn--line" href="shop.html">همهٔ کدها با جزئیات کامل<svg><use href="#i-arrow"></use></svg></a>
+  </div>
+</section>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track" id="tickerTrack"></div>
+</div>
+
+<!-- ══════════════════════ ۳ · خطِ تولید ══════════════════════ -->
+<section class="act shell" id="line">
+  <div class="act__head">
+    <div>
+      <div class="act__no"><b>۰۳</b>PRODUCTION LINE</div>
+      <h2 class="act__ttl">از سینهٔ معدن تا برگهٔ مهرشده</h2>
+    </div>
+    <p class="act__say">
+      شش ایستگاه که یک مشت خاک را به یک پارتِ شماره‌دار تبدیل می‌کند. روی هر ایستگاه بروید تا
+      عددهایش خوانده شود.
+    </p>
+  </div>
+
+  <div class="line">
+    <div class="line__panel">
+      <div class="gauge">
+        <div class="gauge__top">
+          <span class="gauge__lamp"></span>
+          <span class="gauge-label">STATION READOUT</span>
+          <span class="gauge-label" id="gaugeIx" style="margin-inline-start:auto">۰۱ / ۰۶</span>
+        </div>
+        <div class="gauge__bar"><i id="gaugeBar" style="--at:.166"></i></div>
+        <div class="gauge__face">
+          <div class="gauge__no mono" id="gaugeNo">STATION 01</div>
+          <h3 class="gauge__ttl" id="gaugeTtl">برداشت خاک</h3>
+          <p class="gauge__note" id="gaugeNote"></p>
+        </div>
+        <div class="gauge__reads">
+          <div class="gauge__read"><span class="gauge-label fa">مشخصات</span><b id="gaugeSpec">—</b></div>
+          <div class="gauge__read"><span class="gauge-label fa">خوانش</span><b id="gaugeRead">—</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stations" id="stations"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════ ۴ · کارگاه ══════════════════════ -->
+<section class="act shell" id="field">
+  <div class="act__head">
+    <div>
+      <div class="act__no"><b>۰۴</b>FIELD EVIDENCE</div>
+      <h2 class="act__ttl">شواهدِ کارگاهی</h2>
+    </div>
+    <p class="act__say">
+      نمای اجراشده، با شمارهٔ کدی که ساخته‌اش. این‌ها بایگانیِ ماست؛ اگر رنگی را پسندیدید،
+      همان کد را در رف پیدا می‌کنید.
+    </p>
+  </div>
+  <div class="sheetgrid" id="plates"></div>
+</section>
+
+<!-- ══════════════════════ ۵ · صدور شناسنامه ══════════════════════ -->
+<section class="act shell" id="issue">
+  <div class="act__head">
+    <div>
+      <div class="act__no"><b>۰۵</b>ISSUE RECORD</div>
+      <h2 class="act__ttl">شناسنامهٔ سفارشِ شما</h2>
+    </div>
+    <p class="act__say">
+      ابعادِ نما را بدهید تا متراژ، تعداد آجر، پالت، وزنِ بار و مبلغ درب کارخانه محاسبه شود.
+      پرتِ اجرا به‌طور پیش‌فرض هفت درصد لحاظ می‌شود.
+    </p>
+  </div>
+
+  <div class="issue">
+    <div class="issue__in">
+    <form class="form" id="calc" novalidate>
+      <div class="field field__sel">
+        <label class="gauge-label fa" for="calcProduct">کدِ محصول</label>
+        <select id="calcProduct"></select>
+      </div>
+      <div class="form__row form__row--2">
+        <div class="field">
+          <label class="gauge-label fa" for="calcW">عرضِ نما (متر)</label>
+          <input id="calcW" type="text" inputmode="decimal" value="۱۲" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="gauge-label fa" for="calcH">ارتفاعِ نما (متر)</label>
+          <input id="calcH" type="text" inputmode="decimal" value="۳٫۵" autocomplete="off">
+        </div>
+      </div>
+      <div class="slider">
+        <div class="slider__top">
+          <span class="gauge-label fa">سهمِ بازشوها (در و پنجره)</span>
+          <b id="calcOpenOut">۱۵٪</b>
+        </div>
+        <input id="calcOpen" type="range" min="0" max="60" step="1" value="15" aria-label="سهم بازشوها به درصد">
+      </div>
+      <p class="note" id="calcHint"></p>
+    </form>
+    </div>
+
+    <div class="draft" id="draft">
+      <div class="draft__top">
+        <div>
+          <!-- az:draft-head -->
+          <div class="draft__ttl" id="draftName">نسوز قرمز شفق</div>
+          <span class="draft__serial" id="draftSerial">AZ-R110 / BATCH 1404-07-B18</span>
+        <!-- /az:draft-head -->
+        </div>
+        <span class="draft__swatch" id="draftSwatch"></span>
+      </div>
+      <div class="draft__rows">
+        <!-- az:draft -->
+        <div class="draft__row"><span>مساحتِ خالصِ نما</span><b id="dArea">۳۵٫۷ متر مربع</b></div>
+        <div class="draft__row"><span>با پرتِ اجرا (۷٪)</span><b id="dBilled">۳۸٫۲ متر مربع</b></div>
+        <div class="draft__row"><span>تعدادِ آجر</span><b id="dBricks">۱٬۹۸۷ عدد</b></div>
+        <div class="draft__row"><span>پالت</span><b id="dPallets">۴ پالت</b></div>
+        <div class="draft__row"><span>وزنِ تقریبیِ بار</span><b id="dWeight">۱٬۱۰۸ کیلوگرم</b></div>
+        <div class="draft__row draft__row--sum"><span>مبلغ درب کارخانه</span><b id="dPrice">۴۵٬۰۷۴٬۸۲۰ تومان</b></div>
+        <!-- /az:draft -->
+      </div>
+      <div class="draft__foot">
+        <p class="note">این برگه پیش‌نویس است؛ پیش‌فاکتور رسمی با مهر کارخانه پس از تأیید صادر می‌شود.</p>
+        <button class="btn btn--ink" type="button" id="draftAdd"><svg><use href="#i-plus"></use></svg>ثبت در پرونده</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="act__head" style="margin-block:clamp(3rem,7vh,5rem) clamp(1rem,2vh,1.6rem)">
+    <div>
+      <div class="act__no"><b>۰۵ب</b>MARGIN NOTES</div>
+      <h2 class="act__ttl" style="font-size:clamp(1.3rem,1rem+1.4vw,1.9rem)">یادداشت‌های حاشیهٔ پرونده</h2>
+    </div>
+  </div>
+  <div class="notes" id="notes"></div>
+</section>
+
+<!-- ══════════════════════ ۶ · میزِ مشاور ══════════════════════ -->
+<section class="act act--tight shell">
+  <div class="bench">
+    <div>
+      <div class="act__no"><b>۰۶</b>TECHNICAL DESK</div>
+      <h3 class="bench__ttl">میزِ مشاورِ فنی، همیشه باز است.</h3>
+      <p class="act__say" style="margin-block-start:.8rem">
+        محاسبهٔ متراژ، انتخاب رنگ بر اساس جهتِ نما، تفاوت کدها، زمانِ ارسال — بپرسید.
+        پاسخ‌ها از همین دفترِ آزمایشگاه می‌آید و آفلاین روی همین صفحه اجرا می‌شود.
+      </p>
+      <div class="hero__acts" style="margin-block-start:1.4rem">
+        <button class="btn btn--sealed" type="button" data-ask><svg><use href="#i-chat"></use></svg>شروع گفتگو</button>
+      </div>
+    </div>
+    <div>
+      <span class="gauge-label fa">پرسش‌های آماده</span>
+      <div class="bench__prompts" id="benchPrompts"></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================== پاورقی ============================== -->
+<!-- az:foot -->
+<footer class="foot">
+  <div class="shell">
+    <div class="foot__grid">
+      <div>
+        <div class="foot__mark">
+          <svg viewBox="0 0 40 40" aria-hidden="true">
+            <rect x="1"  y="5"    width="16" height="8.4" rx="1" fill="var(--seal)"/>
+            <rect x="19" y="5"    width="20" height="8.4" rx="1" fill="currentColor"/>
+            <rect x="1"  y="15.8" width="24" height="8.4" rx="1" fill="currentColor"/>
+            <rect x="27" y="15.8" width="12" height="8.4" rx="1" fill="var(--seal)"/>
+            <rect x="1"  y="26.6" width="12" height="8.4" rx="1" fill="currentColor"/>
+            <rect x="15" y="26.6" width="24" height="8.4" rx="1" fill="var(--seal)"/>
+          </svg>
+          <span class="foot__ttl">آذرخش</span>
+        </div>
+        <p class="note">
+          کارخانهٔ آجر نمای نسوز · تبریز، کیلومتر ۱۲ جادهٔ آذرشهر، شهرک صنعتی غرب.
+          تولید از خاکِ معدن سهند، پختِ تونلی ۱۱۸۰ درجه، شناسنامهٔ پارت برای هر بار.
+        </p>
+      </div>
+      <div>
+        <h4>پرونده</h4>
+        <ul class="foot__links">
+          <li><a href="index.html#booth">اتاقکِ نور</a></li>
+          <li><a href="index.html#rack">رفِ نمونه‌ها</a></li>
+          <li><a href="index.html#line">خطِ تولید</a></li>
+          <li><a href="index.html#field">شواهدِ کارگاهی</a></li>
+          <li><a href="shop.html">فروشگاه</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>تماس</h4>
+        <ul class="foot__links">
+          <li><a href="tel:+984133821140">۰۴۱ ۳۳۸۲ ۱۱۴۰</a></li>
+          <li><a href="tel:+989141234567">۰۹۱۴ ۱۲۳ ۴۵۶۷</a></li>
+          <li><a href="mailto:lab@azarakhsh.shop">lab@azarakhsh.shop</a></li>
+          <li><a href="#" data-ask>مشاورهٔ فنی</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot__end">
+      <span>© ۱۴۰۴ آذرخش</span>
+      <span class="mono">AZARAKHSH TEST · BATCH RECORD</span>
+      <span class="mono" id="footVer">BUILD AZ-TEST · REC 1404</span>
+      <span>قیمت‌ها درب کارخانهٔ تبریز</span>
+    </div>
+  </div>
+</footer>
+<!-- /az:foot -->
+
+<!-- ============================== داک ============================== -->
+<!-- az:dock -->
+<nav class="dock" id="dock" aria-label="راهبری موبایل">
+  <a class="dock__b" href="index.html" aria-current="page"><svg><use href="#i-home"></use></svg><span>خانه</span></a>
+  <a class="dock__b" href="shop.html"><svg><use href="#i-grid"></use></svg><span>فروشگاه</span></a>
+  <button class="dock__b" type="button" data-ask><svg><use href="#i-chat"></use></svg><span>مشاور</span></button>
+  <button class="dock__b" type="button" id="dockFile"><svg><use href="#i-file"></use></svg><span>پرونده</span><span class="tool__count mono" id="dockCount">۰</span></button>
+</nav>
+<!-- /az:dock -->
+
+<!-- ============================== کشوها ============================== -->
+<!-- az:sheets -->
+<sl-drawer id="fileSheet" placement="end" no-header>
+  <div class="pane">
+    <div class="pane__top">
+      <div>
+        <div class="pane__ttl">پروندهٔ سفارش</div>
+        <span class="pane__sub">ORDER RECORD · DRAFT</span>
+      </div>
+      <button class="pane__x" type="button" data-close="#fileSheet" aria-label="بستن"><svg><use href="#i-x"></use></svg></button>
+    </div>
+    <div class="pane__body" id="fileBody"></div>
+    <div class="pane__foot" id="fileFoot" hidden></div>
+  </div>
+</sl-drawer>
+
+<sl-drawer id="menuSheet" placement="end" no-header>
+  <div class="pane">
+    <div class="pane__top">
+      <div>
+        <div class="pane__ttl">فهرست</div>
+        <span class="pane__sub">INDEX</span>
+      </div>
+      <button class="pane__x" type="button" data-close="#menuSheet" aria-label="بستن"><svg><use href="#i-x"></use></svg></button>
+    </div>
+    <div class="pane__body">
+      <div class="menu__list">
+        <a class="menu__row" href="index.html">صفحهٔ نخست<span class="mono">00</span></a>
+        <a class="menu__row" href="index.html#booth">اتاقکِ نور<span class="mono">01</span></a>
+        <a class="menu__row" href="index.html#rack">رفِ نمونه‌ها<span class="mono">02</span></a>
+        <a class="menu__row" href="index.html#line">خطِ تولید<span class="mono">03</span></a>
+        <a class="menu__row" href="index.html#field">شواهدِ کارگاهی<span class="mono">04</span></a>
+        <a class="menu__row" href="index.html#issue">صدورِ شناسنامه<span class="mono">05</span></a>
+        <a class="menu__row" href="shop.html">فروشگاه<span class="mono">06</span></a>
+      </div>
+    </div>
+  </div>
+</sl-drawer>
+<!-- /az:sheets -->
+
+
+<!-- ============================ میزِ مشاور ============================ -->
+<!-- az:advisor -->
+<div class="pop" id="advisorPop" aria-hidden="true" role="dialog" aria-modal="true" aria-label="میزِ مشاورِ فنی آذرخش">
+  <div class="pop__scrim" data-pop-close></div>
+  <div class="pop__panel">
+    <div class="pop__head" id="popHead">
+      <span class="pop__grip"></span>
+      <span class="pop__dot"></span>
+      <div class="pop__id">
+        <b>میزِ مشاورِ فنی</b>
+        <span class="pop__sub">TECHNICAL DESK · OFFLINE</span>
+      </div>
+      <div class="pop__acts">
+        <button class="pane__x" type="button" id="chatReset" aria-label="گفتگوی تازه"><svg><use href="#i-rotate"></use></svg></button>
+        <button class="pane__x" type="button" data-pop-close aria-label="بستن"><svg><use href="#i-x"></use></svg></button>
+      </div>
+      <span class="pop__scan"></span>
+    </div>
+
+    <div class="chat__scroll" id="chatScroll">
+      <div class="chat__intro" id="chatIntro">
+        <b>بپرسید؛ از روی همین دفترِ آزمایشگاه جواب می‌دهم.</b>
+        <p>
+          انتخاب رنگ بر اساس جهتِ نما، محاسبهٔ متراژ و تعداد آجر، تفاوت کدها، شرایط ارسال و ضمانت.
+          موتور پاسخ روی همین صفحه اجرا می‌شود و هیچ چیزی جایی فرستاده نمی‌شود.
+        </p>
+      </div>
+      <div class="chat__feed" id="chatFeed"></div>
+    </div>
+
+    <div class="chat__chips" id="chatChips"></div>
+
+    <form class="composer" id="composer">
+      <textarea id="chatInput" rows="1" placeholder="مثلاً: نمای شمالی، ۱۴ در ۳٫۲ متر، رنگ روشن"></textarea>
+      <button class="composer__send" id="chatSend" type="submit" aria-label="ارسال"><svg><use href="#i-send"></use></svg></button>
+    </form>
+  </div>
+</div>
+<!-- /az:advisor -->
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span class="toast__seal"></span><span id="toastText"></span>
+</div>
+
+<!-- ============================== اسکریپت‌ها ============================== -->
+<!-- az:foot-scripts -->
+<script src="vendor/gsap/gsap.min.js"></script>
+<script src="vendor/gsap/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis/lenis.min.js"></script>
+<script type="module" src="js/sl.js"></script>
+<script src="js/data.js"></script>
+<script src="js/content.js"></script>
+<script src="js/lab.js"></script>
+<script src="js/core.js"></script>
+<script src="js/motion.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/advisor.js"></script>
+<!-- /az:foot-scripts -->
+<script type="module" src="js/home.js"></script>
+</body>
+</html>

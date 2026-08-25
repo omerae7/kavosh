@@ -1,0 +1,145 @@
+/* =========================================================================
+   آذرخش · قطعه‌های مشترکِ صفحه‌ها
+   چیزهایی که صفحهٔ نخست، فروشگاه و شناسنامهٔ محصول با هم دارند.
+   ========================================================================= */
+
+/* ------------------------------- مسیر ------------------------------- */
+.crumb {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;
+  padding-block: clamp(.6rem, 2vh, 1rem);
+  font-size: .78rem;
+  color: var(--ink-3);
+}
+.crumb a { text-decoration: none; transition: color .24s var(--plot); }
+.crumb a:hover { color: var(--seal); }
+.crumb span { color: var(--ink-4); }
+.crumb b { font-weight: 500; color: var(--ink); }
+@media (pointer: coarse) { .crumb a { padding-block: .62rem; } }
+
+/* ========================== سرِ هر پرده ============================== */
+.act { padding-block: var(--gap-y); position: relative; }
+.act--tight { padding-block: clamp(3rem, 7vh, 5.4rem); }
+
+.act__head {
+  display: grid; gap: .9rem;
+  margin-block-end: clamp(1.8rem, 4vh, 3rem);
+}
+@media (min-width: 900px) {
+  .act__head { grid-template-columns: minmax(0, 1fr) minmax(0, .82fr); align-items: end; gap: clamp(1.4rem, 4vw, 3.4rem); }
+}
+.act__no {
+  display: flex; align-items: center; gap: .7rem;
+  font-family: 'Mono', 'Shabnam', monospace; font-size: .6rem; letter-spacing: .14em;
+  color: var(--ink-4);
+  margin-block-end: .6rem;
+}
+/* شمارهٔ پرده جدا از عنوانِ لاتین می‌ایستد — بدون خط تیره */
+.act__no b {
+  font-weight: 600;
+  color: var(--seal);
+  padding-inline-end: .6rem;
+  border-inline-end: 1px solid var(--rule);
+}
+.act__no i {
+  font-family: 'Shabnam', sans-serif; font-style: normal;
+  font-size: 1.14em; letter-spacing: 0;
+}
+.act__no::after { content: ''; flex: 1 1 auto; height: 1px; background: var(--rule); }
+.act__ttl {
+  font-family: 'Kufi', sans-serif; font-weight: 600;
+  font-size: clamp(1.55rem, 1rem + 2.3vw, 2.85rem);
+  line-height: 1.3; letter-spacing: -.008em;
+}
+.act__say { color: var(--ink-2); font-size: clamp(.9rem, .88rem + .2vw, 1rem); line-height: 1.9; max-width: 46ch; }
+
+/* دکمه‌های اصلی — روی زمینهٔ تیره */
+.btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  height: 44px; padding-inline: 1.1rem;
+  border-radius: var(--r2);
+  border: 1px solid transparent;
+  font-size: .88rem;
+  transition: background-color .3s var(--plot), border-color .3s var(--plot), color .3s var(--plot), transform .3s var(--plot);
+}
+.btn svg { width: 16px; height: 16px; flex: none; }
+.btn:active { transform: translateY(1px); }
+.btn--seal { background: #2fbf8b; color: #04140e; border-color: #2fbf8b; }
+.btn--seal:hover { background: #45d29e; border-color: #45d29e; }
+.btn--ghost { border-color: rgba(221,230,225,.26); color: rgba(221,230,225,.86); }
+.btn--ghost:hover { border-color: rgba(221,230,225,.6); color: #f0f5f2; background: rgba(221,230,225,.06); }
+
+/* نسخهٔ روشنِ همان دکمه‌ها، برای بقیهٔ صفحه */
+.btn--ink { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.btn--ink:hover { background: var(--seal); border-color: var(--seal); color: var(--on-seal); }
+.btn--line { border-color: var(--rule-2); color: var(--ink); }
+.btn--line:hover { border-color: var(--seal); color: var(--seal); background: var(--seal-wash); }
+.btn--sealed { background: var(--seal); color: var(--on-seal); border-color: var(--seal); }
+.btn--sealed:hover { background: var(--seal-2); border-color: var(--seal-2); }
+
+/* --------------------------- صافیِ خانواده --------------------------- */
+.filters {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .4rem;
+  margin-block-end: clamp(1.2rem, 3vh, 1.8rem);
+  padding-block-end: .9rem;
+  border-block-end: 1px solid var(--rule);
+}
+.filters .gauge-label { margin-inline-end: .4rem; }
+.chip {
+  position: relative;
+  padding: .42rem .82rem;
+  border: 1px solid var(--rule);
+  border-radius: 99px;
+  font-size: .8rem;
+  color: var(--ink-2);
+  transition: color .26s var(--plot), border-color .26s var(--plot), background-color .26s var(--plot);
+}
+.chip:hover { color: var(--ink); border-color: var(--rule-2); }
+.chip[aria-pressed="true"] { color: var(--on-seal); background: var(--seal); border-color: var(--seal); }
+.chip__n { font-family: 'Mono', 'Shabnam', monospace; font-size: .6rem; opacity: .68; margin-inline-start: .3rem; }
+.filters__count { margin-inline-start: auto; font-size: .74rem; color: var(--ink-4); }
+@media (pointer: coarse) { .chip { padding: .58rem .95rem; } }
+
+.rack-more { display: flex; justify-content: center; margin-block-start: clamp(1.4rem, 3vh, 2rem); }
+
+.field { display: grid; gap: .38rem; }
+.field > .gauge-label { color: var(--ink-3); }
+.field input, .field select, .field textarea {
+  width: 100%;
+  height: 46px;
+  padding-inline: .8rem;
+  background: var(--sheet-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--r2);
+  color: var(--ink);
+  font-size: .92rem;
+  transition: border-color .26s var(--plot), background-color .26s var(--plot);
+}
+.field textarea { height: auto; min-height: 106px; padding-block: .65rem; resize: vertical; line-height: 1.8; }
+.field input:hover, .field select:hover, .field textarea:hover { border-color: var(--rule-2); }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--seal); outline: none; box-shadow: 0 0 0 3px var(--seal-wash); }
+.field input::placeholder, .field textarea::placeholder { color: var(--ink-4); }
+.field select { appearance: none; padding-inline-end: 2.1rem; background-image: none; }
+.field__sel { position: relative; }
+.field__sel::after {
+  content: ''; position: absolute;
+  inset-block-end: 21px; inset-inline-start: .85rem;
+  width: 7px; height: 7px;
+  border-inline-start: 1px solid var(--ink-3);
+  border-block-end: 1px solid var(--ink-3);
+  transform: rotate(-45deg);
+  pointer-events: none;
+}
+.field__err { font-size: .72rem; color: var(--stamp); min-height: 1.2em; }
+.field.is-bad input, .field.is-bad textarea { border-color: var(--stamp); }
+
+/* جای عکسی که هنوز آپلود نشده */
+.img-slot {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .3rem; padding: 1rem;
+  background: var(--sheet-3);
+  border: 1px dashed var(--rule-2);
+  text-align: center;
+}
+.img-slot b { font-family: 'Kufi', sans-serif; font-size: .82rem; color: var(--ink-2); }
+.img-slot span { font-family: 'Mono', 'Shabnam', monospace; font-size: .54rem; color: var(--ink-4); word-break: break-all; }

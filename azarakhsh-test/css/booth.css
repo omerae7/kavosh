@@ -1,0 +1,182 @@
+/* =========================================================================
+   آذرخش · اتاقکِ نور
+   نمونهٔ آجر زیر سه صحنهٔ نور. این تنها جایی است که سایت سه‌بعدی می‌شود،
+   و دلیلش کاربردی است: رنگِ آجر را باید زیر نور دید، نه در جدول.
+   ========================================================================= */
+
+.stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: min(62vh, 560px);
+}
+@media (max-width: 999px) {
+  .stage { aspect-ratio: 4 / 3; max-height: 32svh; }
+  margin-inline: auto;
+  touch-action: pan-y;
+}
+.stage__gl { width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1s var(--plot); }
+.stage.is-lit .stage__gl { opacity: 1; }
+
+/* پشتیبانِ بدون WebGL — همان نمونه، عکس استودیویی، با گذرِ نور */
+.stage__flat {
+  position: absolute; inset: 0;
+  display: none;
+  overflow: hidden;
+}
+.stage.is-flat .stage__flat { display: block; }
+.stage.is-flat .stage__gl { display: none; }
+.stage__flat img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 30px 40px rgba(0,0,0,.55));
+}
+.stage__flat::after {
+  content: '';
+  position: absolute; inset: -30%;
+  background: linear-gradient(105deg, transparent 38%, rgba(255,244,228,.20) 50%, transparent 62%);
+  animation: sweep 6.5s var(--io) infinite;
+}
+@keyframes sweep { 0%,100% { transform: translateX(-28%) } 50% { transform: translateX(28%) } }
+
+/* هالهٔ نورِ اتاقک روی کف */
+.stage__pool {
+  position: absolute;
+  inset-block-end: 8%; inset-inline: 12%;
+  height: 22%;
+  background: radial-gradient(60% 100% at 50% 50%, rgba(255,238,214,.16), transparent 72%);
+  filter: blur(8px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s var(--plot);
+}
+.stage.is-lit .stage__pool { opacity: 1; }
+
+/* راهنمای کشیدن */
+.stage__hint {
+  position: absolute;
+  inset-block-end: 2%; inset-inline: 0;
+  text-align: center;
+  font-family: 'Mono', 'Shabnam', monospace;
+  font-size: .58rem; letter-spacing: .14em;
+  color: rgba(221,230,225,.42);
+  pointer-events: none;
+  transition: opacity .4s var(--io);
+}
+.stage.is-held .stage__hint { opacity: 0; }
+
+/* زاویهٔ چرخش — عددی که با انگشت عوض می‌شود */
+.stage__deg {
+  position: absolute;
+  inset-block-start: 4%; inset-inline-end: 4%;
+  font-family: 'Mono', 'Shabnam', monospace;
+  font-size: .62rem; letter-spacing: .04em;
+  color: rgba(221,230,225,.55);
+  pointer-events: none;
+}
+.stage__deg b { color: #2fbf8b; font-weight: 500; }
+
+/* ---------------------- کلیدهای صحنهٔ نور --------------------------- */
+.lights {
+  display: flex; align-items: stretch;
+  border: 1px solid rgba(221,230,225,.16);
+  border-radius: var(--r2);
+  overflow: hidden;
+  background: rgba(8,13,12,.5);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.lights__b {
+  flex: 1 1 0;
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .1rem;
+  padding: .6rem .3rem .55rem;
+  color: rgba(221,230,225,.6);
+  font-size: .8rem;
+  transition: color .3s var(--plot), background-color .3s var(--plot);
+  min-height: 46px;
+}
+.lights__b + .lights__b { border-inline-end: 1px solid rgba(221,230,225,.14); }
+.lights__b:hover { color: #dde6e1; background: rgba(221,230,225,.05); }
+.lights__b[aria-pressed="true"] { color: #dde6e1; background: rgba(47,191,139,.14); }
+.lights__b .gauge-label { font-size: .53rem; color: rgba(221,230,225,.42); }
+.lights__b[aria-pressed="true"] .gauge-label { color: #2fbf8b; }
+.lights__b::after {
+  content: ''; position: absolute;
+  inset-block-end: 0; inset-inline: 20%;
+  height: 2px; background: #2fbf8b;
+  transform: scaleX(0); transform-origin: 100% 50%;
+  transition: transform .38s var(--plot);
+}
+.lights__b[aria-pressed="true"]::after { transform: scaleX(1); }
+
+/* ------------------------ رنگ‌بندی نمونه ---------------------------- */
+.swatches { display: flex; flex-wrap: wrap; gap: .42rem; }
+.swatch {
+  position: relative;
+  width: 34px; height: 34px;
+  border-radius: var(--r1);
+  border: 1px solid rgba(221,230,225,.22);
+  transition: transform .32s var(--snap), border-color .3s var(--io);
+}
+.swatch::after {
+  content: ''; position: absolute; inset: -4px;
+  border: 1px solid #2fbf8b;
+  border-radius: var(--r2);
+  opacity: 0; transform: scale(.86);
+  transition: opacity .3s var(--io), transform .34s var(--snap);
+}
+.swatch:hover { transform: translateY(-2px); border-color: rgba(221,230,225,.5); }
+.swatch[aria-pressed="true"]::after { opacity: 1; transform: scale(1); }
+
+/* ------------------------- خوانش‌های اتاقک -------------------------- */
+.reads { display: grid; gap: 0; border-block-start: 1px solid rgba(221,230,225,.14); }
+.reads__row {
+  display: flex; align-items: baseline; gap: .7rem;
+  padding-block: .58rem;
+  border-block-end: 1px solid rgba(221,230,225,.1);
+}
+.reads__row .gauge-label { flex: none; color: rgba(221,230,225,.44); }
+.reads__row b {
+  margin-inline-start: auto;
+  font-family: 'Mono', 'Shabnam', monospace;
+  font-size: .78rem; font-weight: 500; letter-spacing: -.04em;
+  color: #dde6e1;
+}
+.reads__row b.is-fa { font-family: 'Shabnam', sans-serif; letter-spacing: 0; font-size: .84rem; }
+
+/* نوارِ رنگِ خوانده‌شده */
+.reads__chip {
+  width: 13px; height: 13px; flex: none;
+  border-radius: 2px;
+  border: 1px solid rgba(221,230,225,.3);
+  align-self: center;
+}
+
+@media (pointer: coarse) {
+  .swatch { width: 42px; height: 42px; }
+  .lights__b { min-height: 52px; }
+}
+
+/* ------------------- سرِ قاب و خانه‌های نوار فرمان ------------------- */
+.hero__stage { position: relative; }
+.hero__cap {
+  display: flex; align-items: baseline; gap: .6rem;
+  padding-block-end: .5rem;
+  border-block-end: 1px solid rgba(221,230,225,.14);
+  margin-block-end: .3rem;
+}
+.hero__cap .gauge-label { color: rgba(221,230,225,.44); }
+.hero__cap b {
+  margin-inline-start: auto;
+  font-family: 'Mono', 'Shabnam', monospace; font-size: .62rem; font-weight: 500;
+  color: rgba(221,230,225,.66);
+}
+
+.rig__cell { display: grid; gap: .5rem; align-content: start; }
+.rig__cell > .gauge-label { color: rgba(221,230,225,.44); }
+.rig__note {
+  font-size: .74rem; line-height: 1.75;
+  color: rgba(221,230,225,.5);
+  min-height: 2.6em;
+}

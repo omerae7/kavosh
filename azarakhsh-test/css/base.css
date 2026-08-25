@@ -1,0 +1,315 @@
+/* =========================================================================
+   آذرخش · نسخهٔ آزمایشی «شناسنامهٔ پارت»
+   لایهٔ پایه: توکن‌ها، حروف، سطح‌های خودِ مرورگر
+   ــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ
+   جهانِ این طراحی: آزمایشگاه کنترل کیفیت. صفحه سرد و اندازه‌گرفتنی است؛
+   تنها رنگِ گرمِ صفحه، خودِ آجر است. هر جا رنگ گرم می‌بینید یعنی محصول.
+   ========================================================================= */
+
+/* ------------------------------- حروف ------------------------------- */
+@font-face {
+  font-family: 'Kufi';
+  src: url('../assets/fonts/NotoKufiArabic-Variable.woff2') format('woff2-variations');
+  font-weight: 100 900; font-style: normal; font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200F, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Shabnam';
+  src: url('../assets/fonts/Shabnam-Light.woff2') format('woff2');
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Shabnam';
+  src: url('../assets/fonts/Shabnam.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Shabnam';
+  src: url('../assets/fonts/Shabnam-Medium.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Shabnam';
+  src: url('../assets/fonts/Shabnam-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Mono';
+  src: url('../assets/fonts/MartianMono-Latin-Variable.woff2') format('woff2-variations');
+  font-weight: 100 800; font-style: normal; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+2122, U+2212;
+}
+@font-face {
+  font-family: 'Mono';
+  src: url('../assets/fonts/MartianMono-LatinExt-Variable.woff2') format('woff2-variations');
+  font-weight: 100 800; font-style: normal; font-display: swap;
+  unicode-range: U+0100-02BA, U+1E00-1E9F, U+2020, U+20A0-20AB, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ------------------------------ توکن‌ها ------------------------------ */
+:root {
+  /* روز آزمایشگاه — نور شمالی روی میز سنگی */
+  --ground:   #dfe4de;
+  --ground-2: #d6ddd7;
+  --sheet:    #f2f6f1;
+  --sheet-2:  #fafcf9;
+  --sheet-3:  #e9efe9;
+
+  --ink:   #101817;
+  --ink-2: #374644;
+  --ink-3: #4a5755;   /* ≥۵٫۴ روی تیره‌ترین سطحِ روشن */
+  --ink-4: #556260;   /* ≥۴٫۶ — کمترین متنِ خوانا */
+  --ink-rgb: 16, 24, 23;
+
+  --seal:    #0a6448;          /* سبزِ چاپِ اوراق بهادار — تنها رنگ نشانه‌ای */
+  --seal-2:  #0d7d59;
+  --seal-3:  #063b2b;
+  --seal-rgb: 10, 100, 72;
+  --on-seal: #f2f6f1;
+  --seal-wash: rgba(10, 100, 72, .08);
+
+  --stamp:   #a1302a;          /* مهرِ قرمز — فقط معنا: خارج از محدوده، حذف، هشدار */
+  --stamp-rgb: 161, 48, 42;
+
+  --rule:   rgba(16, 24, 23, .14);
+  --rule-2: rgba(16, 24, 23, .26);
+  --rule-3: rgba(10, 100, 72, .42);
+
+  --glass:  rgba(242, 246, 241, .78);
+  --ground-rgb: 223, 228, 222;
+  --shade:   rgba(16, 24, 23, .09);
+  --shade-2: rgba(16, 24, 23, .16);
+
+  /* گرمای آجر — هر بلوک محصول مقدارش را خودش می‌گذارد */
+  --warm: #8d4a30;
+  --warm-soft: rgba(141, 74, 48, .14);
+
+  color-scheme: light;
+
+  /* هندسه — گوشه‌ها تیزند؛ این یک برگهٔ آزمایشگاهی است، نه یک کارت نرم */
+  --r0: 0px;
+  --r1: 2px;
+  --r2: 4px;
+  --r3: 8px;
+  --r4: 14px;
+
+  /* شتاب‌ها */
+  --plot: cubic-bezier(.16, .84, .44, 1);      /* حرکت قلمِ رسم */
+  --snap: cubic-bezier(.22, 1.14, .34, 1);     /* جا افتادنِ مهر */
+  --io:   cubic-bezier(.62, .02, .34, 1);
+
+  --pad:   clamp(1.1rem, 3.6vw, 3.4rem);
+  --shell: 1500px;
+  --gap-y: clamp(4.6rem, 10vh, 9rem);
+  --bar-h: 62px;
+  --dock-h: 66px;
+
+  /* لایه‌ها — یک بار برای همیشه */
+  --z-film: 600;
+  --z-bar: 850;
+  --z-dock: 850;
+  --z-drawer: 1000;
+  --z-booth: 1100;
+  --z-toast: 1200;
+  --z-cursor: 1300;
+  --z-veil: 1400;
+}
+
+:root[data-theme="dark"], .night {
+  /* شب آزمایشگاه — چراغ موضعی روی میز، اتاق خاموش */
+  --ground:   #090f0e;
+  --ground-2: #060b0a;
+  --sheet:    #111917;
+  --sheet-2:  #16201e;
+  --sheet-3:  #0d1413;
+
+  --ink:   #dde6e1;
+  --ink-2: #9dada8;
+  --ink-3: #8b9a95;   /* ≥۵٫۶ روی روشن‌ترین سطحِ تیره */
+  --ink-4: #7b8b86;   /* ≥۴٫۶ */
+  --ink-rgb: 221, 230, 225;
+
+  --seal:    #2fbf8b;
+  --seal-2:  #45d29e;
+  --seal-3:  #8ee5c4;
+  --seal-rgb: 47, 191, 139;
+  --on-seal: #04140e;
+  --seal-wash: rgba(47, 191, 139, .10);
+
+  --stamp:   #e0655a;
+  --stamp-rgb: 224, 101, 90;
+
+  --rule:   rgba(221, 230, 225, .14);
+  --rule-2: rgba(221, 230, 225, .26);
+  --rule-3: rgba(47, 191, 139, .38);
+
+  --glass:  rgba(17, 25, 23, .80);
+  --ground-rgb: 9, 15, 14;
+  --shade:   rgba(0, 0, 0, .5);
+  --shade-2: rgba(0, 0, 0, .68);
+
+  --warm-soft: rgba(255, 178, 130, .12);
+
+  color-scheme: dark;
+}
+
+/* ------------------------------- ریست ------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto;
+}
+
+body {
+  font-family: 'Shabnam', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(.94rem, .9rem + .22vw, 1.02rem);
+  line-height: 1.85;
+  color: var(--ink);
+  background: var(--ground);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color .5s var(--io), color .5s var(--io);
+}
+
+body.is-frozen { overflow: hidden; height: 100vh; }
+
+img, svg, video, canvas { display: block; max-width: 100%; }
+img { height: auto; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { background: none; border: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+[hidden] { display: none !important; }
+
+/* ------------------------------- حروف‌چینی --------------------------- */
+.kufi, h1, h2, h3, h4 {
+  font-family: 'Kufi', 'Shabnam', system-ui, sans-serif;
+  font-weight: 500;
+  line-height: 1.42;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+/* عددها و کدهای لاتین — صدای ابزار دقیق.
+   فارسی هرگز داخل «مونو» نمی‌افتد: شبنم پشتِ آن ایستاده و کشیدگیِ حروف
+   لاتین روی خطِ فارسی اعمال نمی‌شود. */
+.mono {
+  font-family: 'Mono', 'Shabnam', ui-monospace, monospace;
+  font-weight: 400;
+  letter-spacing: -.04em;
+  font-feature-settings: 'ss01';
+}
+
+/* عدد یا کدی که باید چپ‌به‌راست خوانده شود (ابعاد، شمارهٔ پارت، کد رنگ) */
+.ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+.h-xl { font-size: clamp(2.05rem, 1.1rem + 4.4vw, 4.6rem); line-height: 1.2;  font-weight: 600; letter-spacing: -.012em; }
+.h-lg { font-size: clamp(1.62rem, 1.1rem + 2.3vw, 2.9rem);  line-height: 1.3;  font-weight: 600; letter-spacing: -.008em; }
+.h-md { font-size: clamp(1.2rem, 1rem + 1vw, 1.6rem);       line-height: 1.42; font-weight: 600; }
+.h-sm { font-size: clamp(1.02rem, .96rem + .4vw, 1.16rem);  line-height: 1.5;  font-weight: 600; }
+
+.lead {
+  font-size: clamp(1rem, .95rem + .4vw, 1.16rem);
+  line-height: 1.9;
+  color: var(--ink-2);
+  max-width: 62ch;
+}
+.note { font-size: .84rem; line-height: 1.8; color: var(--ink-3); max-width: 68ch; }
+
+/* برچسبِ ریزِ خط‌کش — روی هر بلوکِ اندازه‌گیری.
+   نسخهٔ لاتین کشیده و بزرگ‌حرف است؛ نسخهٔ فارسی (fa) بدون کشیدگی، چون
+   کشیدگیِ حروف پیوندِ خطِ فارسی را می‌شکند. */
+.gauge-label {
+  font-family: 'Mono', 'Shabnam', ui-monospace, monospace;
+  font-size: .62rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+.gauge-label.fa {
+  font-family: 'Shabnam', sans-serif;
+  font-size: .72rem;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+}
+/* نیمهٔ فارسیِ یک برچسبِ دوزبانه */
+.gauge-label i {
+  font-family: 'Shabnam', sans-serif;
+  font-style: normal;
+  font-size: 1.12em;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.fa-num { font-variant-numeric: normal; }
+
+/* --------------------- سطح‌هایی که مرورگر می‌کشد ---------------------- */
+::selection { background: var(--seal); color: var(--on-seal); }
+::-moz-selection { background: var(--seal); color: var(--on-seal); }
+
+:root { scrollbar-color: var(--rule-2) transparent; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--rule-2);
+  border: 3px solid var(--ground);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--seal); }
+
+input, textarea { caret-color: var(--seal); }
+
+:focus-visible {
+  outline: 2px solid var(--seal);
+  outline-offset: 3px;
+  border-radius: var(--r1);
+}
+:focus:not(:focus-visible) { outline: none; }
+
+/* زیرخط فقط برای پیوندِ درونِ متن — نه برای عنوانِ کارت و راهبری */
+.note a, .lead a, .act__say a, p a, li a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .28em;
+  text-decoration-color: var(--rule-3);
+}
+.note a:hover, .lead a:hover, .act__say a:hover, p a:hover, li a:hover { text-decoration-color: var(--seal); }
+.foot__links a, .menu__row, .crumb a, .spec__name a, .bar__link, .plate, .dock__b { text-decoration: none; }
+
+/* ------------------------------ ابزارها ------------------------------ */
+.shell { width: min(100% - var(--pad) * 2, var(--shell)); margin-inline: auto; }
+.only-fine { display: none; }
+@media (hover: hover) and (pointer: fine) { .only-fine { display: inline; } .only-touch { display: none; } }
+
+.sr {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* خطِ مو — همه‌جای این سایت مرزها یک پیکسل و رسم‌شده‌اند */
+.rule { height: 1px; background: var(--rule); border: 0; }
+
+/* --------------------- برچسب متنِ روی سطح گرم ----------------------- */
+.warm-tint { color: color-mix(in oklab, var(--warm) 28%, var(--ink)); }
+
+/* --------------------- کاهش حرکت ------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

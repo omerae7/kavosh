@@ -1,0 +1,231 @@
+/* =========================================================================
+   آذرخش · برگهٔ نمونه
+   کارتِ محصول در این جهان یک برگهٔ آزمایشگاهی است: زبانهٔ رنگ، قابِ
+   مدرج، سه عددِ اندازه‌گرفته‌شده، و یک امضا. رنگِ گرمِ هر برگه از خودِ
+   آجر می‌آید (--warm) و تنها نقطهٔ گرمِ صفحه است.
+   ========================================================================= */
+
+.spec {
+  --warm: #8d4a30;
+  position: relative;
+  display: flex; flex-direction: column;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: var(--r1);
+  overflow: hidden;
+  isolation: isolate;
+  transition: border-color .38s var(--plot), box-shadow .38s var(--plot), transform .38s var(--plot);
+}
+@media (hover: hover) {
+  .spec:hover {
+    border-color: var(--rule-2);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 44px -22px rgba(var(--ink-rgb), .34);
+  }
+}
+.spec:focus-within { border-color: var(--seal); }
+
+/* زبانهٔ رنگِ نمونه */
+.spec__tab {
+  height: 3px; flex: none;
+  background: var(--warm);
+  transform: scaleX(1);
+  transform-origin: 100% 50%;
+}
+
+/* ------------------------------- قاب ------------------------------- */
+.spec__frame {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3.15;
+  background: var(--sheet-3);
+  overflow: hidden;
+}
+/* روی گوشی برگه‌ها پشتِ هم می‌آیند؛ قاب کوتاه‌تر یعنی اسکرولِ کمتر */
+@media (max-width: 620px) { .spec__frame { aspect-ratio: 16 / 9.4; } }
+.spec__shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.spec__shot--unit { opacity: 0; transform: scale(1.06); transition: opacity .55s var(--plot), transform .8s var(--plot); }
+.spec__shot--wall { transition: opacity .55s var(--plot), transform .8s var(--plot), filter .55s var(--plot); }
+@media (hover: hover) {
+  .spec:hover .spec__shot--wall { opacity: 0; transform: scale(1.04); }
+  .spec:hover .spec__shot--unit { opacity: 1; transform: scale(1); }
+}
+
+/* خط‌کشِ میلی‌متری روی لبهٔ پایینِ قاب */
+.spec__scale {
+  position: absolute;
+  inset-block-end: 0; inset-inline: 0;
+  height: 34px;
+  display: flex; align-items: flex-end;
+  padding-inline: .55rem; padding-block-end: .18rem;
+  background: linear-gradient(to top, rgba(4,8,7,.90) 12%, rgba(4,8,7,.55) 55%, rgba(4,8,7,0));
+  pointer-events: none;
+}
+.spec__ticks {
+  flex: 1 1 auto; height: 9px;
+  background-image: repeating-linear-gradient(to left,
+    rgba(244,249,246,.8) 0 1px, transparent 1px 12px);
+  transform: scaleY(.55);
+  transform-origin: 100% 100%;
+  transition: transform .5s var(--plot);
+}
+@media (hover: hover) { .spec:hover .spec__ticks { transform: scaleY(1); } }
+.spec__mm {
+  font-family: 'Mono', 'Shabnam', monospace;
+  direction: ltr; unicode-bidi: isolate;
+  font-size: .58rem; letter-spacing: .04em;
+  color: rgba(244,249,246,.94);
+  padding-inline-start: .45rem;
+  padding-block-end: 1px;
+  white-space: nowrap;
+}
+
+.spec__flag {
+  position: absolute;
+  inset-block-start: .6rem; inset-inline-start: .6rem;
+  padding: .2rem .48rem;
+  font-family: 'Mono', 'Shabnam', monospace;
+  font-size: .55rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--on-seal); background: var(--seal);
+  border-radius: var(--r1);
+}
+.spec__flag--fa { font-family: 'Shabnam', sans-serif; letter-spacing: 0; text-transform: none; font-size: .62rem; }
+
+/* ------------------------------- تن ------------------------------- */
+.spec__body { padding: clamp(.95rem, 2.4vw, 1.25rem); display: flex; flex-direction: column; gap: .55rem; flex: 1 1 auto; }
+
+.spec__id { display: flex; align-items: baseline; gap: .55rem; }
+.spec__code {
+  font-family: 'Mono', 'Shabnam', monospace;
+  font-size: .66rem; font-weight: 500; letter-spacing: -.02em;
+  color: var(--ink-3);
+}
+.spec__fam {
+  font-size: .68rem;
+  color: var(--ink-4);
+  padding-inline-start: .55rem;
+  border-inline-start: 1px solid var(--rule);
+}
+
+.spec__name {
+  font-family: 'Kufi', sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.02rem, .98rem + .3vw, 1.2rem);
+  line-height: 1.44;
+  letter-spacing: -.004em;
+}
+.spec__name a { transition: color .26s var(--plot); }
+.spec:hover .spec__name a { color: color-mix(in oklab, var(--warm) 42%, var(--ink)); }
+
+.spec__desc {
+  font-size: .84rem; line-height: 1.82;
+  color: var(--ink-3);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* سه عددِ اندازه‌گرفته‌شده */
+.spec__reads {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  margin-block-start: .18rem;
+  border-block: 1px solid var(--rule);
+}
+.spec__read { padding: .58rem .1rem .6rem; text-align: center; }
+.spec__read + .spec__read { border-inline-end: 1px solid var(--rule); }
+.spec__read b {
+  display: block;
+  font-family: 'Shabnam', sans-serif;
+  font-size: .84rem; font-weight: 700;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.spec__read b .mono { font-weight: 500; font-size: .82em; }
+.spec__read .gauge-label { font-size: .64rem; }
+
+/* رنگ‌بندی */
+.spec__tones { display: flex; align-items: center; gap: .3rem; margin-block-start: auto; padding-block-start: .3rem; }
+.spec__tone {
+  width: 18px; height: 18px;
+  border-radius: 99px;
+  border: 1px solid var(--rule-2);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.spec__tones .gauge-label { margin-inline-start: .25rem; }
+
+/* ------------------------------ پای برگه ---------------------------- */
+.spec__foot {
+  display: flex; align-items: center; gap: .8rem;
+  padding: .85rem clamp(.95rem, 2.4vw, 1.25rem);
+  border-block-start: 1px solid var(--rule);
+  background: var(--sheet-2);
+}
+.spec__price { display: flex; flex-direction: column; line-height: 1.35; }
+.spec__price b {
+  font-family: 'Kufi', sans-serif;
+  font-weight: 600; font-size: 1.02rem;
+  letter-spacing: .01em;
+}
+.spec__price s { color: var(--ink-4); font-size: .72rem; text-decoration-color: var(--stamp); }
+.spec__price span { font-size: .66rem; color: var(--ink-4); }
+
+.spec__add {
+  margin-inline-start: auto;
+  position: relative;
+  display: inline-flex; align-items: center; gap: .42rem;
+  height: 38px; padding-inline: .85rem;
+  border: 1px solid var(--ink);
+  border-radius: var(--r1);
+  background: var(--ink); color: var(--ground);
+  font-size: .8rem;
+  overflow: hidden;
+  transition: background-color .3s var(--plot), border-color .3s var(--plot), color .3s var(--plot);
+}
+.spec__add svg { width: 15px; height: 15px; }
+.spec__add:hover { background: var(--seal); border-color: var(--seal); color: var(--on-seal); }
+.spec__add.is-done { background: var(--seal); border-color: var(--seal); color: var(--on-seal); }
+
+/* مهرِ ثبت — وقتی برگه وارد پرونده می‌شود */
+.spec__stamp {
+  position: absolute;
+  inset-block-start: 50%; inset-inline-start: 50%;
+  translate: 50% -50%;
+  rotate: -13deg;
+  padding: .3rem .7rem;
+  border: 2px solid var(--seal);
+  border-radius: var(--r2);
+  font-family: 'Kufi', sans-serif;
+  font-size: .82rem; font-weight: 700;
+  color: var(--seal);
+  background: rgba(var(--ground-rgb), .82);
+  opacity: 0; scale: 1.7;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ------------------------- حالت‌های شبکه --------------------------- */
+.rack {
+  display: grid;
+  gap: clamp(.9rem, 2vw, 1.4rem);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 268px), 1fr));
+}
+@media (max-width: 520px) { .rack { grid-template-columns: 1fr; } }
+
+/* حالتِ خالی — وقتی صافی چیزی برنمی‌گرداند */
+.rack-empty {
+  grid-column: 1 / -1;
+  display: flex; flex-direction: column; align-items: center; gap: .9rem;
+  padding: clamp(2.6rem, 8vh, 5rem) 1.2rem;
+  border: 1px dashed var(--rule-2);
+  border-radius: var(--r2);
+  text-align: center;
+  color: var(--ink-3);
+}
+.rack-empty svg { width: 34px; height: 34px; color: var(--ink-4); }
+.rack-empty b { font-family: 'Kufi', sans-serif; font-size: 1.02rem; color: var(--ink); }
+
+@media (pointer: coarse) {
+  .spec__add { height: 44px; padding-inline: 1rem; }
+  .spec__tone { width: 24px; height: 24px; }
+  /* عنوانِ برگه هم باید یک هدفِ لمسیِ درست باشد */
+  .spec__name a { display: block; padding-block: .42rem; margin-block: -.42rem; }
+}
