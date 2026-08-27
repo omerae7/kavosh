@@ -5,7 +5,7 @@ const path=require('path'), fs=require('fs');
  const ctx=await b.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
  const p=await ctx.newPage();
  const errs=[];p.on('pageerror',e=>errs.push(e.message));
- await p.goto('file://'+path.resolve(__dirname,'../../../invoice.html'));await p.waitForTimeout(500);
+ await p.goto('file://'+path.resolve(__dirname,'../../../فاکتور شهریور 1405.html'));await p.waitForTimeout(500);
  await p.fill('input[placeholder="مثال: آقای یزدانی"]','آقای رضایی');
  await p.fill('input[placeholder="09xxxxxxxxx"]','09120000000');
  const cb=await p.$$('.rowcard .combo input');

@@ -6,7 +6,7 @@ const path=require('path');
  const p=await ctx.newPage();
  const errs=[];p.on('pageerror',e=>errs.push(e.message));
  let printed=false;
- await p.goto('file://'+path.resolve(__dirname,'../../../invoice.html'));
+ await p.goto('file://'+path.resolve(__dirname,'../../../فاکتور شهریور 1405.html'));
  await p.waitForTimeout(600);
  await p.addInitScript(()=>{});
  // instrument: record whether print() was reached

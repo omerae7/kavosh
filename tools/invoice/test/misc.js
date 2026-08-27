@@ -1,6 +1,6 @@
 const { chromium, devices } = require('/opt/node22/lib/node_modules/playwright');
 const path = require('path');
-const FILE = 'file://' + path.resolve(__dirname, '../../../invoice.html');
+const FILE = 'file://' + path.resolve(__dirname, '../../../فاکتور شهریور 1405.html');
 (async()=>{
   const browser = await chromium.launch();
   // ---- network guard: nothing must be requested besides the file itself

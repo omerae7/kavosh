@@ -7,6 +7,9 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no">
 <title>صدور پیش فاکتور — آجر نسوز آذرخش</title>
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,%%ICON32%%">
+<link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,%%ICON192%%">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,%%ICON180%%">
 <!--
   ============================================================
   پیش‌فاکتورساز — یک فایل مستقل، بدون نیاز به اینترنت یا نصب
@@ -87,12 +90,9 @@ body{
 }
 .brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto;overflow:hidden}
 .brand-mark{
-  width:30px;height:30px;border-radius:8px;flex:none;
-  background:linear-gradient(145deg,var(--brand),#7E3B22);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.28), var(--sh-1);
-  position:relative;
+  width:34px;height:34px;flex:none;display:block;
+  object-fit:contain;
 }
-.brand-mark svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .brand-txt{display:flex;flex-direction:column;line-height:1.15;min-width:0}
 .brand-txt b{font-size:14.5px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brand-txt span{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -514,7 +514,7 @@ select.inp{
 
 <header class="topbar">
   <div class="brand">
-    <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 30 30" fill="none"><g fill="#fff" fill-opacity=".92"><rect x="6" y="8.6" width="8" height="3.6" rx=".7"/><rect x="15" y="8.6" width="9" height="3.6" rx=".7"/><rect x="6" y="13.2" width="12.5" height="3.6" rx=".7"/><rect x="19.5" y="13.2" width="4.5" height="3.6" rx=".7"/><rect x="6" y="17.8" width="5.5" height="3.6" rx=".7"/><rect x="12.5" y="17.8" width="11.5" height="3.6" rx=".7"/></g></svg></div>
+    <img class="brand-mark" src="data:image/png;base64,%%ICONMARK%%" alt="" aria-hidden="true">
     <div class="brand-txt">
       <b>پیش فاکتور فروش</b>
       <span>آجر نسوز آذرخش — پودر بند کشی فلکس</span>

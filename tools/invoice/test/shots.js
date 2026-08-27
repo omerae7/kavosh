@@ -1,6 +1,6 @@
 const { chromium, devices } = require('/opt/node22/lib/node_modules/playwright');
 const path=require('path');
-const FILE='file://'+path.resolve(__dirname,'../../../invoice.html');
+const FILE='file://'+path.resolve(__dirname,'../../../فاکتور شهریور 1405.html');
 async function fill(page){
   await page.fill('input[placeholder="مثال: آقای یزدانی"]','آقای یزدانی');
   await page.fill('input[placeholder="09xxxxxxxxx"]','09131724832');

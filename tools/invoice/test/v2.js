@@ -1,6 +1,6 @@
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const path=require('path'), fs=require('fs');
-const FILE='file://'+path.resolve(__dirname,'../../../invoice.html');
+const FILE='file://'+path.resolve(__dirname,'../../../فاکتور شهریور 1405.html');
 const log=(...a)=>console.log(...a);
 async function openRow(p,i){const c=await p.$$('.rowcard');
   if(!(await c[i].getAttribute('class')).includes('open')){await c[i].$eval('.rowhead',e=>e.click());await p.waitForTimeout(200);}}

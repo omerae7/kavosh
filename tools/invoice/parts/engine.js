@@ -458,13 +458,16 @@ var InvoiceEngine = (function () {
     tbl: {
       headY: 209.60,
       rowY0: 230.16, rowStep: 23.76,
+      /* figures are centred in the room their cell leaves them; the two
+         accounting columns keep IRR pinned where the reference puts it, so
+         those markers still line up down the page */
       col: {
-        total:   { irr: 56.10, num: 127.30, dash: 118.20 },
+        total:   { irr: 56.10, box: [71.10, 130.20] },
         disc:    { c: 152.10, w: 45.0 },
-        amount:  { irr: 176.90, num: 248.00, dash: 248.00 },
-        price:   { num: 308.91, dash: 299.80 },
+        amount:  { irr: 176.90, box: [193.40, 250.70] },
+        price:   { box: [253.70, 311.50] },
         unit:    { c: 334.00, w: 37.0 },
-        qty:     { num: 389.56, dash: 380.50 },
+        qty:     { box: [356.30, 392.30] },
         desc:    { c: 434.80, w: 76.0 },
         code:    { c: 495.50, w: 38.0 },
         no:      { c: 536.03 }
@@ -473,7 +476,7 @@ var InvoiceEngine = (function () {
         ['مبلغ کل', 91.60, 'c', 's12'],
         ['تخفیف نقدی', 152.10, 'c', 's10'],
         ['مبلغ', 212.60, 'c', 's12'],
-        ['بهای واحد', 311.58, 'r', 's12'],
+        ['بهای واحد', 282.60, 'c', 's12'],
         ['واحد', 334.00, 'c', 's12'],
         ['مقدار', 374.30, 'c', 's12'],
         ['شرح کالا', 434.80, 'c', 's12'],
@@ -587,9 +590,8 @@ var InvoiceEngine = (function () {
     var col = L.tbl.col;
     // money columns share their cell with a leading "IRR": keep the number
     // inside the space that is actually left, whatever its magnitude
-    var irrW11 = R.measure(T.irr, S.s11, false);
-    var fitTotal = col.total.num - col.total.irr - R.measure(T.irr, S.s11n, false) - 4;
-    var fitAmount = col.amount.num - col.amount.irr - irrW11 - 4;
+    function ctr(box) { return (box[0] + box[1]) / 2; }
+    function wide(box) { return box[1] - box[0]; }
     for (i = 0; i < 5; i++) {
       var y = L.tbl.rowY0 + L.tbl.rowStep * i;
       var r = model.rows[i] || {};
@@ -599,19 +601,19 @@ var InvoiceEngine = (function () {
       if (r.used) {
         doc.text(r.code, col.code.c, y, R, S.s11, 'c', { rtl: false, maxWidth: col.code.w, minSize: 5.5, fit: 'truncate' });
         doc.text(r.desc, col.desc.c, y, R, S.s11, 'c', { maxWidth: col.desc.w, minSize: 5.5, fit: 'truncate' });
-        doc.text(group(r.qty), col.qty.num, y, R, S.s11, 'r', { rtl: false, maxWidth: 34, minSize: 5.2 });
+        doc.text(group(r.qty), ctr(col.qty.box), y, R, S.s11, 'c', { rtl: false, maxWidth: wide(col.qty.box), minSize: 5.2 });
         doc.text(r.unit, col.unit.c, y, R, S.s11, 'c', { maxWidth: col.unit.w, minSize: 6, fit: 'truncate' });
-        doc.text(group(r.unitPrice), col.price.num, y, R, S.s11, 'r', { rtl: false, maxWidth: 54, minSize: 5.2 });
-        doc.text(group(r.gross), col.amount.num, y, R, S.s11, 'r', { rtl: false, maxWidth: fitAmount, minSize: 5.2 });
+        doc.text(group(r.unitPrice), ctr(col.price.box), y, R, S.s11, 'c', { rtl: false, maxWidth: wide(col.price.box), minSize: 5.2 });
+        doc.text(group(r.gross), ctr(col.amount.box), y, R, S.s11, 'c', { rtl: false, maxWidth: wide(col.amount.box), minSize: 5.2 });
         if (r.discountText) {
           doc.text(r.discountText, col.disc.c, y, R, S.s11n, 'c', { maxWidth: col.disc.w, minSize: 5.5, fit: 'truncate' });
         }
-        doc.text(group(r.final), col.total.num, y, R, S.s11n, 'r', { rtl: false, maxWidth: fitTotal, minSize: 5.2 });
+        doc.text(group(r.final), ctr(col.total.box), y, R, S.s11n, 'c', { rtl: false, maxWidth: wide(col.total.box), minSize: 5.2 });
       } else {
-        doc.text(T.dash, col.qty.dash, y, R, S.s11, 'r', { rtl: false });
-        doc.text(T.dash, col.price.dash, y, R, S.s11, 'r', { rtl: false });
-        doc.text(T.dash, col.amount.dash, y, R, S.s11, 'r', { rtl: false });
-        doc.text(T.dash, col.total.dash, y, R, S.s11n, 'r', { rtl: false });
+        doc.text(T.dash, ctr(col.qty.box), y, R, S.s11, 'c', { rtl: false });
+        doc.text(T.dash, ctr(col.price.box), y, R, S.s11, 'c', { rtl: false });
+        doc.text(T.dash, ctr(col.amount.box), y, R, S.s11, 'c', { rtl: false });
+        doc.text(T.dash, ctr(col.total.box), y, R, S.s11n, 'c', { rtl: false });
       }
     }
 

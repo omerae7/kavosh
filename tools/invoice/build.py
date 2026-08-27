@@ -14,7 +14,7 @@ import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
-OUT = ROOT / "invoice.html"
+OUT = ROOT / "فاکتور شهریور 1405.html"
 
 
 def read(p):
@@ -32,6 +32,17 @@ def inject_json(html, marker, path):
     return pat.sub(lambda m: blob, html, count=1)
 
 
+def inject_assets(html, path):
+    """Splice the base64 logo into the favicon links and the top-bar mark."""
+    logo = json.loads(read(path))
+    for key, token in (("i32", "%%ICON32%%"), ("i192", "%%ICON192%%"),
+                       ("i180", "%%ICON180%%"), ("mark", "%%ICONMARK%%")):
+        if token not in html:
+            sys.exit("placeholder %s not found" % token)
+        html = html.replace(token, logo[key])
+    return html
+
+
 def inject_code(html, marker, path):
     code = read(path)
     token = "/*__%s__*/" % marker
@@ -45,10 +56,11 @@ def main():
     html = inject_json(html, "FONTDATA", "data/fontdata.json")
     html = inject_json(html, "UNIMETA", "data/unimeta.json")
     html = inject_json(html, "PRODUCTS", "data/products.json")
+    html = inject_assets(html, "data/logo.json")
     html = inject_code(html, "ENGINE", "parts/engine.js")
     html = inject_code(html, "APP", "parts/app.js")
 
-    for bad in ("__FONTDATA__", "__UNIMETA__", "__PRODUCTS__", "__ENGINE__", "__APP__"):
+    for bad in ("__FONTDATA__", "__UNIMETA__", "__PRODUCTS__", "__ENGINE__", "__APP__", "%%ICON"):
         if bad in html:
             sys.exit("placeholder %s survived the build" % bad)
 

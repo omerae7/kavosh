@@ -3,7 +3,7 @@
 The shipped product is a single file at the repository root:
 
 ```
-invoice.html
+فاکتور شهریور 1405.html
 ```
 
 It is fully standalone: no CSS/JS/font/image files, no CDN, no server, no
@@ -18,8 +18,11 @@ This folder holds the sources that file is assembled from.
 python3 tools/invoice/build.py
 ```
 
-`build.py` inlines the data files and the two scripts into
-`parts/template.html` and writes `invoice.html`.
+`build.py` inlines the data files, the icons and the two scripts into
+`parts/template.html` and writes the deliverable.
+
+`make_icons.py` regenerates `data/logo.json` and `data/brickala.ico` from
+`data/logo-source.png`; run it only when the logo changes.
 
 ```
 parts/template.html   markup + all CSS + data placeholders
@@ -28,7 +31,18 @@ parts/app.js          state, calculation, packaging, assistant, UI, validation
 data/fontdata.json    subset fonts (base64) + shaping/metric tables
 data/unimeta.json     bidi classes + combining marks for the codepoints used
 data/products.json    the 107-product database (80 bricks, 24 grout powders, 3 accessories)
+data/logo-source.png  the brand mark, 512px master
+data/logo.json        base64 icons inlined at build time (tab, home screen, top bar)
+data/brickala.ico     multi-size icon for a Windows desktop shortcut
 ```
+
+## Icon
+
+An `.html` file cannot carry its own icon — Windows and Android draw it from
+the file *type*, i.e. the default browser. What the embedded icons do cover is
+the browser tab, bookmarks, and any desktop or home-screen shortcut made from
+the page. For a branded icon in Explorer itself, make a shortcut to the file
+and point `Properties → Change Icon` at `data/brickala.ico` (16–256 px).
 
 ## Where the data came from
 
@@ -104,7 +118,10 @@ the packaging fields are hidden rather than shown blank.
 
 Three, all from the same print model:
 
-- **PDF** — written byte by byte (below).
+- **PDF** — written byte by byte (below). Figures in مقدار, بهای واحد, مبلغ and
+  مبلغ کل sit centred in the room their cell leaves them; the two accounting
+  columns keep IRR pinned where the reference puts it, so those markers still
+  line up down the page.
 - **Print** — the generated PDF is loaded into a hidden frame and printed, so
   paper matches the file exactly. Where a browser has no inline PDF viewer the
   file is offered through a toast link instead.
