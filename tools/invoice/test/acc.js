@@ -1,0 +1,25 @@
+const { chromium } = require('/opt/node22/lib/node_modules/playwright');
+const path=require('path'), fs=require('fs');
+(async()=>{
+ const b=await chromium.launch();
+ const ctx=await b.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
+ const p=await ctx.newPage();
+ const errs=[];p.on('pageerror',e=>errs.push(e.message));
+ await p.goto('file://'+path.resolve(__dirname,'../../../invoice.html'));await p.waitForTimeout(500);
+ await p.fill('input[placeholder="مثال: آقای یزدانی"]','آقای رضایی');
+ await p.fill('input[placeholder="09xxxxxxxxx"]','09120000000');
+ const cb=await p.$$('.rowcard .combo input');
+ await cb[0].click(); await cb[0].fill('اسپیسر سه'); await p.waitForTimeout(250);
+ await (await (await p.$$('.rowcard'))[0].$('.combo-item')).click(); await p.waitForTimeout(250);
+ await p.evaluate(()=>{const c=document.querySelectorAll('.rowcard')[0];
+   const f=[...c.querySelectorAll('.f')].find(f=>f.querySelector('label').textContent.trim().startsWith('مقدار'));
+   const i=f.querySelector('input');i.focus();i.value='3';i.dispatchEvent(new Event('input',{bubbles:true}));i.blur();});
+ await p.waitForTimeout(300);
+ console.log('accessory row:', await p.evaluate(()=>JSON.stringify(window.Invoice.state().rows[0])));
+ console.log('print model row0:', await p.evaluate(()=>JSON.stringify(window.Invoice.output.model().rows[0])));
+ console.log('validate:', await p.evaluate(()=>JSON.stringify(window.Invoice.validate.run())));
+ const [dl]=await Promise.all([p.waitForEvent('download',{timeout:15000}),p.click('#btnPdfSide')]);
+ await dl.saveAs(path.join(__dirname,'acc.pdf'));
+ console.log('pdf ok'); console.log('errors:',errs);
+ await b.close();
+})();

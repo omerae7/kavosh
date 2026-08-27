@@ -1,0 +1,33 @@
+const { chromium } = require('/opt/node22/lib/node_modules/playwright');
+const path=require('path');
+(async()=>{
+ const b=await chromium.launch();
+ const ctx=await b.newContext({viewport:{width:1440,height:1000}});
+ const p=await ctx.newPage();
+ const errs=[];p.on('pageerror',e=>errs.push(e.message));
+ let printed=false;
+ await p.goto('file://'+path.resolve(__dirname,'../../../invoice.html'));
+ await p.waitForTimeout(600);
+ await p.addInitScript(()=>{});
+ // instrument: record whether print() was reached
+ await p.evaluate(()=>{ window.__printCalls=0;
+   const orig=window.print; window.print=function(){window.__printCalls++;}; });
+ await p.fill('input[placeholder="مثال: آقای یزدانی"]','آقای احمد');
+ await p.fill('input[placeholder="09xxxxxxxxx"]','09121112233');
+ const cb=await p.$$('.rowcard .combo input');
+ await cb[0].click(); await cb[0].fill('AB51301'); await p.waitForTimeout(200);
+ await (await (await p.$$('.rowcard'))[0].$('.combo-item')).click(); await p.waitForTimeout(200);
+ await p.evaluate(()=>{const c=document.querySelectorAll('.rowcard')[0];
+   const f=[...c.querySelectorAll('.f')].find(f=>f.querySelector('label').textContent.trim().startsWith('مقدار'));
+   const i=f.querySelector('input');i.focus();i.value='3724';i.dispatchEvent(new Event('input',{bubbles:true}));i.blur();});
+ await p.waitForTimeout(300);
+ await p.click('#btnPrintSide');
+ await p.waitForTimeout(600);
+ console.log('modal after click:', await p.evaluate(()=>document.getElementById('modal').classList.contains('on')?document.getElementById('modalBody').innerText:'(no modal)'));
+ await p.waitForTimeout(5000);
+ console.log('iframe present:', await p.evaluate(()=>!!document.getElementById('printFrame')));
+ console.log('toast:', await p.evaluate(()=>{const t=document.getElementById('toast');
+   return t.classList.contains('on') ? t.innerText.replace(/\n/g,' | ') : '(none)';}));
+ console.log('errors:', errs);
+ await b.close();
+})();

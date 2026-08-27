@@ -160,6 +160,11 @@
     var items = PRODUCTS.map(function (p) {
       return {
         code: p.c, desc: p.d, price: p.p,
+        /* what goes in the invoice's کد کالا cell; the three accessories on
+           the Felex list carry no code, so nothing is printed for them */
+        printCode: p.pc === undefined ? p.c : p.pc,
+        unit: p.u || 'قالب',
+        grout: !!p.g,
         perM2: p.m === undefined ? null : p.m,
         perCarton: p.k === undefined ? null : p.k,
         perPallet: p.l === undefined ? null : p.l,
@@ -196,21 +201,29 @@
       unitFor: function (code) {
         var c = String(code || '').trim().toUpperCase();
         if (!c) return '';
+        var known = byCode[c];
+        if (known) return known.unit;
         if (c[0] === 'A') return 'قالب';
-        if (c[0] === 'C' || c[0] === '-') return 'کیسه';
+        if (c[0] === 'C' || c[0] === 'G' || c[0] === '-') return 'کیسه';
         if (c[0] === 'N') return 'لیتر';
         return 'قالب';
-      }
+      },
+      /* one bag of Felex grout powder covers about 5 m² (from the price list) */
+      groutCoverage: 5
     };
   })();
 
   /* ==================================================================
      Store — invoice state
      ================================================================== */
-  var KEY = 'brickala.invoice.v1';
+  /* an exported invoice keeps its own autosave slot, so opening one never
+     shows another invoice's leftovers (file:// shares one localStorage) */
+  var EMBEDDED = (typeof window !== 'undefined' && window.__INVOICE_DATA__) || null;
+  var DOC_ID = (EMBEDDED && EMBEDDED.docId) || 'main';
+  var KEY = 'brickala.invoice.v2:' + DOC_ID;
   function newRow() {
     return {
-      mode: 'empty', code: '', desc: '', unit: 'قالب',
+      mode: 'empty', code: '', desc: '', unit: 'قالب', grout: false,
       refPrice: null, price: null,
       perM2: null, perCarton: null, perPallet: null,
       qtyMode: 'brick', area: null, qty: null,
@@ -232,6 +245,15 @@
   var S = newState();
   var Store = {
     load: function () {
+      if (EMBEDDED && EMBEDDED.state) {
+        try {
+          var base = newState();
+          S.meta = Object.assign(base.meta, EMBEDDED.state.meta || {});
+          S.customer = Object.assign(base.customer, EMBEDDED.state.customer || {});
+          S.rows = EMBEDDED.state.rows.map(function (r) { return Object.assign(newRow(), r); });
+          return true;
+        } catch (e) { /* fall through to local autosave */ }
+      }
       try {
         var raw = localStorage.getItem(KEY);
         if (!raw) return false;
@@ -306,6 +328,20 @@
     isActive: function (r) {
       return r.mode !== 'empty' && !!(r.code || r.desc || r.qty || r.price);
     },
+    /* a grout row: flagged by the catalog, or a manual row that says so */
+    isGrout: function (r) {
+      if (r.grout) return true;
+      return !r.perM2 && /بندکشی/.test(r.desc || '');
+    },
+    /* total brickwork area on the invoice — drives the grout suggestion */
+    brickArea: function () {
+      var a = 0;
+      S.rows.forEach(function (r) {
+        if (!Calc.isActive(r) || Calc.isGrout(r)) return;
+        if (r.perM2 && r.qty) a += r.qty / r.perM2;
+      });
+      return a;
+    },
     isComplete: function (r) {
       return Calc.isActive(r) && !!(r.code || r.desc) && r.qty > 0 && r.price !== null && r.price >= 0;
     },
@@ -322,7 +358,11 @@
         disc = Money.discount(gross, pct);
         final = gross - disc;
       }
-      return { gross: gross, discount: disc, final: final, pct: pct };
+      return {
+        gross: gross, discount: disc, final: final, pct: pct,
+        /* unit price actually charged once the row discount is applied */
+        netUnit: qty ? final / qty : null
+      };
     },
     totals: function () {
       var g = 0, d = 0, f = 0;
@@ -345,12 +385,55 @@
      ================================================================== */
   var OfflineRulesEngine = {
     id: 'offline-rules',
-    analyze: function (r) {
+    analyze: function (r, ctx) {
       var out = [], hasWarn = false;
       var pc = r.perCarton, pm = r.perM2, pp = r.perPallet, qty = r.qty;
+      ctx = ctx || { brickArea: 0 };
 
       if (!Calc.isActive(r)) {
         return { messages: [{ level: 'info', text: 'کالایی برای این ردیف انتخاب نشده است.' }], warn: false };
+      }
+
+      /* ---- grout powder: sold by the bag, ~5 m² of brickwork per bag ---- */
+      if (Calc.isGrout(r)) {
+        var cover = Catalog.groutCoverage;
+        out.push({
+          level: 'info',
+          text: 'طبق لیست قیمت فلکس، هر کیسه پودر بندکشی برای حدود <n>' + cover + '</n> متر مربع کافی است.'
+        });
+        if (ctx.brickArea > 0) {
+          var need = Math.ceil(ctx.brickArea / cover - 1e-9);
+          out.push({
+            level: 'tip',
+            text: 'متراژ کل آجرهای این فاکتور <n>' + Num.pct(ctx.brickArea, 2) + '</n> متر مربع است؛ ' +
+              'بنابراین حدود <n>' + Num.group(need) + '</n> کیسه پودر بندکشی لازم می‌شود.',
+            actions: (qty !== need) ? [{ label: 'تنظیم مقدار روی ' + Num.group(need) + ' کیسه', act: 'setQty', qty: need }] : null
+          });
+          if (qty && qty !== need) {
+            var diff = qty - need;
+            out.push({
+              level: diff < 0 ? 'warn' : 'info',
+              text: diff < 0
+                ? 'مقدار فعلی <n>' + Num.group(-diff) + '</n> کیسه کمتر از نیاز تقریبی است.'
+                : 'مقدار فعلی <n>' + Num.group(diff) + '</n> کیسه بیشتر از نیاز تقریبی است.'
+            });
+            if (diff < 0) hasWarn = false;   // advisory only, never blocks issuing
+          }
+        } else {
+          out.push({
+            level: 'info',
+            text: 'هنوز آجری در فاکتور ثبت نشده است؛ با ثبت آجرها، تعداد کیسهٔ لازم به‌صورت خودکار پیشنهاد می‌شود.'
+          });
+        }
+        if (r.refPrice && r.price !== null && r.price !== r.refPrice) {
+          out.push(OfflineRulesEngine.priceNote(r));
+        }
+        var gc = Calc.row(r);
+        if (gc.gross > 0 && gc.final > gc.gross) {
+          hasWarn = true;
+          out.push(OfflineRulesEngine.negativeNote());
+        }
+        return { messages: out, warn: hasWarn };
       }
 
       /* --- area-based order explanation --- */
@@ -453,23 +536,29 @@
 
       /* --- pricing sanity --- */
       if (r.refPrice && r.price !== null && r.price !== r.refPrice) {
-        var dp = ((r.price - r.refPrice) / r.refPrice) * 100;
-        out.push({
-          level: 'info',
-          text: 'بهای واحد این فاکتور <n>' + Num.pct(Math.abs(dp), 1) + '٪</n> ' +
-            (dp > 0 ? 'بالاتر' : 'پایین‌تر') + ' از قیمت مرجع (<n>' + Num.group(r.refPrice) + '</n> ریال) است.'
-        });
+        out.push(OfflineRulesEngine.priceNote(r));
       }
       var cc = Calc.row(r);
       if (cc.gross > 0 && cc.final > cc.gross) {
         hasWarn = true;
-        out.push({
-          level: 'warn',
-          text: 'مبلغ کل بیشتر از مبلغ ناخالص است؛ این یعنی افزایش قیمت به جای تخفیف. در صورت عمدی بودن، تأیید کنید.',
-          actions: [{ label: 'تأیید افزایش قیمت', act: 'ackNegative', kind: 'ghost' }]
-        });
+        out.push(OfflineRulesEngine.negativeNote());
       }
       return { messages: out, warn: hasWarn };
+    },
+    priceNote: function (r) {
+      var dp = ((r.price - r.refPrice) / r.refPrice) * 100;
+      return {
+        level: 'info',
+        text: 'بهای واحد این فاکتور <n>' + Num.pct(Math.abs(dp), 1) + '٪</n> ' +
+          (dp > 0 ? 'بالاتر' : 'پایین‌تر') + ' از قیمت مرجع (<n>' + Num.group(r.refPrice) + '</n> ریال) است.'
+      };
+    },
+    negativeNote: function () {
+      return {
+        level: 'warn',
+        text: 'مبلغ کل بیشتر از مبلغ ناخالص است؛ این یعنی افزایش قیمت به جای تخفیف. در صورت عمدی بودن، تأیید کنید.',
+        actions: [{ label: 'تأیید افزایش قیمت', act: 'ackNegative', kind: 'ghost' }]
+      };
     }
   };
 
@@ -479,10 +568,10 @@
   var Assistant = {
     providers: [OfflineRulesEngine],
     external: null,          // reserved for a future ExternalAIProvider
-    analyze: function (row) {
+    analyze: function (row, ctx) {
       var res = { messages: [], warn: false };
       this.providers.forEach(function (p) {
-        var r = p.analyze(row);
+        var r = p.analyze(row, ctx);
         res.messages = res.messages.concat(r.messages);
         res.warn = res.warn || r.warn;
       });
@@ -568,25 +657,100 @@
         totals: { gross: t.gross, discount: t.discount, payable: t.payable }
       };
     },
-    fileName: function () {
-      var d = Num.normalize(S.meta.date).replace(/[^\d]/g, '-').replace(/-+/g, '-');
-      return 'pish-faktor-' + (d || 'invoice') + '.pdf';
+    /* «نام خریدار + تاریخ ۶ رقمی»  →  «آقای احمد 050604» */
+    fileBase: function () {
+      var name = (S.customer.name || '').replace(/[\\/:*?"<>|]/g, ' ')
+        .replace(/\s+/g, ' ').trim();
+      var d = Num.normalize(S.meta.date).replace(/[^0-9]/g, '');
+      var six = d.length >= 8 ? d.slice(2, 8) : d.slice(-6);
+      var base = ((name ? name + ' ' : '') + six).trim();
+      return base || 'pish-faktor';
     },
-    generate: function () {
-      var bytes = InvoiceEngine.render(Output.model());
-      var blob = new Blob([bytes], { type: 'application/pdf' });
+    pdfBlob: function () {
+      return new Blob([InvoiceEngine.render(Output.model())], { type: 'application/pdf' });
+    },
+    download: function (blob, name) {
       var url = URL.createObjectURL(blob);
-      var name = Output.fileName();
       var a = document.createElement('a');
       a.href = url; a.download = name; a.rel = 'noopener';
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
       setTimeout(function () { document.body.removeChild(a); }, 0);
-      UI.toast('فایل PDF ساخته شد.', { label: 'باز کردن', href: url });
       setTimeout(function () { URL.revokeObjectURL(url); }, 120000);
-    }
-  };
+      return url;
+    },
+    generate: function () {
+      var url = Output.download(Output.pdfBlob(), Output.fileBase() + '.pdf');
+      UI.toast('فایل PDF ساخته شد.', { label: 'باز کردن', href: url });
+    },
+    /* printing goes through the generated PDF itself, so paper matches the file */
+    print: function () {
+      var url = URL.createObjectURL(Output.pdfBlob());
+      var settled = false;
+      /* if the browser has no inline PDF viewer (or blocks printing from a
+         blob frame) the user still gets the file, one tap away */
+      function fallback() {
+        if (settled) return;
+        settled = true;
+        UI.toast('برای چاپ، فایل را باز کنید و از منوی مرورگر «چاپ» را بزنید.',
+          { label: 'باز کردن فایل', href: url });
+      }
+      var old = document.getElementById('printFrame');
+      if (old) old.parentNode.removeChild(old);
+      var f = document.createElement('iframe');
+      f.id = 'printFrame';
+      f.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;border:0;left:-9999px;bottom:0';
+      f.onload = function () {
+        setTimeout(function () {
+          try {
+            f.contentWindow.focus();
+            f.contentWindow.print();
+            settled = true;
+          } catch (e) { fallback(); }
+        }, 250);
+      };
+      f.onerror = fallback;
+      f.src = url;
+      document.body.appendChild(f);
+      setTimeout(fallback, 4000);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 180000);
+    },
+    /* a copy of this very application with the invoice baked in, so the file
+       can be reopened later and edited without retyping anything */
+    exportHtml: function () {
+      var docId = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      var clone = document.documentElement.cloneNode(true);
+      ['mainCol', 'asideCol', 'modalBody', 'modalFoot', 'toast'].forEach(function (id) {
+        var e = clone.querySelector('#' + id);
+        if (e) { e.innerHTML = ''; e.classList.remove('on'); }
+      });
+      ['modal', 'scrim'].forEach(function (id) {
+        var e = clone.querySelector('#' + id);
+        if (e) e.classList.remove('on');
+      });
+      var mt = clone.querySelector('#modalTitle'); if (mt) mt.textContent = '';
+      var mb = clone.querySelector('#mbTotal'); if (mb) mb.textContent = '0';
+      var pf = clone.querySelector('#printFrame'); if (pf) pf.parentNode.removeChild(pf);
+      var prev = clone.querySelector('#invoice-data');
+      if (prev) prev.parentNode.removeChild(prev);
+
+      var payload = JSON.stringify({ docId: docId, savedAt: Date.now(), state: S })
+        .replace(/</g, '\\u003c')
+        .replace(/\u2028/g, '\\u2028')
+        .replace(/\u2029/g, '\\u2029');
+      var sc = document.createElement('script');
+      sc.id = 'invoice-data';
+      sc.textContent = 'window.__INVOICE_DATA__=' + payload + ';';
+      var head = clone.querySelector('head');
+      head.insertBefore(sc, head.firstChild);
+      var ttl = clone.querySelector('title');
+      if (ttl) ttl.textContent = 'پیش فاکتور' + (S.customer.name ? ' — ' + S.customer.name : '');
+
+      var blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html;charset=utf-8' });
+      Output.download(blob, Output.fileBase() + '.html');
+      UI.toast('فایل HTML ذخیره شد؛ با باز کردن آن، همین فاکتور قابل ویرایش است.');
+    }  };
 
   /* ==================================================================
      UI
@@ -607,7 +771,9 @@
     info: '<svg class="ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7.5v4"/><path d="M8 4.6h.01"/><circle cx="8" cy="8" r="6.4"/></svg>',
     spark: '<svg class="spark" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.2 9.3 5 13 6.3 9.3 7.6 8 11.4 6.7 7.6 3 6.3 6.7 5 8 1.2Z"/><path d="M12.8 10.2l.55 1.6 1.6.55-1.6.55-.55 1.6-.55-1.6-1.6-.55 1.6-.55.55-1.6Z" opacity=".55"/></svg>',
     chev: '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg>',
-    reset: '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8a5 5 0 1 1-1.6-3.7"/><path d="M13 2.5V5h-2.5"/></svg>'
+    reset: '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8a5 5 0 1 1-1.6-3.7"/><path d="M13 2.5V5h-2.5"/></svg>',
+    printer: '<svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8V3h8v5"/><path d="M6 14H4.5A1.5 1.5 0 0 1 3 12.5v-3A1.5 1.5 0 0 1 4.5 8h11A1.5 1.5 0 0 1 17 9.5v3a1.5 1.5 0 0 1-1.5 1.5H14"/><path d="M6 12h8v5H6z"/></svg>',
+    save: '<svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h9l3 3v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M7 4v4h6"/><path d="M6.5 17v-4h7v4"/></svg>'
   };
 
   var UI = {
@@ -780,9 +946,15 @@
       /* price */
       var g2 = el('div', 'grid g2'); g2.style.marginTop = '12px';
       var inPrice = el('input', 'inp'); inPrice.type = 'text'; inPrice.placeholder = '0';
-      var priceField = UI.wrapField('بهای واحد (ریال)', inPrice);
-      var refChip = el('div', 'chip soft'); refChip.style.marginTop = '2px'; refChip.classList.add('hidden');
-      priceField.appendChild(refChip);
+      /* the reference price rides in the label row so this field keeps the
+         same height as the quantity field beside it and the two stay aligned */
+      var priceField = el('div', 'f');
+      var pLab = el('label');
+      pLab.innerHTML = '<span>بهای واحد (ریال)</span>';
+      var refChip = el('div', 'chip soft'); refChip.style.marginInlineStart = 'auto';
+      refChip.classList.add('hidden');
+      pLab.appendChild(refChip);
+      priceField.appendChild(pLab); priceField.appendChild(inPrice);
       g2.appendChild(priceField);
 
       /* quantity */
@@ -791,7 +963,7 @@
       qLab.innerHTML = '<span>مقدار</span>';
       var segWrap = el('div', 'seg'); segWrap.style.marginInlineStart = 'auto';
       var segArea = el('button', null, 'متر مربع'); segArea.type = 'button';
-      var segBrick = el('button', null, 'قالب'); segBrick.type = 'button';
+      var segBrick = el('button', null, 'قالب'); segBrick.type = 'button';   // label follows the unit
       segWrap.appendChild(segArea); segWrap.appendChild(segBrick);
       qLab.appendChild(segWrap);
       qtyField.appendChild(qLab);
@@ -833,9 +1005,15 @@
       disc.appendChild(quick);
       s2.appendChild(disc);
 
-      var g3 = el('div', 'grid g2'); g3.style.marginTop = '12px';
+      var g3 = el('div', 'grid g3'); g3.style.marginTop = '12px';
       var inGross = el('input', 'inp'); inGross.type = 'text'; inGross.disabled = true;
       g3.appendChild(UI.wrapField('مبلغ (ناخالص)', inGross));
+      var inNet = el('input', 'inp'); inNet.type = 'text';
+      var netField = UI.wrapField('<span>بهای واحد پس از تخفیف</span>', inNet);
+      var netLab = netField.querySelector('label');
+      var netUnitTag = el('span', 'chip soft'); netUnitTag.style.marginInlineStart = 'auto';
+      netLab.appendChild(netUnitTag);
+      g3.appendChild(netField);
       var inFinal = el('input', 'inp'); inFinal.type = 'text';
       var finalField = UI.wrapField('مبلغ کل (پس از تخفیف)', inFinal);
       g3.appendChild(finalField);
@@ -895,6 +1073,19 @@
       var m2Ctl = attachNumber(inM2, { onInput: function (v) { r.perM2 = v; if (r.qtyMode === 'area') applyArea(); recompute(); } });
       var ctCtl = attachNumber(inCt, { onInput: function (v) { r.perCarton = v; r.ackCarton = false; if (r.qtyMode === 'area') applyArea(); recompute(); } });
       var plCtl = attachNumber(inPl, { onInput: function (v) { r.perPallet = v; recompute(); } });
+      var netCtl = attachNumber(inNet, {
+        onInput: function (v) {
+          var gross = Math.round((r.qty || 0) * (r.price || 0));
+          if (v === null || !r.qty) { r.finalExact = null; r.finalBase = null; }
+          else {
+            r.finalExact = Math.round(v * r.qty); r.finalBase = gross;
+            r.discPct = gross ? Money.pctOf(gross, gross - r.finalExact) : 0;
+            if (r.finalExact <= gross) r.ackNegative = false;
+          }
+          recompute({ keepNet: true });
+        },
+        selectAll: true
+      });
       var finalCtl = attachNumber(inFinal, {
         onInput: function (v) {
           var c = Calc.row(r);
@@ -967,7 +1158,7 @@
       /* combo callbacks */
       combo.onPick = function (p) {
         r.mode = 'catalog';
-        r.code = p.code; r.desc = p.desc; r.unit = Catalog.unitFor(p.code);
+        r.code = p.printCode; r.desc = p.desc; r.unit = p.unit; r.grout = p.grout;
         r.refPrice = p.price; r.price = p.price;
         r.perM2 = p.perM2; r.perCarton = p.perCarton; r.perPallet = p.perPallet;
         r.finalExact = null; r.finalBase = null; r.ackCarton = false;
@@ -978,7 +1169,7 @@
       };
       combo.onManual = function () {
         r.mode = 'manual';
-        r.refPrice = null;
+        r.refPrice = null; r.grout = false;
         if (!r.open) { r.open = true; card.classList.add('open'); head.setAttribute('aria-expanded', 'true'); }
         recompute();
         setTimeout(function () { inCode.focus(); }, 60);
@@ -1038,11 +1229,13 @@
         if (document.activeElement !== inM2) m2Ctl.set(r.perM2);
         if (document.activeElement !== inCt) ctCtl.set(r.perCarton);
         if (document.activeElement !== inPl) plCtl.set(r.perPallet);
-        packWrap.style.display = (r.mode === 'empty') ? 'none' : '';
+        // packaging inputs only make sense where packaging data exists
+        var noPack = r.mode === 'catalog' && !r.perM2 && !r.perCarton && !r.perPallet;
+        packWrap.style.display = (r.mode === 'empty' || noPack) ? 'none' : '';
 
         combo.setLabel(r);
 
-        /* reference price chip */
+        /* reference price chip (sits in the label row) */
         if (r.refPrice !== null) {
           refChip.classList.remove('hidden');
           var same = r.price === r.refPrice;
@@ -1055,6 +1248,7 @@
         } else refChip.classList.add('hidden');
 
         /* quantity mode */
+        segBrick.textContent = r.unit || 'قالب';
         var canArea = !!r.perM2;
         segArea.disabled = !canArea;
         segArea.style.opacity = canArea ? '' : '.45';
@@ -1082,6 +1276,11 @@
         if (document.activeElement !== inPct) inPct.value = Num.pct(pctShown);
         inGross.value = Num.group(c.gross);
         if (document.activeElement !== inFinal) finalCtl.set(c.final);
+        inNet.disabled = !r.qty;
+        if (document.activeElement !== inNet) {
+          netCtl.set(c.netUnit === null ? null : Math.round(c.netUnit));
+        }
+        netUnitTag.textContent = 'به ازای هر ' + (r.unit || 'قالب');
         finalField.classList.toggle('bad', c.gross > 0 && c.final > c.gross && !r.ackNegative);
 
         selDt.value = r.dtMode;
@@ -1092,7 +1291,7 @@
           (dtOut ? '<b style="color:var(--ink-2)">' + esc(dtOut) + '</b>' : '<span style="color:var(--muted-2)">— خالی —</span>');
 
         /* assistant */
-        var res = Assistant.analyze(r);
+        var res = Assistant.analyze(r, { brickArea: Calc.brickArea() });
         asst.classList.toggle('has-warn', res.warn);
         asstBody.innerHTML = '';
         if (!res.messages.length) {
@@ -1114,7 +1313,7 @@
             asstBody.appendChild(ab);
           }
         });
-        if (r.ackCarton && r.perCarton && r.qty && r.qty % r.perCarton !== 0) {
+        if (!Calc.isGrout(r) && r.ackCarton && r.perCarton && r.qty && r.qty % r.perCarton !== 0) {
           var okm = el('div', 'msg ok');
           okm.innerHTML = '<span class="dot"></span><div class="txt">مقدار غیرکارتنی توسط شما تأیید شده است.</div>';
           asstBody.appendChild(okm);
@@ -1230,9 +1429,17 @@
       btn.style.marginTop = '14px';
       btn.id = 'btnPdfSide';
       b.appendChild(btn);
+      var outs = el('div');
+      outs.style.cssText = 'display:flex;gap:8px;margin-top:8px';
+      var bPrint = el('button', 'btn sm', ICON.printer + '<span>پرینت</span>');
+      bPrint.type = 'button'; bPrint.id = 'btnPrintSide'; bPrint.style.flex = '1';
+      var bHtml = el('button', 'btn sm', ICON.save + '<span>ذخیره HTML</span>');
+      bHtml.type = 'button'; bHtml.id = 'btnHtmlSide'; bHtml.style.flex = '1';
+      outs.appendChild(bPrint); outs.appendChild(bHtml);
+      b.appendChild(outs);
       var note = el('div', 'lbl');
       note.style.cssText = 'font-size:11px;color:var(--muted-2);font-weight:500;margin-top:10px;line-height:1.7;text-align:center';
-      note.textContent = 'خروجی دقیقاً مطابق قالب رسمی پیش فاکتور تولید می‌شود.';
+      note.innerHTML = 'PDF و پرینت دقیقاً مطابق قالب رسمی‌اند.<br>فایل HTML، همین فاکتور را با تمام اطلاعات برای ویرایش بعدی نگه می‌دارد.';
       b.appendChild(note);
       c.appendChild(b);
       return c;
@@ -1295,25 +1502,32 @@
   /* ==================================================================
      PDF action
      ================================================================== */
-  function doPdf() {
+  var OUT = {
+    pdf: { run: function () { Output.generate(); }, label: 'صدور PDF' },
+    print: { run: function () { Output.print(); }, label: 'چاپ' },
+    html: { run: function () { Output.exportHtml(); }, label: 'ذخیره فایل HTML' }
+  };
+  function doOut(kind) {
+    var job = OUT[kind];
     var v = Validate.run();
     if (!v.ok) {
-      UI.modal('امکان صدور PDF نیست',
-        '<p style="margin:0 0 10px">برای صدور فاکتور، موارد زیر باید اصلاح شوند:</p><ul style="margin:0;padding-inline-start:18px">' +
+      UI.modal('امکان ' + job.label + ' نیست',
+        '<p style="margin:0 0 10px">برای این خروجی، موارد زیر باید اصلاح شوند:</p><ul style="margin:0;padding-inline-start:18px">' +
         v.blocking.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul>',
         [{ label: 'باشد', pri: true }]);
       return;
     }
     if (v.advisory.length) {
-      UI.modal('تأیید صدور',
+      UI.modal('تأیید ' + job.label,
         '<p style="margin:0 0 10px">فاکتور قابل صدور است، اما توجه کنید:</p><ul style="margin:0 0 12px;padding-inline-start:18px">' +
         v.advisory.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul>' +
-        '<p style="margin:0;color:var(--muted)">آیا PDF صادر شود؟</p>',
-        [{ label: 'صدور PDF', pri: true, act: Output.generate }, { label: 'بازگشت' }]);
+        '<p style="margin:0;color:var(--muted)">ادامه می‌دهید؟</p>',
+        [{ label: job.label, pri: true, act: job.run }, { label: 'بازگشت' }]);
       return;
     }
-    Output.generate();
+    job.run();
   }
+  function doPdf() { doOut('pdf'); }
 
   /* ==================================================================
      Boot
@@ -1340,8 +1554,13 @@
 
     document.getElementById('btnPdfTop').addEventListener('click', doPdf);
     document.getElementById('btnPdfMob').addEventListener('click', doPdf);
+    document.getElementById('btnPrintMob').addEventListener('click', function () { doOut('print'); });
     document.addEventListener('click', function (e) {
-      if (e.target && e.target.id === 'btnPdfSide') doPdf();
+      var t = e.target && e.target.closest ? e.target.closest('button') : null;
+      if (!t) return;
+      if (t.id === 'btnPdfSide') doPdf();
+      else if (t.id === 'btnPrintSide' || t.id === 'btnPrintTop') doOut('print');
+      else if (t.id === 'btnHtmlSide') doOut('html');
     });
     document.getElementById('btnNew').addEventListener('click', function () {
       UI.modal('فاکتور جدید',
@@ -1352,7 +1571,8 @@
     document.getElementById('scrim').addEventListener('click', UI.closeModal);
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') UI.closeModal();
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); doPdf(); }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); doOut('print'); }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) { e.preventDefault(); doOut('html'); }
     });
     window.addEventListener('beforeunload', function () { Store.save(); });
   }

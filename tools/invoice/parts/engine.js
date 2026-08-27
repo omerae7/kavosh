@@ -438,7 +438,9 @@ var InvoiceEngine = (function () {
       vRule2: [434.04, 455.88, 0.84, 51.36],
       payable: [51.36, 417.72, 120.60, 23.88]
     },
-    size: { s10: 8.14, s11: 8.98, s12: 9.82, mark: 6.59 },
+    /* s11n: the تخفیف نقدی and مبلغ کل cells run a touch smaller than the
+       rest of the row so large rial figures keep room to breathe */
+    size: { s10: 8.14, s11: 8.98, s11n: 8.0, s12: 9.82, mark: 6.59 },
     head: {
       title: { x: 554.44, y: 87.36, a: 'r' },
       statusLabel: { x: 133.08, y: 110.28, a: 'l' },
@@ -586,13 +588,13 @@ var InvoiceEngine = (function () {
     // money columns share their cell with a leading "IRR": keep the number
     // inside the space that is actually left, whatever its magnitude
     var irrW11 = R.measure(T.irr, S.s11, false);
-    var fitTotal = col.total.num - col.total.irr - irrW11 - 4;
+    var fitTotal = col.total.num - col.total.irr - R.measure(T.irr, S.s11n, false) - 4;
     var fitAmount = col.amount.num - col.amount.irr - irrW11 - 4;
     for (i = 0; i < 5; i++) {
       var y = L.tbl.rowY0 + L.tbl.rowStep * i;
       var r = model.rows[i] || {};
       doc.text(String(i + 1), col.no.c, y, R, S.s11, 'c', { rtl: false });
-      doc.text(T.irr, col.total.irr, y, R, S.s11, 'l', { rtl: false });
+      doc.text(T.irr, col.total.irr, y, R, S.s11n, 'l', { rtl: false });
       doc.text(T.irr, col.amount.irr, y, R, S.s11, 'l', { rtl: false });
       if (r.used) {
         doc.text(r.code, col.code.c, y, R, S.s11, 'c', { rtl: false, maxWidth: col.code.w, minSize: 5.5, fit: 'truncate' });
@@ -602,14 +604,14 @@ var InvoiceEngine = (function () {
         doc.text(group(r.unitPrice), col.price.num, y, R, S.s11, 'r', { rtl: false, maxWidth: 54, minSize: 5.2 });
         doc.text(group(r.gross), col.amount.num, y, R, S.s11, 'r', { rtl: false, maxWidth: fitAmount, minSize: 5.2 });
         if (r.discountText) {
-          doc.text(r.discountText, col.disc.c, y, R, S.s11, 'c', { maxWidth: col.disc.w, minSize: 5.5, fit: 'truncate' });
+          doc.text(r.discountText, col.disc.c, y, R, S.s11n, 'c', { maxWidth: col.disc.w, minSize: 5.5, fit: 'truncate' });
         }
-        doc.text(group(r.final), col.total.num, y, R, S.s11, 'r', { rtl: false, maxWidth: fitTotal, minSize: 5.2 });
+        doc.text(group(r.final), col.total.num, y, R, S.s11n, 'r', { rtl: false, maxWidth: fitTotal, minSize: 5.2 });
       } else {
         doc.text(T.dash, col.qty.dash, y, R, S.s11, 'r', { rtl: false });
         doc.text(T.dash, col.price.dash, y, R, S.s11, 'r', { rtl: false });
         doc.text(T.dash, col.amount.dash, y, R, S.s11, 'r', { rtl: false });
-        doc.text(T.dash, col.total.dash, y, R, S.s11, 'r', { rtl: false });
+        doc.text(T.dash, col.total.dash, y, R, S.s11n, 'r', { rtl: false });
       }
     }
 
