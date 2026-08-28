@@ -133,12 +133,26 @@
       var j = Jalali.of(d);
       return DAYS[d.getDay()] + '، ' + j[2] + ' ' + MONTHS[j[1] - 1] + ' ' + j[0];
     },
-    /* "1405.06.06" -> "۶ شهریور ۱۴۰۵" style, in Latin digits */
+    /* "1405.06.06" -> "6 شهریور 1405" */
     pretty: function (stamp) {
       var d = Num.normalize(String(stamp || '')).replace(/\D/g, '');
       if (d.length < 8) return stamp || '';
       var m = parseInt(d.slice(4, 6), 10);
       return parseInt(d.slice(6, 8), 10) + ' ' + (MONTHS[m - 1] || '') + ' ' + d.slice(0, 4);
+    },
+    /* The same date as markup. A Jalali date mixes a Latin day, a Persian
+       month and a Latin year; left to the bidi algorithm — especially
+       inside anything marked direction:ltr — the three parts reorder and
+       come out as "شهریور 1405 6". Isolating each part pins the order on
+       every device. */
+    html: function (stamp) {
+      var d = Num.normalize(String(stamp || '')).replace(/\D/g, '');
+      if (d.length < 8) return '<span class="jdate">' + (stamp || '—') + '</span>';
+      var m = parseInt(d.slice(4, 6), 10);
+      return '<span class="jdate">' +
+        '<i>' + parseInt(d.slice(6, 8), 10) + '</i> ' +
+        (MONTHS[m - 1] || '') +
+        ' <i>' + d.slice(0, 4) + '</i></span>';
     },
     /* six-digit tail used in file names: 1405.06.04 -> 050604 */
     six: function (stamp) {
@@ -151,71 +165,111 @@
      Odo — vertical digit reels
      --------------------------------------------------------------- */
   var Odo = {
-    /* Render `text` into `el`, rolling any digit that changed. */
+    /* Render `text` into `el`, rolling any digit that changed.
+
+       Each digit is a reel of 0…9 with a repeat of 0 at the end. Moving
+       9 -> 0 animates onto that trailing 0 — still upward — and then
+       snaps back to the real 0 with the transition off. The reel
+       therefore never runs backwards, the way a mechanical counter
+       never does. */
     set: function (el, text, opt) {
       opt = opt || {};
       text = String(text === null || text === undefined ? '' : text);
       if (!el) return;
       if (el.dataset.odo === text) return;
       var reduce = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (el.className.indexOf('odo') < 0) el.className += ' odo';
+
       if (reduce || opt.instant || !el.isConnected) {
         el.dataset.odo = text;
-        el.className = (el.className.indexOf('odo') < 0 ? el.className + ' odo' : el.className);
         el.textContent = text;
+        el.__cells = null;
         return;
       }
       var prev = el.dataset.odo || '';
       el.dataset.odo = text;
-      if (el.className.indexOf('odo') < 0) el.className += ' odo';
 
-      var cells = [];
-      for (var i = 0; i < text.length; i++) cells.push(text[i]);
-      // reuse existing reels where the shape matches, so only digits move
-      var same = el.childElementCount === cells.length;
-      if (!same) el.innerHTML = '';
+      var cells = text.split('');
+      if (el.childElementCount !== cells.length) { el.innerHTML = ''; el.__cells = null; }
 
       cells.forEach(function (ch, i) {
         var isDigit = ch >= '0' && ch <= '9';
-        var node = same ? el.children[i] : null;
-        if (!node) {
-          node = document.createElement('span');
-          node.className = isDigit ? 'odo-d' : 'odo-s';
-          if (isDigit) {
-            var reel = document.createElement('i');
-            for (var d = 0; d <= 9; d++) {
-              var s = document.createElement('span'); s.textContent = String(d); reel.appendChild(s);
-            }
-            node.appendChild(reel);
-          } else node.textContent = ch;
-          el.appendChild(node);
-        }
-        if (isDigit) {
-          if (node.className !== 'odo-d') {
-            node.className = 'odo-d'; node.textContent = '';
-            var r2 = document.createElement('i');
-            for (var d2 = 0; d2 <= 9; d2++) {
-              var s2 = document.createElement('span'); s2.textContent = String(d2); r2.appendChild(s2);
-            }
-            node.appendChild(r2);
+        var node = el.children[i];
+        if (!node) { node = document.createElement('span'); el.appendChild(node); }
+
+        if (!isDigit) {
+          if (node.className !== 'odo-s' || node.textContent !== ch) {
+            node.className = 'odo-s';
+            node.textContent = ch;
           }
-          var reelEl = node.firstChild;
-          var from = prev[i];
-          if (!(from >= '0' && from <= '9')) reelEl.style.transition = 'none';
-          var target = -Number(ch) * 1.15;
-          // a nudge apart per column reads like a mechanical counter
-          reelEl.style.transitionDelay = (i * 22) + 'ms';
-          requestAnimationFrame(function () {
-            reelEl.style.transition = '';
-            reelEl.style.transform = 'translateY(' + target + 'em)';
-          });
-        } else if (node.className !== 'odo-s' || node.textContent !== ch) {
-          node.className = 'odo-s'; node.textContent = ch;
+          return;
         }
+        if (node.className !== 'odo-d') {
+          node.className = 'odo-d';
+          node.textContent = '';
+          var reel = document.createElement('i');
+          for (var d = 0; d <= 10; d++) {          // 0…9 plus a repeat of 0
+            var sp = document.createElement('span');
+            sp.textContent = String(d % 10);
+            reel.appendChild(sp);
+          }
+          node.appendChild(reel);
+          node.dataset.at = '';
+        }
+        var reelEl = node.firstChild;
+        var from = node.dataset.at === '' ? null : Number(node.dataset.at);
+        var to = Number(ch);
+        if (from === to) return;
+        node.dataset.at = String(to);
+
+        // a fresh cell just appears at its digit
+        if (from === null || !(prev[i] >= '0' && prev[i] <= '9')) {
+          place(reelEl, to);
+          return;
+        }
+        roll(node, reelEl, from, to, i * 22);
       });
     },
     money: function (el, v, opt) { Odo.set(el, Num.group(v), opt); },
     count: function (el, v, opt) { Odo.set(el, Num.group(v), opt); }
   };
+
+  /* Put a reel at a digit with no animation. */
+  function place(reelEl, d) {
+    reelEl.style.transition = 'none';
+    reelEl.style.transform = 'translateY(' + (-d * 1.15) + 'em)';
+    reelEl.offsetHeight;                      // commit before re-enabling
+    reelEl.style.transition = '';
+  }
+  function glide(reelEl, d, delayMs) {
+    reelEl.style.transitionDelay = (delayMs || 0) + 'ms';
+    reelEl.style.transform = 'translateY(' + (-d * 1.15) + 'em)';
+  }
+
+  /* Climb from one digit to another, never downwards.
+
+     Going 9 -> 2 would be a fall, so the reel climbs onto the spare 0 at
+     the end of the strip, snaps home invisibly, and then climbs on to 2.
+     A sequence number guards the hand-off, so a value that changes again
+     mid-roll cannot leave a stale continuation behind. */
+  function roll(node, reelEl, from, to, delayMs) {
+    var seq = (Number(node.dataset.seq || 0) + 1) % 1000;
+    node.dataset.seq = String(seq);
+    if (to > from) { glide(reelEl, to, delayMs); return; }
+
+    glide(reelEl, 10, delayMs);
+    var done = function () {
+      reelEl.removeEventListener('transitionend', done);
+      if (node.dataset.seq !== String(seq)) return;   // superseded
+      place(reelEl, 0);
+      if (to > 0) {
+        requestAnimationFrame(function () {
+          if (node.dataset.seq === String(seq)) glide(reelEl, to, 0);
+        });
+      }
+    };
+    reelEl.addEventListener('transitionend', done);
+  }
 
   /* ---------------------------------------------------------------
      API

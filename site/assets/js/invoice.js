@@ -125,6 +125,14 @@
   var KEY = 'brickala.invoice.v2:' + DOC_ID;
   var CTX = window.INVOICE_CTX || { mode: 'faktor' };
   var IN_PANEL = CTX.mode === 'panel';
+  var ONLINE = !!window.INVOICE_CTX;
+
+  /* Online the draft lives in sessionStorage, not localStorage: a reload
+     keeps what you were typing, but opening the composer afresh — a new
+     tab, a new visit, or coming back tomorrow — gives a blank form rather
+     than the last customer you happened to invoice. Anything already
+     issued is on the server and can be reopened from the list. */
+  var DRAFT = ONLINE ? window.sessionStorage : window.localStorage;
   function newRow() {
     return {
       mode: 'empty', code: '', desc: '', unit: 'قالب', grout: false,
@@ -144,7 +152,7 @@
       /* identity of this invoice, so repeated outputs update one record
          rather than piling up copies */
       docId: 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
-      kind: 'normal', parentId: null, customerId: null,
+      kind: 'normal', parentId: null, customerId: null, filed: false,
       meta: { status: 'پیش نویس', date: Jalali.today(), preparedBy: '' },
       customer: { name: '', phone: '', province: '', postal: '', address: '', nationalId: '' },
       rows: rows
@@ -167,7 +175,7 @@
     /* what this browser last autosaved for this document, with its time */
     localCopy: function () {
       try {
-        var raw = localStorage.getItem(KEY);
+        var raw = DRAFT.getItem(KEY);
         if (!raw) return null;
         var d = JSON.parse(raw);
         if (!d) return null;
@@ -176,6 +184,10 @@
     },
     load: function () {
       var local = Store.localCopy();
+      if (ONLINE && local && local.state && local.state.filed) {
+        try { DRAFT.removeItem(KEY); } catch (e) { /* ignore */ }
+        local = null;
+      }
       if (EMBEDDED && EMBEDDED.state) {
         // an edit made to this very file outranks the copy baked into it
         if (local && local.savedAt > (EMBEDDED.savedAt || 0) && Store.apply(local.state)) return true;
@@ -185,12 +197,12 @@
     },
     save: function () {
       try {
-        localStorage.setItem(KEY, JSON.stringify({ savedAt: Date.now(), state: S }));
+        DRAFT.setItem(KEY, JSON.stringify({ savedAt: Date.now(), state: S }));
       } catch (e) { /* storage unavailable */ }
     },
     reset: function () {
       S = newState();
-      try { localStorage.removeItem(KEY); } catch (e) { }
+      try { DRAFT.removeItem(KEY); } catch (e) { }
     }
   };
 
@@ -696,6 +708,10 @@
       }
       return API.post('invoices.php?a=save', payload).then(function (r) {
         S.docId = r.docId || S.docId;
+        /* Filed invoices live on the server and can be reopened from the
+           list, so the draft is spent: the next visit to the composer
+           starts blank instead of resurrecting this customer. */
+        S.filed = true;
         Store.save();
         if (UI.filed) UI.filed(r);
         return r;
@@ -1609,7 +1625,7 @@
       b.innerHTML =
         '<div class="sum-row"><span>جمع کل</span><div class="sum-amt"><b class="num" id="sGross">0</b><span class="sum-cur">ریال</span></div></div>' +
         '<div class="sum-row"><span>تخفیف</span><div class="sum-amt"><b class="num" id="sDisc">0</b><span class="sum-cur">ریال</span></div></div>' +
-        '<div class="sum-row total"><span>قابل پرداخت</span><div class="sum-amt"><b class="num" id="sPay">0</b><span class="sum-cur">ریال</span></div></div>' +
+        '<div class="sum-row total"><span>قابل پرداخت</span><div class="sum-amt"><b class="num pay" id="sPay">0</b><span class="sum-cur">ریال</span></div></div>' +
         '<div class="divider" style="margin:14px 0 12px"></div>' +
         '<div class="checks" id="checks"></div>' +
         (window.INVOICE_CTX ? '<div id="filedChip" class="chip" style="margin-top:10px;display:none"></div>' : '');
@@ -1729,9 +1745,12 @@
         });
     }).then(function () {
       InvoiceEngine.init(window.FONT_DATA, window.UNI_META);
-      Store.load();
       if (window.INVOICE_PRESET) {
-        try { Store.apply(window.INVOICE_PRESET); } catch (e) { /* keep the draft */ }
+        try { DRAFT.removeItem(KEY); } catch (e) { /* ignore */ }
+        Store.apply(window.INVOICE_PRESET);
+        S.filed = false;
+      } else {
+        Store.load();
       }
       UI.build();
       wire();

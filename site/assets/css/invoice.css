@@ -166,13 +166,23 @@
    ------------------------------------------------------------------ */
 .sum-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0}
 .sum-row span{font-size:12.5px;color:var(--muted);font-weight:600}
-.sum-amt{display:flex;align-items:baseline;gap:5px}
+.sum-amt{display:flex;align-items:baseline;gap:5px;min-width:0}
 .sum-row b{font-size:14.5px;font-weight:600;font-variant-numeric:tabular-nums;direction:ltr}
 .sum-cur{font-size:11px;color:var(--muted);font-weight:600}
-.sum-row.total{margin-top:8px;padding:12px 14px;border-radius:var(--r-md);background:var(--ink);color:#F6F1EA}
-.sum-row.total span{color:#B9AFA4}
-.sum-row.total b{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.01em}
-.sum-row.total .sum-cur{color:#B9AFA4}
+.sum-row.total{
+  margin-top:10px;padding:13px 15px;border-radius:var(--r-md);
+  background:var(--ink);color:#F6F1EA;align-items:center;
+}
+.sum-row.total span{color:#C6BBB0;font-size:13px}
+/* The figure everyone actually looks for: large and white. The reel step
+   is 1.15em everywhere — overriding the cell height here but not the step
+   in script left every digit sitting half-way out of its window, which is
+   what made this number unreadable. Size it with font-size alone. */
+.sum-row.total b.pay{
+  font-size:21px;font-weight:700;color:#fff;letter-spacing:-.015em;
+}
+.sum-row.total .sum-cur{color:#C6BBB0}
+@media (max-width:400px){.sum-row.total b.pay{font-size:18px}}
 .checks{display:flex;flex-direction:column;gap:7px;margin-top:2px}
 .check{display:flex;gap:8px;align-items:flex-start;font-size:12.3px;line-height:1.6;color:var(--ink-2)}
 .check .ic{width:14px;height:14px;flex:none;margin-top:3px}

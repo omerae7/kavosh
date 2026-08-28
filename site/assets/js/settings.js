@@ -196,7 +196,7 @@
     API.get('system.php?a=info').then(function (s) {
       var mb = function (b) { return Num.pct(b / 1048576, 2) + ' مگابایت'; };
       pane.innerHTML =
-        '<div class="lk-stats" style="margin-bottom:16px">' +
+        '<div class="acts" style="grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px">' +
           stat('فاکتورها', Num.group(s.invoices)) + stat('مشتریان', Num.group(s.customers)) +
           stat('کالاها', Num.group(s.products)) + stat('ادمین‌ها', Num.group(s.admins)) +
           stat('حجم PDFها', mb(s.pdfBytes)) + stat('حجم داده‌ها', mb(s.jsonBytes)) +
@@ -211,8 +211,8 @@
               '<input type="file" id="rf" accept="application/json" style="display:none">' +
               '<button class="btn" id="rb">انتخاب فایل و بازگردانی</button>') +
         '</div>' +
-        '<div class="pcard" style="margin-top:16px;border-color:#EFCFC9;box-shadow:none">' +
-          '<div class="pcard-b pad">' +
+        '<div class="pc" style="margin-top:16px;border-color:#EFCFC9;box-shadow:none">' +
+          '<div class="pc-b">' +
             '<b style="color:var(--danger-ink)">پاک‌سازی کامل</b>' +
             '<div style="font-size:12.5px;color:var(--ink-2);margin:6px 0 12px">' +
               'همهٔ فاکتورها، فایل‌های PDF، مشتریان، یادآورها و یادداشت‌ها حذف می‌شوند. ' +
@@ -259,7 +259,7 @@
       });
     }).catch(fail);
 
-    function stat(k, v) { return '<div class="lk-stat"><span>' + esc(k) + '</span><b class="num">' + esc(v) + '</b></div>'; }
+    function stat(k, v) { return '<div class="st"><span>' + esc(k) + '</span><b class="num">' + esc(v) + '</b></div>'; }
     function box(t, d, a) {
       return '<div style="border:1px solid var(--line);border-radius:var(--r-md);padding:14px;background:var(--surface-2)">' +
         '<b style="font-size:13.5px">' + esc(t) + '</b>' +
@@ -268,6 +268,6 @@
   }
 
   API.boot().then(render).catch(function (e) {
-    if (e.status === 401) location.href = '/panel/login.php'; else fail(e);
+    if (e && e.status === 401) location.href = '/panel/login.php'; else fail(e);
   });
 })();

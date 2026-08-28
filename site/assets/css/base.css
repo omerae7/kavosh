@@ -74,11 +74,14 @@ a{color:inherit}
    Odometer — each digit rolls in its own column
    ============================================================ */
 .odo{display:inline-flex;direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums;
-     line-height:1.15;overflow:hidden;vertical-align:baseline}
+     line-height:1.15;vertical-align:baseline}
 .odo-d{display:inline-block;overflow:hidden;height:1.15em;position:relative}
 .odo-d i{display:block;font-style:normal;transition:transform var(--slow)}
-.odo-d i span{display:block;height:1.15em}
+.odo-d i span{display:block;height:1.15em;text-align:center}
 .odo-s{display:inline-block}
+/* a Jalali date holds its order wherever it is placed */
+.jdate{unicode-bidi:isolate;direction:rtl;white-space:nowrap}
+.jdate i{font-style:normal;unicode-bidi:isolate;direction:ltr;font-variant-numeric:tabular-nums}
 
 /* ============================================================
    Buttons

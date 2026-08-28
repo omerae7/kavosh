@@ -2,12 +2,16 @@
 /* Two sticky notes per user, kept apart from everyone else's. */
 require __DIR__ . '/_boot.php';
 $me = require_login();
-$action = $_GET['a'] ?? 'get';
+/* A POST without an action used to fall through to 'get' and silently
+   discard the note, so writing is now explicit. */
+$action = $_GET['a'] ?? ($_SERVER['REQUEST_METHOD'] === 'POST' ? 'save' : 'get');
 
 if ($action === 'get') {
     $all = Store::read('notes', []);
     json_out(['ok' => true, 'notes' => $all[$me] ?? ['', '']]);
 }
+
+if ($action !== 'save') fail('unknown action', 404);
 
 csrf_check();
 $in   = body();

@@ -6,7 +6,7 @@ Three pages on one shared host, no database:
 | --- | --- | --- |
 | `/` | the photograph and one line of type | no |
 | `/faktor` | the invoice composer, exactly as the standalone file | no |
-| `/panel` | dashboard, history, customers, reminders, settings | yes |
+| `/panel` | dashboard, history, customers, reminders, messages, settings | yes |
 
 `/` and `/faktor` can reach no stored record: every endpoint that reads history,
 customers, users or settings calls `require_login()` first. The only open calls
@@ -53,6 +53,34 @@ it — the same file the business already uses.
 Rebuild it with `python3 tools/invoice/build.py && cp "فاکتور شهریور 1405.html"
 site/assets/faktor-standalone.html`.
 
+## The panel's frame
+
+`panel/_shell.php` and `_foot.php` wrap every panel page in the same chrome: a
+floating navigation rail and, beside it, a floating window that holds the top
+bar and the page. The room photograph is left visible as a frame around both —
+it never sits behind text. `.prow` rows give each dashboard row its own column
+template, so every card in a row is exactly as tall as its neighbours.
+
+Below 1000px the rail becomes an off-canvas drawer behind the hamburger. The
+rail and the messages drawer are both anchored with **physical** `right` and
+`translateX(100%)`: a logical `inset-inline-end` slides a closed panel *into* an
+RTL page instead of out of it, where it silently swallows every click.
+
+## Messages
+
+An invoice filed from `/faktor` — or by another administrator — is a message.
+`messages.php` compares each invoice's `createdAt` against the reading
+administrator's own entry in `seen.json`, so the bell count is per-person.
+Opening the drawer marks them read; the assistant mentions the count until it
+does.
+
+## Notes
+
+Two notepads per administrator, in `notes.json` keyed by username, never shared.
+A written note loads locked so a stray keystroke cannot change it; the pencil
+unlocks it. `notes.php` treats a POST with no `?a=` as a save — it used to fall
+through to the read branch and drop the text.
+
 ## Numbers move
 
 `Odo` in `core.js` renders each digit as its own reel and rolls only the ones
@@ -65,5 +93,5 @@ figures and row amounts all go through it.
 php -S 127.0.0.1:8899 -t site
 ```
 
-Then `tools/invoice/test/site.js`, `panel.js`, `flows.js` and `mob.js` drive it
-in Chromium.
+Then `tools/invoice/test/site.js`, `pages.js`, `v3.js`, `edit.js`, `flows.js`
+and `mob.js` drive it in Chromium.

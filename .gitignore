@@ -1,1 +1,6 @@
 brickala-data/
+tools/invoice/test/*.png
+tools/invoice/test/*.pdf
+tools/invoice/test/web-export.html
+tools/invoice/test/shot*.js
+tools/invoice/test/sumshot.js

@@ -1,11 +1,13 @@
 <?php
 $PAGE_TITLE = 'یادآورها — بریک کالا';
-$SHELL_BACK = '/panel/';
+$PAGE_HEAD  = 'یادآورها';
+$PAGE_SUB   = 'تازه‌ترین در بالا';
+$NAV = 'reminders';
 require __DIR__ . '/_shell.php';
 ?>
-  <div class="pcard">
-    <div class="pcard-h">
-      <h2>یادآورها</h2>
+  <div class="pc">
+    <div class="pc-h">
+      <h3>یادآورها</h3>
       <span class="sp"></span>
       <div class="tabs" id="tabs">
         <button aria-selected="true" data-f="open">انجام نشده</button>
@@ -13,7 +15,7 @@ require __DIR__ . '/_shell.php';
         <button aria-selected="false" data-f="all">همه</button>
       </div>
     </div>
-    <div class="pcard-b pad">
+    <div class="pc-b">
       <form class="rem-add" id="addF" style="margin:0 0 14px">
         <input class="inp" id="addT" type="text" placeholder="یادآور تازه…" autocomplete="off">
         <button class="btn pri" type="submit">افزودن</button>
@@ -21,9 +23,8 @@ require __DIR__ . '/_shell.php';
       <div id="list"><div class="empty">در حال بارگذاری…</div></div>
     </div>
   </div>
-<script src="/assets/js/core.js?v=<?= $ASSET_V ?>"></script>
 <script>
-(function () {
+window.__page = function () {
   var esc = UI.esc, el = UI.el, filter = 'open', all = [];
   var WEEK = 7 * 86400;
 
@@ -103,7 +104,7 @@ require __DIR__ . '/_shell.php';
     API.post('reminders.php?a=add', { text: text }).then(load)
       .catch(function (err) { UI.toast(err.message, { kind: 'bad' }); i.value = text; });
   });
-  API.boot().then(load);
-})();
+  load();
+};
 </script>
-</body></html>
+<?php require __DIR__ . '/_foot.php'; ?>
