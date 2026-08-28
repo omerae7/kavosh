@@ -151,17 +151,20 @@ body.panel{
 .prows{display:flex;flex-direction:column;gap:12px}
 .prow{display:grid;gap:12px;align-items:stretch}
 .prow.r1{grid-template-columns:repeat(3,minmax(0,1fr))}
-.prow.r2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.prow.r3{grid-template-columns:repeat(4,minmax(0,1fr))}
+.prow.r2{grid-template-columns:minmax(0,3fr) minmax(0,3fr) minmax(0,6fr)}
+.prow.r3{grid-template-columns:minmax(0,6fr) minmax(0,3fr) minmax(0,3fr)}
 
 @media (max-width:1340px){
   .prow.r1{grid-template-columns:repeat(2,minmax(0,1fr))}
   .prow.r1 > :nth-child(2){order:3;grid-column:1/-1}   /* quick access goes wide */
+  .prow.r2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .prow.r2 > :nth-child(3){grid-column:1/-1}           /* the chart goes wide */
   .prow.r3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .prow.r3 > :nth-child(1){grid-column:1/-1}           /* the list goes wide */
 }
-@media (max-width:1040px){.prow.r2{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:760px){
   .prow.r1,.prow.r2,.prow.r3{grid-template-columns:minmax(0,1fr)}
+  .prow.r2 > :nth-child(3),.prow.r3 > :nth-child(1){grid-column:auto}
   /* on a phone the clock leads, the way a phone's own screen does */
   .prow.r1 > :nth-child(3){order:-1}
   .prow.r1 > :nth-child(2){order:0}
@@ -260,7 +263,7 @@ body.panel{
 
 /* a compact table for the recent invoices */
 .ptab-wrap{overflow-x:auto}
-.ptab{width:100%;border-collapse:collapse;min-width:396px}
+.ptab{width:100%;border-collapse:collapse;min-width:290px}
 .ptab th{
   padding:8px 10px;text-align:start;font-size:10.5px;font-weight:600;color:var(--muted);
   border-bottom:1px solid var(--line);white-space:nowrap;

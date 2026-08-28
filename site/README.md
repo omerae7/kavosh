@@ -61,7 +61,11 @@ holds the top bar and the page, with the front page's copyright line under it.
 The stage caps at 1180px, so on a desktop the room photograph frames the work
 rather than hiding behind it, and neither panel is stretched to a height its
 content does not need. `.prow` rows give each dashboard row its own column
-template, so every card in a row is exactly as tall as its neighbours.
+template, so every card in a row is exactly as tall as its neighbours: the
+figures and the clock across the top, the assistant, the reminders and the
+month chart in the middle, and the latest few invoices beside the notepads
+below. The dashboard's invoice list is a glance, not a ledger — date, customer
+and amount for four rows, with the full history one link away.
 
 Below 1000px the rail becomes an off-canvas drawer behind the hamburger. The
 rail and the messages drawer are both anchored with **physical** `right` and

@@ -66,17 +66,30 @@ require __DIR__ . '/_shell.php';
 
     <section class="pc">
       <div class="pc-h">
-        <svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h9"/></svg>
-        <h3>پیش‌فاکتورهای صادر شده</h3>
-        <span class="sp"></span>
-        <a class="btn pri sm" href="/panel/invoice.php">فاکتور جدید</a>
+        <svg class="ic" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.2 9.3 5 13 6.3 9.3 7.6 8 11.4 6.7 7.6 3 6.3 6.7 5 8 1.2Z"/><path d="M12.8 10.2l.55 1.6 1.6.55-1.6.55-.55 1.6-.55-1.6-1.6-.55 1.6-.55.55-1.6Z" opacity=".55"/></svg>
+        <h3>دستیار هوشمند</h3>
       </div>
-      <div class="pc-b flush">
-        <div class="rows" id="wRecent"><div class="wempty">در حال بارگذاری…</div></div>
+      <div class="pc-b">
+        <div class="pa" id="wAssist"><div class="wempty">در حال بررسی…</div></div>
       </div>
-      <div class="pc-f"><a href="/panel/invoices.php">مشاهده همه پیش‌فاکتورها
-        <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 4-6 6 6 6"/></svg></a></div>
     </section>
+
+    <section class="pc">
+      <div class="pc-h">
+        <svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3a5 5 0 0 0-5 5v3l-1.5 2.5h13L15 11V8a5 5 0 0 0-5-5Z"/><path d="M8.2 16.5a1.9 1.9 0 0 0 3.6 0"/></svg>
+        <h3>یادآورها</h3>
+        <span class="sp"></span>
+        <a href="/panel/reminders.php">همه</a>
+      </div>
+      <div class="pc-b col">
+        <div id="wRem"><div class="wempty">در حال بارگذاری…</div></div>
+        <form class="rem-add" id="remAdd">
+          <input class="inp" id="remText" type="text" placeholder="یادآور تازه…" autocomplete="off">
+          <button class="btn pri" type="submit" style="height:36px">افزودن</button>
+        </form>
+      </div>
+    </section>
+
 
     <section class="pc">
       <div class="pc-h">
@@ -108,34 +121,24 @@ require __DIR__ . '/_shell.php';
 
     <section class="pc">
       <div class="pc-h">
-        <svg class="ic" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.2 9.3 5 13 6.3 9.3 7.6 8 11.4 6.7 7.6 3 6.3 6.7 5 8 1.2Z"/><path d="M12.8 10.2l.55 1.6 1.6.55-1.6.55-.55 1.6-.55-1.6-1.6-.55 1.6-.55.55-1.6Z" opacity=".55"/></svg>
-        <h3>دستیار هوشمند</h3>
+        <svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h9"/></svg>
+        <h3>آخرین فاکتورها</h3>
+        <span class="sp"></span>
+        <a class="btn pri sm" href="/panel/invoice.php">فاکتور جدید</a>
       </div>
-      <div class="pc-b">
-        <div class="pa" id="wAssist"><div class="wempty">در حال بررسی…</div></div>
+      <div class="pc-b flush">
+        <div class="rows" id="wRecent"><div class="wempty">در حال بارگذاری…</div></div>
       </div>
+      <div class="pc-f"><a href="/panel/invoices.php">مشاهده همه پیش‌فاکتورها
+        <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 4-6 6 6 6"/></svg></a></div>
     </section>
 
-    <section class="pc">
-      <div class="pc-h">
-        <svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3a5 5 0 0 0-5 5v3l-1.5 2.5h13L15 11V8a5 5 0 0 0-5-5Z"/><path d="M8.2 16.5a1.9 1.9 0 0 0 3.6 0"/></svg>
-        <h3>یادآورها</h3>
-        <span class="sp"></span>
-        <a href="/panel/reminders.php">همه</a>
-      </div>
-      <div class="pc-b col">
-        <div id="wRem"><div class="wempty">در حال بارگذاری…</div></div>
-        <form class="rem-add" id="remAdd">
-          <input class="inp" id="remText" type="text" placeholder="یادآور تازه…" autocomplete="off">
-          <button class="btn pri" type="submit" style="height:36px">افزودن</button>
-        </form>
-      </div>
-    </section>
+
 
     <?php
     /* The two notepads are identical but for their label; the panel keeps
        them per-admin, so one manager never sees another's notes. */
-    foreach ([1 => 'یادداشت ۲', 0 => 'یادداشت ۱'] as $slot => $label): ?>
+    foreach ([0 => 'یادداشت ۱', 1 => 'یادداشت ۲'] as $slot => $label): ?>
     <section class="pc" data-note="<?= $slot ?>">
       <div class="pc-h">
         <svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h7l3 3v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M12 3v3h3"/></svg>

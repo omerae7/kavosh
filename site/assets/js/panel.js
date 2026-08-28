@@ -85,17 +85,15 @@
     var body = rows.slice(0, 4).map(function (r) {
       return '<tr>' +
         '<td class="c">' + Jalali.html(r.date) + '</td>' +
-        '<td class="c mono hide-xs">' + esc(r.id) + '</td>' +
         '<td><a class="nm" href="/panel/customer.php?id=' + encodeURIComponent(r.customerId || '') + '">' +
-          esc(r.customerName) + (r.phone ? '<small>' + esc(r.phone) + '</small>' : '') + '</a></td>' +
+          esc(r.customerName) + '</a></td>' +
         '<td class="e"><a class="nm amt" href="/panel/invoice.php?open=' + encodeURIComponent(r.id) + '">' +
           Num.group(r.payable) + '</a></td>' +
       '</tr>';
     }).join('');
     var wrap = el('div', 'ptab-wrap');
     wrap.innerHTML = '<table class="ptab"><thead><tr>' +
-      '<th class="c">تاریخ</th><th class="c hide-xs">شماره</th><th>نام مشتری</th>' +
-      '<th class="e">مبلغ کل (ریال)</th>' +
+      '<th class="c">تاریخ</th><th>نام مشتری</th><th class="e">مبلغ کل (ریال)</th>' +
       '</tr></thead><tbody>' + body + '</tbody></table>';
     box.appendChild(wrap);
   }
