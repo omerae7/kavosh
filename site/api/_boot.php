@@ -251,6 +251,35 @@ function jalali_today(): string
 
 /** "1405.06.06" -> [1405, 6, 6]; tolerant of Persian digits and separators. */
 /* ---------------------------------------------------------------------
+   Profiles — how each administrator is named, reached and pictured
+   --------------------------------------------------------------------- */
+define('AVATARS', DATA . '/avatars');
+
+/** A filename that cannot escape the folder, whatever the username is. */
+function avatar_key(string $u): string
+{
+    return substr(hash('sha256', mb_strtolower($u)), 0, 32);
+}
+
+/** One user's card, with sensible fallbacks for an account that has
+    never opened the profile page. */
+function profile_of(string $u): array
+{
+    $rec = user_find($u) ?: [];
+    $p   = Store::read('profiles', [])[mb_strtolower($u)] ?? [];
+    return [
+        'u'     => $rec['u'] ?? $u,
+        'name'  => $p['name'] ?? ($rec['name'] ?? $u),
+        'title' => $p['title'] ?? 'مدیر سیستم',
+        'phone' => $p['phone'] ?? '',
+        'email' => $p['email'] ?? '',
+        'note'  => $p['note'] ?? '',
+        'photo' => is_file(AVATARS . '/' . avatar_key($u) . '.jpg'),
+        'since' => (int) ($rec['createdAt'] ?? 0),
+    ];
+}
+
+/* ---------------------------------------------------------------------
    Messages — their own file, written when an invoice is filed
 
    They used to be derived from the invoice list on every read. Keeping
@@ -276,7 +305,70 @@ function message_for_invoice(array $r): array
         'date'    => (string) ($r['date'] ?? ''),
         'payable' => (int) ($r['payable'] ?? 0),
         'invoice' => (string) ($r['id'] ?? ''),
+        'href'    => '/panel/invoice.php?open=' . rawurlencode((string) ($r['id'] ?? '')),
     ];
+}
+
+/* ---------------------------------------------------------------------
+   Two customers, one telephone
+
+   Nothing is ever refused over this: ten buyers may be آقای حسنی, and a
+   name proves nothing. A repeated *number* is different — it usually
+   means one person was written down twice — so the panel says so
+   afterwards rather than standing in the way at the time.
+   --------------------------------------------------------------------- */
+function duplicate_phones(): array
+{
+    $byPhone = [];
+    foreach (Store::read('customers', []) as $c) {
+        $phone = only_digits((string) ($c['phone'] ?? ''));
+        if ($phone === '') continue;
+        $byPhone[$phone][] = ['id' => $c['id'] ?? '', 'name' => (string) ($c['name'] ?? '')];
+    }
+    $out = [];
+    foreach ($byPhone as $phone => $who) {
+        if (count($who) < 2) continue;
+        $out[] = ['phone' => (string) $phone, 'count' => count($who), 'customers' => $who];
+    }
+    return $out;
+}
+
+/** Raise one message per repeated number, and retire it once the
+    duplicate is gone. */
+function duplicate_messages_sync(): array
+{
+    $dups = duplicate_phones();
+    $live = [];
+    foreach ($dups as $d) $live['m-dup-' . $d['phone']] = $d;
+
+    Store::update('messages', function ($list) use ($live) {
+        if (!is_array($list)) $list = [];
+        $seen = [];
+        foreach ($list as $i => $m) {
+            $id = $m['id'] ?? '';
+            if (strpos($id, 'm-dup-') !== 0) continue;
+            if (!isset($live[$id])) { unset($list[$i]); continue; }   // no longer duplicated
+            $seen[$id] = true;
+        }
+        foreach ($live as $id => $d) {
+            if (isset($seen[$id])) continue;
+            $names = array_slice(array_column($d['customers'], 'name'), 0, 3);
+            array_unshift($list, [
+                'id'      => $id,
+                'kind'    => 'dup',
+                'by'      => '',
+                'at'      => time(),
+                'title'   => 'شمارهٔ تلفن تکراری',
+                'name'    => implode(' و ', $names) . ' — ' . $d['phone'],
+                'date'    => jalali_today(),
+                'payable' => 0,
+                'invoice' => '',
+                'href'    => '/panel/customers.php?q=' . rawurlencode($d['phone']),
+            ]);
+        }
+        return array_values($list);
+    }, []);
+    return $dups;
 }
 
 /** Record one. Re-filing an invoice updates its message rather than
@@ -311,6 +403,14 @@ function messages_all(): array
     $seeded = array_map('message_for_invoice', Store::read('invoices', []));
     Store::write('messages', $seeded);
     return $seeded;
+}
+
+/** The Persian month by number, 1-based. */
+function jalali_month_name(int $m): string
+{
+    $names = ['', 'فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور',
+              'مهر','آبان','آذر','دی','بهمن','اسفند'];
+    return $names[$m] ?? '';
 }
 
 function jalali_parts(string $date): array

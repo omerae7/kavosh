@@ -4,3 +4,8 @@ tools/invoice/test/*.pdf
 tools/invoice/test/web-export.html
 tools/invoice/test/shot*.js
 tools/invoice/test/sumshot.js
+tools/invoice/test/chatshot.js
+tools/invoice/test/specshot.js
+tools/invoice/test/rowshot.js
+tools/invoice/test/probe.js
+tools/invoice/test/dbg.js

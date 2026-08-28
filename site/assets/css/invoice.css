@@ -164,6 +164,83 @@
 /* ------------------------------------------------------------------
    Summary column
    ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------
+   Folding a section away
+   ------------------------------------------------------------------ */
+.card-h.foldable{cursor:pointer;-webkit-user-select:none;user-select:none}
+.fold-sum{
+  margin-inline-start:auto;font-size:12px;color:var(--muted);font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56%;
+}
+.fold-chev{
+  display:grid;place-items:center;width:26px;height:26px;border-radius:8px;flex:none;
+  color:var(--muted);transition:transform var(--fast),background var(--fast),color var(--fast);
+}
+.card-h.foldable:hover .fold-chev{background:var(--surface-2);color:var(--ink)}
+.card.folded .fold-chev{transform:rotate(90deg)}
+.card.folded .card-b{display:none}
+.card.folded .card-h .hint{display:none}
+
+/* ------------------------------------------------------------------
+   Product facts — a quiet table until the pencil opens it
+   ------------------------------------------------------------------ */
+.pen{
+  margin-inline-start:auto;width:24px;height:24px;flex:none;padding:0;
+  border-radius:7px;border:1px solid transparent;background:transparent;color:var(--muted);
+  display:grid;place-items:center;cursor:pointer;font:inherit;
+  transition:background var(--fast),color var(--fast),border-color var(--fast);
+}
+.pen:hover{background:var(--brand-soft);color:var(--brand);border-color:var(--line)}
+.pen svg{width:13px;height:13px}
+.spec.editing > .spec-h .pen,.f.editing .pen{background:var(--brand);color:#fff;border-color:transparent}
+
+.f.guarded > .inp{background:var(--surface-2);cursor:default;color:var(--ink-2)}
+.f.guarded.editing > .inp{background:var(--surface);cursor:text;color:var(--ink)}
+
+.spec{
+  border:1px solid var(--line);border-radius:var(--r-md);
+  background:var(--surface-2);overflow:hidden;
+  transition:border-color var(--fast),background var(--fast);
+}
+.spec.editing{border-color:var(--brand);background:var(--surface)}
+.spec-h{
+  display:flex;align-items:center;gap:8px;padding:6px 11px;
+  border-bottom:1px solid var(--line);background:var(--surface);
+}
+.spec-h b{font-size:11.5px;font-weight:700;color:var(--ink-2)}
+/* The rules are the grid's own gaps over a lined background. Drawing them
+   as cell borders left every divider only as tall as the shorter of the
+   two cells beside it — a line that stopped half-way down the row. */
+.spec-g{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:1px;background:var(--line);
+}
+.spec-c{
+  display:flex;flex-direction:column;gap:1px;padding:6px 11px 7px;min-width:0;
+  background:var(--surface-2);
+}
+.spec.editing .spec-c{background:var(--surface)}
+.spec.nopack .spec-c:nth-child(n+4){display:none}
+.spec-l{font-size:9.5px;color:var(--muted);font-weight:600;letter-spacing:.01em}
+input.spec-i{
+  height:auto;min-height:0;padding:0;border:0;border-radius:0;background:transparent;
+  box-shadow:none;width:100%;font-family:inherit;font-size:12.8px;font-weight:600;
+  color:var(--ink);line-height:1.5;
+}
+input.spec-i:focus{outline:none;box-shadow:none}
+input.spec-i:read-only{cursor:default}
+input.spec-i:disabled{background:transparent;color:var(--ink-2);opacity:1;-webkit-text-fill-color:var(--ink-2)}
+input.spec-i::placeholder{color:var(--muted-2);font-weight:500}
+.spec.editing input.spec-i{border-bottom:1px dashed var(--line-2)}
+.spec.editing input.spec-i:focus{border-bottom-color:var(--brand)}
+@media (max-width:560px){
+  .spec-g{grid-template-columns:repeat(2,minmax(0,1fr))}
+  /* six cells make three tidy rows; with the packaging hidden the third
+     would sit beside an empty half-cell, so it takes the whole row */
+  .spec.nopack .spec-c:nth-child(3){grid-column:1/-1}
+}
+
 .sum-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0}
 .sum-row span{font-size:12.5px;color:var(--muted);font-weight:600}
 .sum-amt{display:flex;align-items:baseline;gap:5px;min-width:0}

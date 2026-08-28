@@ -136,6 +136,7 @@ if ($action === 'save') {
     });
 
     message_write($record);
+    duplicate_messages_sync();     // a repeated number is news too
 
     json_out(['ok' => true, 'id' => $id, 'docId' => $docId, 'pdf' => $record['pdf'], 'updated' => (bool) $existing]);
 }

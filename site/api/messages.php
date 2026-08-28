@@ -14,6 +14,7 @@ $me = require_login();
 $action = $_GET['a'] ?? 'list';
 
 if ($action === 'list') {
+    duplicate_messages_sync();     // a repeated telephone is news, and it retires itself
     $since = (int) (Store::read('seen', [])[$me] ?? 0);
     $items = [];
     foreach (messages_all() as $m) {

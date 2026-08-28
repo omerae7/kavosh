@@ -31,6 +31,7 @@ for ($k = 5; $k >= 0; $k--) {
 
 /* unread messages, for the assistant to mention — counted off the same
    file the bell reads, so the two can never disagree */
+$dups = duplicate_messages_sync();
 $seen = (int) (Store::read('seen', [])[$me] ?? 0);
 $unread = 0;
 foreach (messages_all() as $m) {
@@ -56,6 +57,7 @@ json_out(['ok' => true,
     'series'     => $series,
     'openReminders' => count($open),
     'unread'     => $unread,
+    'dupPhones'  => $dups,
     'overdue'    => $overdue,
     'recent'     => array_slice($inv, 0, 20),
 ]);

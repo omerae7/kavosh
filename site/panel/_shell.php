@@ -5,10 +5,14 @@
 require_once dirname(__DIR__) . '/api/_boot.php';
 $ME = require_login();
 require dirname(__DIR__) . '/_cfg.php';
-$PAGE_CSS = array_merge(['panel.css'], $PAGE_CSS ?? []);
+$PAGE_CSS = array_merge(['panel.css', 'chat.css'], $PAGE_CSS ?? []);
 $NAV = $NAV ?? '';
-$meUser = user_find($ME);
-$meName = $meUser['name'] ?? $ME;
+$meUser  = user_find($ME);
+$meProf  = profile_of($ME);
+$meName  = $meProf['name'];
+$meTitle = $meProf['title'];
+$meHasPhoto = $meProf['photo'];
+$meStamp = $meHasPhoto ? (int) @filemtime(DATA . '/avatars/' . avatar_key($ME) . '.jpg') : 0;
 require dirname(__DIR__) . '/_head.php';
 
 /** One rail entry. */
@@ -46,6 +50,8 @@ function nav_item(string $key, string $current, string $href, string $label, str
       '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7" r="2.7"/><path d="M3 16.5a5 5 0 0 1 10 0"/><path d="M14 4.7a2.6 2.6 0 0 1 0 4.9M17 16.5a4.9 4.9 0 0 0-2-3.9"/></svg>');
     nav_item('reminders', $NAV, '/panel/reminders.php', 'یادآورها',
       '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3a5 5 0 0 0-5 5v3l-1.5 2.5h13L15 11V8a5 5 0 0 0-5-5Z"/><path d="M8.2 16.5a1.9 1.9 0 0 0 3.6 0"/></svg>');
+    nav_item('profile', $NAV, '/panel/profile.php', 'پروفایل من',
+      '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3"/><path d="M4.5 16.8a5.5 5.5 0 0 1 11 0"/></svg>');
     nav_item('settings', $NAV, '/panel/settings.php', 'تنظیمات',
       '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="2.6"/><path d="M10 2.5v2M10 15.5v2M17.5 10h-2M4.5 10h-2M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4M15.3 15.3l-1.4-1.4M6.1 6.1 4.7 4.7" stroke-linecap="round"/></svg>');
     ?>
@@ -79,10 +85,13 @@ function nav_item(string $key, string $current, string $href, string $label, str
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3a5 5 0 0 0-5 5v3l-1.5 2.5h13L15 11V8a5 5 0 0 0-5-5Z"/><path d="M8.2 16.5a1.9 1.9 0 0 0 3.6 0"/></svg>
         <span class="badge zero" id="bellCount"></span>
       </button>
-      <div class="who">
-        <span class="av"><?= mb_substr($meName, 0, 1) ?></span>
-        <span class="nm"><b><?= htmlspecialchars($meName, ENT_QUOTES) ?></b><small>مدیر سیستم</small></span>
-      </div>
+      <a class="who" href="/panel/profile.php" title="پروفایل من">
+        <span class="av<?= $meHasPhoto ? ' img' : '' ?>"<?= $meHasPhoto
+          ? ' style="background-image:url(/api/profile.php?a=avatar&amp;v=' . $meStamp . ')"' : '' ?>><?=
+          $meHasPhoto ? '' : htmlspecialchars(mb_substr($meName, 0, 1), ENT_QUOTES) ?></span>
+        <span class="nm"><b><?= htmlspecialchars($meName, ENT_QUOTES) ?></b><small><?=
+          htmlspecialchars($meTitle, ENT_QUOTES) ?></small></span>
+      </a>
       </div>
     </header>
 

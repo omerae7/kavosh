@@ -47,6 +47,10 @@ window.__page = function () {
       tbl.innerHTML = '<tbody><tr><td class="empty">' + esc(e.message) + '</td></tr></tbody>';
     });
   }
+  /* a link may arrive with the search already decided — the duplicate
+     telephone warning points here with the number in hand */
+  var pre = new URLSearchParams(location.search).get('q');
+  if (pre) q.value = pre;
   var t; q.addEventListener('input', function () { clearTimeout(t); t = setTimeout(load, 220); });
   load();
 };

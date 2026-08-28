@@ -114,6 +114,39 @@ of them and rendered nothing. A fingerprint cannot be forgotten.
 independently, so a widget the page does not have is simply a widget that is
 not filled.
 
+## The assistant
+
+Two files, deliberately split. `api/assistant.php` computes everything the
+assistant is allowed to know in one reply — brick totals by قالب overall and by
+month, per-customer totals in rials and in bricks with the products each bought,
+best sellers, invoice counts, the price list, repeated telephones, open
+reminders — and caches it against the invoice count and the newest timestamp,
+so a second question in the same minute costs one stat call.
+
+`assets/js/assistant-brain.js` holds the wording, the intents and the formulas
+that read that dataset. It is meant to be edited on its own: a phrase, a
+threshold or a whole new question can change there without touching the
+interface. `assets/js/chat.js` is only plumbing — it opens the panel, asks the
+brain, and reports clicks back. Answers link to pages as icons, never as pasted
+addresses, and a reminder can be dictated straight into the chat.
+
+The launcher lives on every panel page, which means it is absent from the
+composer in both editions: `_invoice_page.php` builds its own page and never
+includes `_foot.php`. That is by design — the row cards carry their own offline
+assistant and the two would talk over each other.
+
+On a phone the sheet is lifted by exactly the height the software keyboard has
+taken. `window.innerHeight - visualViewport.height - visualViewport.offsetTop`
+is that number; the layout viewport never notices a keyboard, so nothing else
+would.
+
+## Profiles
+
+Each administrator has a name, a title, a telephone, an email and a portrait.
+Photographs are squared and shrunk to 256px in the browser before they are sent,
+stored under the private data folder, and served only to a signed-in session —
+a logged-out request for one gets a 401 like everything else.
+
 ## Numbers move
 
 `Odo` in `core.js` renders each digit as its own reel and rolls only the ones

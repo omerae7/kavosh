@@ -749,8 +749,23 @@
     chev: '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg>',
     reset: '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8a5 5 0 1 1-1.6-3.7"/><path d="M13 2.5V5h-2.5"/></svg>',
     printer: '<svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8V3h8v5"/><path d="M6 14H4.5A1.5 1.5 0 0 1 3 12.5v-3A1.5 1.5 0 0 1 4.5 8h11A1.5 1.5 0 0 1 17 9.5v3a1.5 1.5 0 0 1-1.5 1.5H14"/><path d="M6 12h8v5H6z"/></svg>',
-    save: '<svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h9l3 3v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M7 4v4h6"/><path d="M6.5 17v-4h7v4"/></svg>'
+    save: '<svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h9l3 3v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M7 4v4h6"/><path d="M6.5 17v-4h7v4"/></svg>',
+    pencil: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11.4 2.3 13.7 4.6 5.6 12.7 2.6 13.4l.7-3Z"/><path d="M10.2 3.5 12.5 5.8"/></svg>'
   };
+
+/* Which sections the user folded away, kept out of the invoice model so
+   the saved document never carries interface state. */
+var FOLD = (function () {
+  var K = 'brickala.fold', v = {};
+  try { v = JSON.parse(localStorage.getItem(K) || '{}') || {}; } catch (e) { v = {}; }
+  return {
+    get: function (k) { return !!v[k]; },
+    set: function (k, on) {
+      v[k] = !!on;
+      try { localStorage.setItem(K, JSON.stringify(v)); } catch (e) { /* private mode */ }
+    }
+  };
+})();
 
   var UI = {
     build: function () {
@@ -1032,7 +1047,11 @@
       }));
       b.appendChild(g);
       c.appendChild(b);
-      return c;
+      return UI.foldable(c, 'meta', function () {
+        var bits = [S.meta.status || 'پیش نویس', S.meta.date || '—'];
+        if (S.meta.preparedBy) bits.push(S.meta.preparedBy);
+        return bits.join('  ·  ');
+      });
     },
 
     /* ---------------- customer ---------------- */
@@ -1064,7 +1083,13 @@
       g.appendChild(txt('نشانی', 'address', { span: true }));
       b.appendChild(g);
       c.appendChild(b);
-      return c;
+      return UI.foldable(c, 'cust', function () {
+        if (!S.customer.name && !S.customer.phone) return 'تکمیل نشده';
+        var bits = [S.customer.name || 'بدون نام'];
+        if (S.customer.phone) bits.push(S.customer.phone);
+        if (S.customer.province) bits.push(S.customer.province);
+        return bits.join('  ·  ');
+      });
     },
 
     itemsHeader: function () {
@@ -1135,19 +1160,22 @@
       s0.appendChild(pickWrap);
       body.appendChild(s0);
 
-      /* identity fields */
+      /* product facts, in one box */
       var s1 = el('div', 'rowsection');
-      var g1 = el('div', 'grid g3');
       var inCode = el('input', 'inp ltr'); inCode.type = 'text'; inCode.placeholder = 'AB51301';
       var inDesc = el('input', 'inp'); inDesc.type = 'text'; inDesc.placeholder = 'شرح کالا';
       var inUnit = el('input', 'inp'); inUnit.type = 'text'; inUnit.placeholder = 'قالب';
-      g1.appendChild(UI.wrapField('کد کالا', inCode));
-      g1.appendChild(UI.wrapField('شرح کالا', inDesc));
-      g1.appendChild(UI.wrapField('واحد', inUnit));
-      s1.appendChild(g1);
+      var inM2 = el('input', 'inp'); inM2.type = 'text'; inM2.placeholder = '—';
+      var inCt = el('input', 'inp'); inCt.type = 'text'; inCt.placeholder = '—';
+      var inPl = el('input', 'inp'); inPl.type = 'text'; inPl.placeholder = '—';
+      var specEl = UI.specBox([
+        ['کد کالا', inCode], ['شرح کالا', inDesc], ['واحد', inUnit],
+        ['تعداد در متر مربع', inM2], ['تعداد در کارتن', inCt], ['تعداد در پالت', inPl]
+      ]);
+      s1.appendChild(specEl);
 
       /* price */
-      var g2 = el('div', 'grid g2'); g2.style.marginTop = '12px';
+      var g2 = el('div', 'grid g2'); g2.style.marginTop = '10px';
       var inPrice = el('input', 'inp'); inPrice.type = 'text'; inPrice.placeholder = '0';
       /* the reference price rides in the label row so this field keeps the
          same height as the quantity field beside it and the two stay aligned */
@@ -1177,15 +1205,6 @@
       g2.appendChild(qtyField);
       s1.appendChild(g2);
 
-      /* manual packaging fields */
-      var packWrap = el('div', 'grid g3'); packWrap.style.marginTop = '12px';
-      var inM2 = el('input', 'inp'); inM2.type = 'text'; inM2.placeholder = '—';
-      var inCt = el('input', 'inp'); inCt.type = 'text'; inCt.placeholder = '—';
-      var inPl = el('input', 'inp'); inPl.type = 'text'; inPl.placeholder = '—';
-      packWrap.appendChild(UI.wrapField('تعداد در متر مربع', inM2));
-      packWrap.appendChild(UI.wrapField('تعداد در کارتن', inCt));
-      packWrap.appendChild(UI.wrapField('تعداد در پالت', inPl));
-      s1.appendChild(packWrap);
       body.appendChild(s1);
 
       /* discount section */
@@ -1212,15 +1231,20 @@
       var inGross = el('input', 'inp'); inGross.type = 'text'; inGross.disabled = true;
       g3.appendChild(UI.wrapField('مبلغ (ناخالص)', inGross));
       var inNet = el('input', 'inp'); inNet.type = 'text';
-      var netField = UI.wrapField('<span>بهای واحد پس از تخفیف</span>', inNet);
-      var netLab = netField.querySelector('label');
-      var netUnitTag = el('span', 'chip soft'); netUnitTag.style.marginInlineStart = 'auto';
-      netLab.appendChild(netUnitTag);
+      /* The unit belongs in the label, not in a chip beside it: one line
+         that reads straight through instead of a heading and a footnote. */
+      var netField = UI.wrapField('<span class="net-lbl">بهای واحد پس از تخفیف</span>', inNet);
+      var netUnitTag = netField.querySelector('.net-lbl');
       g3.appendChild(netField);
       var inFinal = el('input', 'inp'); inFinal.type = 'text';
       var finalField = UI.wrapField('مبلغ کل (پس از تخفیف)', inFinal);
       g3.appendChild(finalField);
       s2.appendChild(g3);
+
+      /* The three money fields open only when asked; see UI.guard. */
+      UI.guard(inPrice, priceField);
+      UI.guard(inNet, netField);
+      UI.guard(inFinal, finalField);
 
       var g4 = el('div', 'grid g2'); g4.style.marginTop = '12px';
       var selDt = el('select', 'inp');
@@ -1432,9 +1456,9 @@
         if (document.activeElement !== inM2) m2Ctl.set(r.perM2);
         if (document.activeElement !== inCt) ctCtl.set(r.perCarton);
         if (document.activeElement !== inPl) plCtl.set(r.perPallet);
-        // packaging inputs only make sense where packaging data exists
+        // the packaging cells only make sense where packaging data exists
         var noPack = r.mode === 'catalog' && !r.perM2 && !r.perCarton && !r.perPallet;
-        packWrap.style.display = (r.mode === 'empty' || noPack) ? 'none' : '';
+        specEl.classList.toggle('nopack', r.mode === 'empty' || noPack);
 
         combo.setLabel(r);
 
@@ -1483,7 +1507,7 @@
         if (document.activeElement !== inNet) {
           netCtl.set(c.netUnit === null ? null : Math.round(c.netUnit));
         }
-        netUnitTag.textContent = 'به ازای هر ' + (r.unit || 'قالب');
+        netUnitTag.textContent = 'بهای واحد هر ' + (r.unit || 'قالب') + ' پس از تخفیف';
         finalField.classList.toggle('bad', c.gross > 0 && c.final > c.gross && !r.ackNegative);
 
         selDt.value = r.dtMode;
@@ -1542,6 +1566,105 @@
       var l = el('label'); l.innerHTML = label;
       f.appendChild(l); f.appendChild(input);
       return f;
+    },
+
+    /* A field that will not take a keystroke until it is asked to.
+
+       These row cards are scrolled past constantly on a phone, and a
+       stray tap on a live money field throws the software keyboard over
+       half the screen. The pencil opens it; leaving the field closes it
+       again, so nothing stays armed by accident. */
+    guard: function (input, field) {
+      var lab = field.querySelector('label');
+      input.readOnly = true;
+      field.classList.add('guarded');
+      var b = el('button', 'pen'); b.type = 'button';
+      b.title = 'ویرایش'; b.setAttribute('aria-label', 'ویرایش این مقدار');
+      b.innerHTML = ICON.pencil;
+      lab.appendChild(b);
+      // never let the button steal focus first: that would blur-lock the
+      // field a moment before the click arrives
+      b.addEventListener('mousedown', function (e) { e.preventDefault(); });
+      b.addEventListener('click', function (e) {
+        e.preventDefault();
+        input.readOnly = false;
+        field.classList.add('editing');
+        input.focus();
+        if (input.select) input.select();
+      });
+      input.addEventListener('blur', function () {
+        input.readOnly = true;
+        field.classList.remove('editing');
+      });
+      return field;
+    },
+
+    /* Code, description, unit and the packaging counts read as one quiet
+       table. They are facts about the product, not things anyone retypes,
+       so they cost a few lines instead of two full field grids — and the
+       pencil opens all six at once when a manual row does need them. */
+    specBox: function (cells) {
+      var box = el('div', 'spec');
+      var h = el('div', 'spec-h');
+      h.appendChild(el('b', null, 'مشخصات کالا'));
+      var pen = el('button', 'pen'); pen.type = 'button';
+      pen.title = 'ویرایش مشخصات کالا';
+      pen.setAttribute('aria-label', 'ویرایش مشخصات کالا');
+      pen.innerHTML = ICON.pencil;
+      h.appendChild(pen);
+      box.appendChild(h);
+
+      var grid = el('div', 'spec-g');
+      cells.forEach(function (c) {
+        var cell = el('div', 'spec-c');
+        cell.appendChild(el('span', 'spec-l', c[0]));
+        c[1].classList.add('spec-i');
+        c[1].readOnly = true;
+        cell.appendChild(c[1]);
+        grid.appendChild(cell);
+      });
+      box.appendChild(grid);
+
+      pen.addEventListener('mousedown', function (e) { e.preventDefault(); });
+      pen.addEventListener('click', function () {
+        var on = !box.classList.contains('editing');
+        box.classList.toggle('editing', on);
+        cells.forEach(function (c) { c[1].readOnly = !on; });
+        if (on) { cells[0][1].focus(); if (cells[0][1].select) cells[0][1].select(); }
+      });
+      return box;
+    },
+
+    /* A whole section folds away behind its own heading, the way a row
+       card does, and says in one line what it holds while it is shut. */
+    foldable: function (card, key, summary) {
+      var head = card.querySelector('.card-h');
+      head.classList.add('foldable');
+      head.setAttribute('role', 'button');
+      head.setAttribute('tabindex', '0');
+      var sum = el('div', 'fold-sum');
+      var chev = el('div', 'fold-chev', ICON.chev);
+      head.appendChild(sum); head.appendChild(chev);
+
+      function paint() {
+        var folded = card.classList.contains('folded');
+        head.setAttribute('aria-expanded', folded ? 'false' : 'true');
+        sum.textContent = folded ? summary() : '';
+      }
+      function toggle() {
+        var folded = !card.classList.contains('folded');
+        card.classList.toggle('folded', folded);
+        FOLD.set(key, folded);
+        paint();
+      }
+      head.addEventListener('click', toggle);
+      head.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+      if (FOLD.get(key)) card.classList.add('folded');
+      paint();
+      UI.bind('fold', paint);
+      return card;
     },
 
     /* ================= combobox ================= */
@@ -1669,6 +1792,8 @@
       if (p) { p.classList.remove('odo'); p.textContent = Num.group(t.payable); }
       var mb = document.getElementById('mbTotal');
       if (mb) { mb.classList.remove('odo'); mb.textContent = Num.group(t.payable); }
+
+      UI.fire('fold');                 // folded sections keep an honest summary
 
       var v = Validate.run();
       var box = document.getElementById('checks');

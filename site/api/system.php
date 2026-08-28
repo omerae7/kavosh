@@ -5,7 +5,7 @@ require __DIR__ . '/_boot.php';
 require_login();
 $action = $_GET['a'] ?? 'info';
 
-$sets = ['products', 'customers', 'invoices', 'messages', 'reminders', 'notes', 'users'];
+$sets = ['products', 'customers', 'invoices', 'messages', 'reminders', 'notes', 'users', 'profiles'];
 
 if ($action === 'info') {
     $inv = Store::read('invoices', []);

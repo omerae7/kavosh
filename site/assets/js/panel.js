@@ -178,6 +178,11 @@
       out.push({ k: 'msg', html: '<b>' + Num.group(s.unread) + '</b> پیام خوانده‌نشده دارید — ' +
         'از زنگولهٔ بالای صفحه ببینید.' });
     }
+    if (s.dupPhones && s.dupPhones.length) {
+      var d = s.dupPhones[0];
+      out.push({ k: 'warn', html: '<b>' + Num.group(s.dupPhones.length) + '</b> شمارهٔ تلفن برای بیش از یک مشتری ثبت شده — ' +
+        '<span class="num">' + esc(d.phone) + '</span> برای ' + Num.group(d.count) + ' مشتری.' });
+    }
     var late = rem.filter(function (x) { return !x.done && (now - (x.createdAt || now)) > WEEK; });
     if (late.length) {
       out.push({ k: 'warn', html: '<b>' + Num.group(late.length) + '</b> یادآور بیش از یک هفته است باز مانده' +

@@ -50,16 +50,22 @@
       return;
     }
     list.innerHTML = items.map(function (m) {
-      var icon = m.kind === 'faktor'
+      var icon = m.kind === 'dup'
+        ? '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.5v5M10 13.6h.01"/><circle cx="10" cy="10" r="7"/></svg>'
+        : m.kind === 'faktor'
         ? '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2.5h6l4 4V17a.5.5 0 0 1-.5.5h-9A.5.5 0 0 1 5 17Z"/><path d="M11 2.5v4h4"/></svg>'
         : '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="2.7"/><path d="M4.5 16.5a5.5 5.5 0 0 1 11 0"/></svg>';
-      return '<a class="msg-i' + (m.read ? '' : ' unread') + (m.kind === 'panel' ? ' panel-src' : '') +
-        '" href="/panel/invoice.php?open=' + encodeURIComponent(m.invoice) + '">' +
+      var tail = m.kind === 'dup'
+        ? 'یک شماره برای چند مشتری ثبت شده است'
+        : Jalali.html(m.date) + ' · ' + UI.ago(m.at) + ' · شمارهٔ ' + esc(m.invoice);
+      return '<a class="msg-i' + (m.read ? '' : ' unread') +
+        (m.kind === 'panel' ? ' panel-src' : '') + (m.kind === 'dup' ? ' warn-src' : '') +
+        '" href="' + esc(m.href || ('/panel/invoice.php?open=' + encodeURIComponent(m.invoice))) + '">' +
         '<span class="mi">' + icon + '</span>' +
         '<span class="mb"><b>' + esc(m.title) + '</b>' +
         '<span>' + esc(m.name) + '</span>' +
-        '<small>' + Jalali.html(m.date) + ' · ' + UI.ago(m.at) + ' · شمارهٔ ' + esc(m.invoice) + '</small></span>' +
-        '<span class="mv">' + Num.group(m.payable) + '</span></a>';
+        '<small>' + tail + '</small></span>' +
+        (m.payable ? '<span class="mv">' + Num.group(m.payable) + '</span>' : '') + '</a>';
     }).join('');
   }
 
@@ -102,10 +108,21 @@
 })();
 
 /* Sub-pages hand their body in as window.__page and run once the CSRF
-   token is in hand, so no page needs its own boot dance. */
+   token is in hand, so no page needs its own boot dance.
+
+   The check waits for DOMContentLoaded: a page may declare __page in an
+   inline script above this file, or in a script tag below it, and only
+   the first of those has run by the time this line is reached. */
 (function () {
-  if (typeof window.__page !== 'function') return;
-  API.boot().then(window.__page).catch(function (e) {
-    if (e && e.status === 401) location.href = '/panel/login.php';
-  });
+  function go() {
+    if (typeof window.__page !== 'function') return;
+    API.boot().then(window.__page).catch(function (e) {
+      if (e && e.status === 401) location.href = '/panel/login.php';
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', go);
+  } else {
+    go();
+  }
 })();

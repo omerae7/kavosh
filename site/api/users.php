@@ -10,6 +10,7 @@ if ($action === 'list') {
         'u' => $u['u'], 'name' => $u['name'] ?? $u['u'],
         'createdAt' => $u['createdAt'] ?? 0, 'me' => mb_strtolower($u['u']) === mb_strtolower($me),
         'mustChange' => !empty($u['mustChange']),
+        'title' => profile_of($u['u'])['title'], 'photo' => profile_of($u['u'])['photo'],
     ], users_all());
     json_out(['ok' => true, 'items' => $out, 'max' => MAX_USERS]);
 }
@@ -55,9 +56,11 @@ if ($action === 'delete') {
     if (count(users_all()) <= 1) fail('حداقل یک ادمین باید باقی بماند.');
     Store::update('users', fn($l) => array_values(array_filter(
         $l, fn($x) => mb_strtolower($x['u']) !== mb_strtolower($u))));
-    // their notes and reminders go with them
+    // their notes, reminders, profile and portrait go with them
     Store::update('reminders', fn($l) => array_values(array_filter($l, fn($r) => ($r['user'] ?? '') !== $u)));
     Store::update('notes', function ($all) use ($u) { unset($all[$u]); return $all; }, []);
+    Store::update('profiles', function ($all) use ($u) { unset($all[mb_strtolower($u)]); return $all; }, []);
+    @unlink(AVATARS . '/' . avatar_key($u) . '.jpg');
     json_out(['ok' => true]);
 }
 
