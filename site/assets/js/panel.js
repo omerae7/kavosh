@@ -36,13 +36,6 @@
       Odo.money($('wMonthSum'), s.thisMonthSum);
       var last = s.series[s.series.length - 1];
       $('wMonthName').textContent = last ? last.label + ' ' + last.y : '';
-      Odo.count($('wToday'), s.today || 0);
-
-      Odo.count($('aInv'), s.invoices);
-      Odo.count($('aMonth'), s.thisMonth);
-      Odo.count($('aCus'), s.customers);
-      Odo.count($('aPro'), s.products || 0);
-
       var total = s.series.reduce(function (a, m) { return a + m.count; }, 0);
       var sum = s.series.reduce(function (a, m) { return a + m.sum; }, 0);
       Odo.count($('sInv'), total);
@@ -50,8 +43,7 @@
       Odo.money($('sAvg'), total ? Math.round(sum / total) : 0);
 
       drawChart(s.series);
-      RECENT = s.recent || [];
-      drawRecent(RECENT);
+      drawRecent(s.recent || []);
       window.__stats = s;
       drawAssistant();
       return s;
@@ -82,48 +74,28 @@
     });
   }
 
-  var RECENT = [];
-
-  /* The search box narrows the five rows shown here; the full history
-     lives on the invoices page. */
-  function wireFind() {
-    var f = $('wFind');
-    if (!f) return;
-    f.addEventListener('input', function () {
-      var q = Num.normalize(f.value.trim().toLowerCase());
-      if (!q) { drawRecent(RECENT); return; }
-      drawRecent(RECENT.filter(function (r) {
-        return Num.normalize(String(r.customerName || '')).toLowerCase().indexOf(q) >= 0 ||
-               Num.normalize(String(r.id || '')).indexOf(q) >= 0 ||
-               Num.normalize(String(r.phone || '')).indexOf(q) >= 0;
-      }), true);
-    });
-  }
-
-  function drawRecent(rows, filtered) {
+  function drawRecent(rows) {
     var box = $('wRecent');
     if (!box) return;
     box.innerHTML = '';
     if (!rows.length) {
-      box.appendChild(el('div', 'wempty',
-        filtered ? 'فاکتوری با این مشخصات پیدا نشد.' : 'هنوز فاکتوری صادر نشده است.'));
+      box.appendChild(el('div', 'wempty', 'هنوز فاکتوری صادر نشده است.'));
       return;
     }
-    var body = rows.slice(0, 5).map(function (r) {
+    var body = rows.slice(0, 4).map(function (r) {
       return '<tr>' +
         '<td class="c">' + Jalali.html(r.date) + '</td>' +
-        '<td class="c mono">' + esc(r.id) + '</td>' +
+        '<td class="c mono hide-xs">' + esc(r.id) + '</td>' +
         '<td><a class="nm" href="/panel/customer.php?id=' + encodeURIComponent(r.customerId || '') + '">' +
           esc(r.customerName) + (r.phone ? '<small>' + esc(r.phone) + '</small>' : '') + '</a></td>' +
-        '<td class="c mono hide-sm">' + Num.group(r.items || 0) + '</td>' +
         '<td class="e"><a class="nm amt" href="/panel/invoice.php?open=' + encodeURIComponent(r.id) + '">' +
           Num.group(r.payable) + '</a></td>' +
       '</tr>';
     }).join('');
     var wrap = el('div', 'ptab-wrap');
     wrap.innerHTML = '<table class="ptab"><thead><tr>' +
-      '<th class="c">تاریخ</th><th class="c">شماره</th><th>نام مشتری</th>' +
-      '<th class="c hide-sm">اقلام</th><th class="e">مبلغ کل (ریال)</th>' +
+      '<th class="c">تاریخ</th><th class="c hide-xs">شماره</th><th>نام مشتری</th>' +
+      '<th class="e">مبلغ کل (ریال)</th>' +
       '</tr></thead><tbody>' + body + '</tbody></table>';
     box.appendChild(wrap);
   }
@@ -300,7 +272,6 @@
     setInterval(tick, 1000);
     wireReminderAdd();
     wireNotes();
-    wireFind();
     return Promise.all([loadStats(), loadReminders()]);
   }).catch(function (e) {
     if (e && e.status === 401) { location.href = '/panel/login.php'; return; }

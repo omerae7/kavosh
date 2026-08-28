@@ -1,5 +1,6 @@
   </div><!-- /window -->
 </div><!-- /stage -->
+<footer class="pfoot">© 2026 Brickala. All rights to this website belong to Brickala.</footer>
 <script src="/assets/js/core.js?v=<?= $ASSET_V ?>"></script>
 <script src="/assets/js/shell.js?v=<?= $ASSET_V ?>"></script>
 <?php foreach (($PAGE_JS ?? []) as $j): ?>

@@ -56,9 +56,11 @@ site/assets/faktor-standalone.html`.
 ## The panel's frame
 
 `panel/_shell.php` and `_foot.php` wrap every panel page in the same chrome: a
-floating navigation rail and, beside it, a floating window that holds the top
-bar and the page. The room photograph is left visible as a frame around both —
-it never sits behind text. `.prow` rows give each dashboard row its own column
+compact sticky navigation rail and, beside it, a floating glass window that
+holds the top bar and the page, with the front page's copyright line under it.
+The stage caps at 1180px, so on a desktop the room photograph frames the work
+rather than hiding behind it, and neither panel is stretched to a height its
+content does not need. `.prow` rows give each dashboard row its own column
 template, so every card in a row is exactly as tall as its neighbours.
 
 Below 1000px the rail becomes an off-canvas drawer behind the hamburger. The

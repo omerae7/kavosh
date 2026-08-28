@@ -37,21 +37,9 @@ require __DIR__ . '/_shell.php';
             <span class="qi"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2.5h6l4 4V17a.5.5 0 0 1-.5.5h-9A.5.5 0 0 1 5 17Z"/><path d="M11 2.5v4h4"/><path d="M10 10v4M8 12h4"/></svg></span>
             <b>صدور پیش‌فاکتور</b><small>ایجاد پیش‌فاکتور جدید</small>
           </a>
-          <a class="qt" href="/panel/invoices.php">
-            <span class="qi"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h9"/></svg></span>
-            <b>پیش‌فاکتورها</b><small>مشاهده و ویرایش</small>
-          </a>
           <a class="qt" href="/panel/customers.php">
             <span class="qi"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7" r="2.7"/><path d="M3 16.5a5 5 0 0 1 10 0"/><path d="M14 4.7a2.6 2.6 0 0 1 0 4.9M17 16.5a4.9 4.9 0 0 0-2-3.9"/></svg></span>
             <b>مشتریان</b><small>مدیریت مشتریان</small>
-          </a>
-          <a class="qt" href="/panel/settings.php?t=products">
-            <span class="qi"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h5M12 6.5h5M3 13.5h9M16 13.5h1"/><circle cx="10" cy="6.5" r="2"/><circle cx="14" cy="13.5" r="2"/></svg></span>
-            <b>محصولات</b><small>فهرست و قیمت‌ها</small>
-          </a>
-          <a class="qt" href="/panel/settings.php">
-            <span class="qi"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="2.6"/><path d="M10 2.5v2M10 15.5v2M17.5 10h-2M4.5 10h-2M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4M15.3 15.3l-1.4-1.4M6.1 6.1 4.7 4.7" stroke-linecap="round"/></svg></span>
-            <b>تنظیمات</b><small>ادمین‌ها و پشتیبان</small>
           </a>
         </div>
       </div>
@@ -66,11 +54,7 @@ require __DIR__ . '/_shell.php';
         <div class="clock-b">
           <div class="clock-time"><span id="wClock">00:00:00</span><span class="clock-ampm" id="wAmPm"></span></div>
           <div class="clock-date" id="wDate">—</div>
-          <div class="clock-strip">
-            <span class="ci"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2.5h6l4 4V17a.5.5 0 0 1-.5.5h-9A.5.5 0 0 1 5 17Z"/><path d="M11 2.5v4h4"/><path d="M7.5 11.5h5M7.5 14h3"/></svg></span>
-            <div class="ct"><b id="wGreet">—</b><small>فعالیت امروز</small></div>
-            <div class="cv"><b class="num" id="wToday">0</b><small>پیش‌فاکتور</small></div>
-          </div>
+          <div class="clock-greet" id="wGreet"></div>
         </div>
       </div>
     </section>
@@ -85,7 +69,6 @@ require __DIR__ . '/_shell.php';
         <svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h9"/></svg>
         <h3>پیش‌فاکتورهای صادر شده</h3>
         <span class="sp"></span>
-        <input class="inp find" id="wFind" type="search" placeholder="جستجو: شماره فاکتور یا نام…" autocomplete="off">
         <a class="btn pri sm" href="/panel/invoice.php">فاکتور جدید</a>
       </div>
       <div class="pc-b flush">
@@ -122,21 +105,6 @@ require __DIR__ . '/_shell.php';
 
   <!-- ── row 3 ───────────────────────────────────────────── -->
   <div class="prow r3">
-
-    <section class="pc">
-      <div class="pc-h">
-        <svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14.5 7.5 9l3.2 3.2L17 5.5"/><path d="M13 5.5h4v4"/></svg>
-        <h3>خلاصه فعالیت‌ها</h3>
-      </div>
-      <div class="pc-b">
-        <div class="acts">
-          <div class="act"><b class="num" id="aInv">0</b><span>کل پیش‌فاکتورها</span></div>
-          <div class="act"><b class="num" id="aMonth">0</b><span>فاکتورهای این ماه</span></div>
-          <div class="act"><b class="num" id="aCus">0</b><span>مشتریان ثبت‌شده</span></div>
-          <div class="act"><b class="num" id="aPro">0</b><span>کالاهای فعال</span></div>
-        </div>
-      </div>
-    </section>
 
     <section class="pc">
       <div class="pc-h">
