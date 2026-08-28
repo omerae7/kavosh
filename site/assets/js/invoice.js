@@ -1662,9 +1662,13 @@
       var g = document.getElementById('sGross'), d = document.getElementById('sDisc'), p = document.getElementById('sPay');
       if (g) Odo.money(g, t.gross);
       if (d) Odo.money(d, t.discount);
-      if (p) Odo.money(p, t.payable);
+      /* The payable is set plainly, exactly as the standalone file sets
+         it. It is the one figure people read off the screen and copy to a
+         customer, and a reel of moving digits is the wrong place to make
+         them wait. */
+      if (p) { p.classList.remove('odo'); p.textContent = Num.group(t.payable); }
       var mb = document.getElementById('mbTotal');
-      if (mb) Odo.money(mb, t.payable);
+      if (mb) { mb.classList.remove('odo'); mb.textContent = Num.group(t.payable); }
 
       var v = Validate.run();
       var box = document.getElementById('checks');

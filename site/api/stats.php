@@ -29,14 +29,15 @@ for ($k = 5; $k >= 0; $k--) {
     $series[] = ['y' => $y, 'm' => $m, 'label' => $names[$m], 'count' => $n, 'sum' => $sum];
 }
 
-/* unread messages, for the assistant to mention */
+/* unread messages, for the assistant to mention — counted off the same
+   file the bell reads, so the two can never disagree */
 $seen = (int) (Store::read('seen', [])[$me] ?? 0);
 $unread = 0;
-foreach ($inv as $r) {
-    $by = $r['issuedBy'] ?? null;
-    $fromPublic = ($r['source'] ?? '') === 'faktor';
-    if (!$fromPublic && $by !== null && mb_strtolower((string) $by) === mb_strtolower($me)) continue;
-    if ((int) ($r['createdAt'] ?? 0) > $seen) $unread++;
+foreach (messages_all() as $m) {
+    if (($m['kind'] ?? '') !== 'faktor'
+        && ($m['by'] ?? '') !== ''
+        && mb_strtolower((string) $m['by']) === mb_strtolower($me)) continue;
+    if ((int) ($m['at'] ?? 0) > $seen) $unread++;
 }
 
 $rem = array_values(array_filter(Store::read('reminders', []), fn($r) => ($r['user'] ?? '') === $me));

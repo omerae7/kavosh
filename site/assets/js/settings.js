@@ -198,6 +198,7 @@
       pane.innerHTML =
         '<div class="acts" style="grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px">' +
           stat('فاکتورها', Num.group(s.invoices)) + stat('مشتریان', Num.group(s.customers)) +
+          stat('پیام‌ها', Num.group(s.messages || 0)) +
           stat('کالاها', Num.group(s.products)) + stat('ادمین‌ها', Num.group(s.admins)) +
           stat('حجم PDFها', mb(s.pdfBytes)) + stat('حجم داده‌ها', mb(s.jsonBytes)) +
           stat('نسخهٔ PHP', s.php) + stat('امروز', Jalali.pretty(s.today)) +
@@ -205,7 +206,7 @@
         (s.writable ? '' : '<div class="check bad" style="margin-bottom:12px">پوشهٔ data یا storage قابل نوشتن نیست؛ ' +
           'در File Manager سطح دسترسی آنها را روی 755 بگذارید.</div>') +
         '<div class="grid g2" style="max-width:820px">' +
-          box('گرفتن پشتیبان', 'یک فایل JSON شامل همهٔ مشتریان، فاکتورها، محصولات، یادآورها و یادداشت‌ها. ' +
+          box('گرفتن پشتیبان', 'یک فایل JSON شامل همهٔ مشتریان، فاکتورها، پیام‌ها، محصولات، یادآورها و یادداشت‌ها. ' +
               'آن را جای امنی نگه دارید.', '<a class="btn pri" href="/api/system.php?a=backup">دانلود فایل پشتیبان</a>') +
           box('بازگرداندن پشتیبان', 'فایل پشتیبان را انتخاب کنید. اطلاعات فعلی با محتوای فایل جایگزین می‌شود.',
               '<input type="file" id="rf" accept="application/json" style="display:none">' +

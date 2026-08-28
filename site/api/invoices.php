@@ -135,6 +135,8 @@ if ($action === 'save') {
         return $list;
     });
 
+    message_write($record);
+
     json_out(['ok' => true, 'id' => $id, 'docId' => $docId, 'pdf' => $record['pdf'], 'updated' => (bool) $existing]);
 }
 
@@ -177,6 +179,9 @@ if ($action === 'delete') {
     if (!empty($rec['pdf']) && is_file(PDFDIR . '/' . $rec['pdf'])) @unlink(PDFDIR . '/' . $rec['pdf']);
     @unlink($p);
     Store::update('invoices', fn($l) => array_values(array_filter($l, fn($r) => $r['id'] !== $id)));
+    // a deleted invoice leaves no message pointing at a page that is gone
+    Store::update('messages', fn($l) => array_values(array_filter(
+        is_array($l) ? $l : [], fn($m) => ($m['invoice'] ?? '') !== $id)), []);
     json_out(['ok' => true]);
 }
 

@@ -24,6 +24,15 @@ function nav_item(string $key, string $current, string $href, string $label, str
 <div class="pbg" role="presentation"></div>
 <div class="rail-scrim" id="railScrim"></div>
 
+<aside class="drawer" id="msgDrawer" aria-hidden="true">
+  <div class="drawer-h">
+    <h3>پیام‌ها</h3>
+    <button class="btn xs ghost" id="msgClose" type="button">بستن</button>
+  </div>
+  <div class="drawer-b" id="msgList"><div class="wempty">در حال بارگذاری…</div></div>
+</aside>
+
+
 <div class="stage">
   <nav class="rail" id="rail">
     <?php
@@ -77,10 +86,3 @@ function nav_item(string $key, string $current, string $href, string $label, str
       </div>
     </header>
 
-<aside class="drawer" id="msgDrawer" aria-hidden="true">
-  <div class="drawer-h">
-    <h3>پیام‌ها</h3>
-    <button class="btn xs ghost" id="msgClose" type="button">بستن</button>
-  </div>
-  <div class="drawer-b" id="msgList"><div class="wempty">در حال بارگذاری…</div></div>
-</aside>

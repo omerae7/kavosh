@@ -170,19 +170,14 @@
 .sum-row b{font-size:14.5px;font-weight:600;font-variant-numeric:tabular-nums;direction:ltr}
 .sum-cur{font-size:11px;color:var(--muted);font-weight:600}
 .sum-row.total{
-  margin-top:10px;padding:13px 15px;border-radius:var(--r-md);
-  background:var(--ink);color:#F6F1EA;align-items:center;
+  margin-top:8px;padding:12px 14px;border-radius:var(--r-md);
+  background:var(--ink);color:#F6F1EA;
 }
-.sum-row.total span{color:#D9CEC2;font-size:13px}
-/* The figure everyone actually looks for: large and white. The reel step
-   is 1.15em everywhere — overriding the cell height here but not the step
-   in script left every digit sitting half-way out of its window, which is
-   what made this number unreadable. Size it with font-size alone. */
-.sum-row.total b.pay{
-  font-size:26px;font-weight:700;color:#fff;letter-spacing:-.02em;
-}
+.sum-row.total span{color:#D9CEC2}
+/* Type, colour and size copied from the standalone file, so the figure a
+   customer is quoted looks the same whichever edition produced it. */
+.sum-row.total b{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.02em}
 .sum-row.total .sum-cur{color:#D9CEC2;font-size:12px}
-@media (max-width:400px){.sum-row.total b.pay{font-size:22px}}
 .checks{display:flex;flex-direction:column;gap:7px;margin-top:2px}
 .check{display:flex;gap:8px;align-items:flex-start;font-size:12.3px;line-height:1.6;color:var(--ink-2)}
 .check .ic{width:14px;height:14px;flex:none;margin-top:3px}

@@ -1,44 +1,35 @@
 <?php
 /* Messages — what happened while you were away.
 
-   An invoice filed from the public /faktor page, or by another admin, is
-   news to you. "Read" is a single timestamp per user rather than a flag
-   per message, so nothing accumulates. */
+   These live in their own messages.json, beside invoices.json and
+   customers.json, so the whole record is still a handful of files you
+   can copy away, restore, or delete to reset one part of the system
+   without touching the rest. A message is written when an invoice is
+   filed; nothing derives it from the invoice list at read time.
+
+   "Read" is a single timestamp per user in seen.json rather than a flag
+   per message, so nothing accumulates as the list grows. */
 require __DIR__ . '/_boot.php';
 $me = require_login();
 $action = $_GET['a'] ?? 'list';
 
-function seen_at(string $user): int
-{
-    $all = Store::read('seen', []);
-    return (int) ($all[$user] ?? 0);
-}
-
 if ($action === 'list') {
-    $since = seen_at($me);
+    $since = (int) (Store::read('seen', [])[$me] ?? 0);
     $items = [];
-    foreach (Store::read('invoices', []) as $r) {
-        $by = $r['issuedBy'] ?? null;
-        $fromPublic = ($r['source'] ?? '') === 'faktor';
+    foreach (messages_all() as $m) {
         // your own work in the panel is not news to you
-        if (!$fromPublic && $by !== null && mb_strtolower((string) $by) === mb_strtolower($me)) continue;
-        $items[] = [
-            'id'      => $r['id'],
-            'kind'    => $fromPublic ? 'faktor' : 'panel',
-            'at'      => (int) ($r['createdAt'] ?? 0),
-            'read'    => (int) ($r['createdAt'] ?? 0) <= $since,
-            'title'   => $fromPublic
-                ? 'فاکتور تازه از صفحهٔ عمومی'
-                : 'فاکتور تازه توسط ' . ($by ?: 'کاربر دیگر'),
-            'name'    => $r['customerName'] ?? '',
-            'date'    => $r['date'] ?? '',
-            'payable' => (int) ($r['payable'] ?? 0),
-            'invoice' => $r['id'],
-        ];
+        if (($m['kind'] ?? '') !== 'faktor'
+            && ($m['by'] ?? '') !== ''
+            && mb_strtolower((string) $m['by']) === mb_strtolower($me)) continue;
+        $m['read'] = (int) ($m['at'] ?? 0) <= $since;
+        $items[] = $m;
     }
     usort($items, fn($a, $b) => $b['at'] <=> $a['at']);
-    $unread = count(array_filter($items, fn($x) => !$x['read']));
-    json_out(['ok' => true, 'unread' => $unread, 'items' => array_slice($items, 0, 60)]);
+    json_out([
+        'ok'     => true,
+        'unread' => count(array_filter($items, fn($x) => !$x['read'])),
+        'items'  => array_slice($items, 0, 60),
+    ]);
 }
 
 if ($action === 'seen') {

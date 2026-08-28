@@ -15,6 +15,13 @@ body.home{
   will-change:transform;
 }
 @media (max-width:900px){.home-bg{background-image:url(../img/bg-sm.jpg)}}
+/* an upright screen gets the upright crop, the same as the panel does */
+@media (orientation:portrait){
+  .home-bg{background-image:url(../img/bg-portrait.jpg)}
+}
+@media (orientation:portrait) and (max-width:900px){
+  .home-bg{background-image:url(../img/bg-portrait-sm.jpg)}
+}
 @keyframes drift{from{transform:scale(1.06) translate3d(0,0,0)}to{transform:scale(1.14) translate3d(1.4%,-1.2%,0)}}
 @media (prefers-reduced-motion:reduce){.home-bg{animation:none;transform:scale(1.06)}}
 

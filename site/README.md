@@ -75,10 +75,24 @@ RTL page instead of out of it, where it silently swallows every click.
 ## Messages
 
 An invoice filed from `/faktor` — or by another administrator — is a message.
-`messages.php` compares each invoice's `createdAt` against the reading
-administrator's own entry in `seen.json`, so the bell count is per-person.
-Opening the drawer marks them read; the assistant mentions the count until it
-does.
+They live in `messages.json`, beside `invoices.json` and `customers.json`:
+`message_write()` records one as the invoice is filed, re-filing updates that
+message rather than adding a second, and deleting an invoice removes it. An
+install that predates the file has its history seeded once from the invoices,
+so upgrading loses nothing.
+
+Read state is one timestamp per administrator in `seen.json`, so nothing
+accumulates as the list grows, and the bell and the assistant count off the
+same file and cannot disagree. Opening the drawer marks them read.
+
+## Fixed panels need an unfiltered ancestor
+
+`backdrop-filter` makes an element the containing block for `position: fixed`
+descendants, and `z-index` on `.stage` scoped the rail's own z-index inside it.
+Together those put the messages drawer inside the window's box — 2077px tall,
+glued to a card — and let `.rail-scrim`, a body child, paint over the open menu
+and swallow every tap on a phone. The drawer is a sibling of `.stage` now, the
+photograph sits on `z-index: -1`, and `.stage` opens no stacking context.
 
 ## Notes
 

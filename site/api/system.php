@@ -5,7 +5,7 @@ require __DIR__ . '/_boot.php';
 require_login();
 $action = $_GET['a'] ?? 'info';
 
-$sets = ['products', 'customers', 'invoices', 'reminders', 'notes', 'users'];
+$sets = ['products', 'customers', 'invoices', 'messages', 'reminders', 'notes', 'users'];
 
 if ($action === 'info') {
     $inv = Store::read('invoices', []);
@@ -16,6 +16,7 @@ if ($action === 'info') {
     if ($it) foreach ($it as $f) { if ($f->isFile()) { $pdfBytes += $f->getSize(); $pdfCount++; } }
     json_out(['ok' => true,
         'invoices' => count($inv), 'customers' => count(Store::read('customers', [])),
+        'messages' => count(messages_all()),
         'products' => count(Store::read('products', [])), 'admins' => count(users_all()),
         'jsonBytes' => $bytes, 'pdfBytes' => $pdfBytes, 'pdfCount' => $pdfCount,
         'writable' => is_writable(DATA) && is_writable(PDFDIR),
@@ -58,8 +59,9 @@ if ($action === 'reset') {
     if (($in['confirm'] ?? '') !== 'RESET') fail('برای پاک‌سازی باید عبارت تأیید ارسال شود.');
     $keepProducts = !empty($in['keepProducts']);
     $keepUsers    = !empty($in['keepUsers']);
-    foreach (['customers', 'invoices', 'reminders'] as $s) Store::write($s, []);
+    foreach (['customers', 'invoices', 'messages', 'reminders'] as $s) Store::write($s, []);
     Store::write('notes', []);
+    Store::write('seen', []);
     if (!$keepProducts) @unlink(DATA . '/products.json');
     if (!$keepUsers)    @unlink(DATA . '/users.json');
     foreach (glob(DATA . '/invoices/*.json') ?: [] as $f) @unlink($f);

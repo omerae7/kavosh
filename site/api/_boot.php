@@ -250,6 +250,69 @@ function jalali_today(): string
 }
 
 /** "1405.06.06" -> [1405, 6, 6]; tolerant of Persian digits and separators. */
+/* ---------------------------------------------------------------------
+   Messages — their own file, written when an invoice is filed
+
+   They used to be derived from the invoice list on every read. Keeping
+   them in messages.json puts them beside invoices.json and customers.json:
+   one more file you can back up, move, or delete on its own to reset that
+   part of the system without disturbing the rest.
+   --------------------------------------------------------------------- */
+
+/** The news one filed invoice is to everybody except its own author. */
+function message_for_invoice(array $r): array
+{
+    $public = ($r['source'] ?? '') === 'faktor';
+    $by = (string) ($r['issuedBy'] ?? '');
+    return [
+        'id'      => 'm-' . $r['id'],
+        'kind'    => $public ? 'faktor' : 'panel',
+        'by'      => $public ? '' : $by,
+        'at'      => (int) ($r['createdAt'] ?? time()),
+        'title'   => $public
+            ? 'فاکتور تازه از صفحهٔ عمومی'
+            : 'فاکتور تازه توسط ' . ($by !== '' ? $by : 'کاربر دیگر'),
+        'name'    => (string) ($r['customerName'] ?? ''),
+        'date'    => (string) ($r['date'] ?? ''),
+        'payable' => (int) ($r['payable'] ?? 0),
+        'invoice' => (string) ($r['id'] ?? ''),
+    ];
+}
+
+/** Record one. Re-filing an invoice updates its message rather than
+    adding a second, and never resets the moment it first arrived. */
+function message_write(array $invoice): void
+{
+    messages_all();          // an upgrading install keeps its history
+    $msg = message_for_invoice($invoice);
+    Store::update('messages', function ($list) use ($msg) {
+        if (!is_array($list)) $list = [];
+        foreach ($list as &$m) {
+            if (($m['id'] ?? '') === $msg['id']) {
+                $msg['at'] = (int) ($m['at'] ?? $msg['at']);
+                $m = $msg;
+                return $list;
+            }
+        }
+        unset($m);
+        array_unshift($list, $msg);
+        return array_slice($list, 0, 500);
+    }, []);
+}
+
+/** Everything on file. An install that predates messages.json gets its
+    history built once from the invoices, so nothing is lost on upgrade. */
+function messages_all(): array
+{
+    if (is_file(Store::path('messages'))) {
+        $list = Store::read('messages', []);
+        return is_array($list) ? $list : [];
+    }
+    $seeded = array_map('message_for_invoice', Store::read('invoices', []));
+    Store::write('messages', $seeded);
+    return $seeded;
+}
+
 function jalali_parts(string $date): array
 {
     $d = only_digits($date);

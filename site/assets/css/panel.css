@@ -16,7 +16,7 @@ body.panel{
 /* ------------------------------------------------------------------
    Background — landscape and portrait crops of the same room
    ------------------------------------------------------------------ */
-.pbg{position:fixed;inset:0;z-index:0;background:url(../img/bg.jpg) center/cover no-repeat}
+.pbg{position:fixed;inset:0;z-index:-1;background:url(../img/bg.jpg) center/cover no-repeat}
 @media (max-width:900px){.pbg{background-image:url(../img/bg-sm.jpg)}}
 @media (orientation:portrait){
   .pbg{background-image:url(../img/bg-portrait.jpg)}
@@ -34,7 +34,7 @@ body.panel{
    photograph left visible as a frame around them.
    ------------------------------------------------------------------ */
 .stage{
-  position:relative;z-index:1;display:flex;gap:12px;align-items:stretch;
+  position:relative;display:flex;gap:12px;align-items:stretch;
   width:100%;max-width:1180px;margin:0 auto;box-sizing:border-box;
   padding:22px max(14px,env(safe-area-inset-right)) 0 max(14px,env(safe-area-inset-left));
 }
@@ -42,7 +42,7 @@ body.panel{
 /* the same line the front page carries, at the foot of the photograph
    rather than tucked under the window */
 .pfoot{
-  position:relative;z-index:1;width:100%;max-width:1180px;margin:auto auto 0;box-sizing:border-box;
+  position:relative;width:100%;max-width:1180px;margin:auto auto 0;box-sizing:border-box;
   padding:26px 20px calc(26px + env(safe-area-inset-bottom));
   color:rgba(255,255,255,.9);font-size:12px;letter-spacing:.02em;text-align:center;
   direction:ltr;text-shadow:0 1px 12px rgba(0,0,0,.5);
