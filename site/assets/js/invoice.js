@@ -1,4 +1,13 @@
 /* =====================================================================
+   INVOICE APPLICATION — web edition
+   ---------------------------------------------------------------------
+   The same engine and rules as the standalone file, with three additions:
+     * the catalogue and font tables arrive over the network, not inline
+     * every output (PDF, print, HTML) is filed on the server
+     * inside /panel a section 0 appears for reordering against an existing
+       customer; /faktor never shows it and never reads history
+   ===================================================================== */
+/* =====================================================================
    APPLICATION
    ---------------------------------------------------------------------
      Num        - numeric parsing / formatting / input behaviour
@@ -18,96 +27,8 @@
   /* ==================================================================
      Num
      ================================================================== */
-  var FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹', AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
-  var Num = {
-    normalize: function (s) {
-      if (s === null || s === undefined) return '';
-      s = String(s);
-      var out = '';
-      for (var i = 0; i < s.length; i++) {
-        var ch = s[i], k = FA_DIGITS.indexOf(ch);
-        if (k >= 0) { out += k; continue; }
-        k = AR_DIGITS.indexOf(ch);
-        if (k >= 0) { out += k; continue; }
-        if (ch === '٫' || ch === '،') { out += ch === '٫' ? '.' : ','; continue; }
-        out += ch;
-      }
-      return out;
-    },
-    parse: function (s) {
-      s = Num.normalize(s).replace(/[,\s٬]/g, '');
-      if (s === '' || s === '-' || s === '.') return null;
-      var v = Number(s);
-      return isFinite(v) ? v : null;
-    },
-    group: function (v, dec) {
-      if (v === null || v === undefined || v === '') return '';
-      var n = Number(v);
-      if (!isFinite(n)) return '';
-      var neg = n < 0; n = Math.abs(n);
-      var s = dec ? n.toFixed(dec) : String(Math.round(n));
-      var parts = s.split('.');
-      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      return (neg ? '-' : '') + parts.join('.');
-    },
-    /* trims trailing zeros: 21.50 -> 21.5 , 21.00 -> 21 */
-    pct: function (v, dec) {
-      if (v === null || v === undefined || !isFinite(v)) return '0';
-      var s = Number(v).toFixed(dec === undefined ? 2 : dec);
-      if (s.indexOf('.') >= 0) s = s.replace(/0+$/, '').replace(/\.$/, '');
-      return s;
-    },
-    clean: function (s, allowDecimal) {
-      s = Num.normalize(s).replace(/[^\d.\-]/g, '');
-      if (!allowDecimal) s = s.replace(/[.\-]/g, '');
-      else {
-        var first = s.indexOf('.');
-        if (first >= 0) s = s.slice(0, first + 1) + s.slice(first + 1).replace(/\./g, '');
-      }
-      return s;
-    }
-  };
-
-  /* Caret-preserving formatted numeric input */
-  function attachNumber(el, opt) {
-    opt = opt || {};
-    el.setAttribute('inputmode', opt.decimal ? 'decimal' : 'numeric');
-    el.setAttribute('autocomplete', 'off');
-    el.classList.add('num');
-    function reformat() {
-      var pos = el.selectionStart === null ? el.value.length : el.selectionStart;
-      var before = el.value.slice(0, pos).replace(/[^\d]/g, '').length;
-      var clean = Num.clean(el.value, opt.decimal);
-      var out;
-      if (opt.group === false) out = clean;
-      else {
-        var p = clean.split('.');
-        p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        out = p.join('.');
-      }
-      if (out !== el.value) {
-        el.value = out;
-        var i = 0, seen = 0;
-        while (i < out.length && seen < before) { if (out.charCodeAt(i) >= 48 && out.charCodeAt(i) <= 57) seen++; i++; }
-        try { el.setSelectionRange(i, i); } catch (e) { /* ignore */ }
-      }
-    }
-    el.addEventListener('input', function () {
-      reformat();
-      if (opt.onInput) opt.onInput(Num.parse(el.value));
-    });
-    el.addEventListener('blur', function () {
-      reformat();
-      if (opt.onChange) opt.onChange(Num.parse(el.value));
-    });
-    el.addEventListener('focus', function () { if (opt.selectAll) el.select(); });
-    return {
-      set: function (v) {
-        el.value = (v === null || v === undefined || v === '') ? ''
-          : (opt.group === false ? String(v) : Num.group(v, opt.decimal ? undefined : 0));
-      }
-    };
-  }
+  /* Num, attachNumber and Jalali come from core.js — one implementation
+     shared with the panel, so formatting can never drift between pages. */
 
   /* ==================================================================
      Money — exact rial arithmetic
@@ -129,36 +50,15 @@
   };
 
   /* ==================================================================
-     Jalali date
-     ================================================================== */
-  var Jalali = {
-    fromGregorian: function (gy, gm, gd) {
-      var gdm = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-      var jy = gy <= 1600 ? 0 : 979;
-      gy -= gy <= 1600 ? 621 : 1600;
-      var gy2 = gm > 2 ? gy + 1 : gy;
-      var days = 365 * gy + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) +
-        Math.floor((gy2 + 399) / 400) - 80 + gd + gdm[gm - 1];
-      jy += 33 * Math.floor(days / 12053); days %= 12053;
-      jy += 4 * Math.floor(days / 1461); days %= 1461;
-      if (days > 365) { jy += Math.floor((days - 1) / 365); days = (days - 1) % 365; }
-      var jm = days < 186 ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
-      var jd = 1 + (days < 186 ? days % 31 : (days - 186) % 30);
-      return [jy, jm, jd];
-    },
-    today: function () {
-      var d = new Date();
-      var j = Jalali.fromGregorian(d.getFullYear(), d.getMonth() + 1, d.getDate());
-      return j[0] + '.' + ('0' + j[1]).slice(-2) + '.' + ('0' + j[2]).slice(-2);
-    }
-  };
-
-  /* ==================================================================
      Catalog — reference data, never mutated by an invoice
      ================================================================== */
   var Catalog = (function () {
-    var items = PRODUCTS.map(function (p) {
-      return {
+    var items = [];
+    var byCode = {};
+
+    function build(raw) {
+      items = (raw || []).map(function (p) {
+        return {
         code: p.c, desc: p.d, price: p.p,
         /* what goes in the invoice's کد کالا cell; the three accessories on
            the Felex list carry no code, so nothing is printed for them */
@@ -168,17 +68,19 @@
         perM2: p.m === undefined ? null : p.m,
         perCarton: p.k === undefined ? null : p.k,
         perPallet: p.l === undefined ? null : p.l,
-        key: (p.c + ' ' + p.d).toLowerCase()
-      };
-    });
-    var byCode = {};
-    items.forEach(function (p) { byCode[p.code.toUpperCase()] = p; });
+          key: (p.c + ' ' + p.d).toLowerCase()
+        };
+      });
+      byCode = {};
+      items.forEach(function (p) { byCode[p.code.toUpperCase()] = p; });
+    }
     function normalizeSearch(s) {
       return Num.normalize(String(s || '')).toLowerCase()
         .replace(/[يى]/g, 'ی').replace(/ك/g, 'ک').replace(/‌/g, ' ').trim();
     }
     return {
-      all: items,
+      load: build,
+      get all() { return items; },
       get: function (code) { return byCode[String(code || '').toUpperCase()] || null; },
       search: function (q) {
         q = normalizeSearch(q);
@@ -221,6 +123,8 @@
   var EMBEDDED = (typeof window !== 'undefined' && window.__INVOICE_DATA__) || null;
   var DOC_ID = (EMBEDDED && (EMBEDDED.docId || (EMBEDDED.state && EMBEDDED.state.docId))) || 'main';
   var KEY = 'brickala.invoice.v2:' + DOC_ID;
+  var CTX = window.INVOICE_CTX || { mode: 'faktor' };
+  var IN_PANEL = CTX.mode === 'panel';
   function newRow() {
     return {
       mode: 'empty', code: '', desc: '', unit: 'قالب', grout: false,
@@ -289,6 +193,8 @@
       try { localStorage.removeItem(KEY); } catch (e) { }
     }
   };
+
+  function newRowPublic() { return newRow(); }
 
   /* ==================================================================
      Packaging engine
@@ -696,12 +602,15 @@
       return url;
     },
     generate: function () {
-      var url = Output.download(Output.pdfBlob(), Output.fileBase() + '.pdf');
+      var bytes = InvoiceEngine.render(Output.model());
+      var url = Output.download(new Blob([bytes], { type: 'application/pdf' }), Output.fileBase() + '.pdf');
       UI.toast('فایل PDF ساخته شد.', { label: 'باز کردن', href: url });
+      return Server.file('pdf', bytes);
     },
     /* printing goes through the generated PDF itself, so paper matches the file */
     print: function () {
-      var url = URL.createObjectURL(Output.pdfBlob());
+      var bytes = InvoiceEngine.render(Output.model());
+      var url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
       var settled = false;
       /* if the browser has no inline PDF viewer (or blocks printing from a
          blob frame) the user still gets the file, one tap away */
@@ -730,41 +639,78 @@
       document.body.appendChild(f);
       setTimeout(fallback, 4000);
       setTimeout(function () { URL.revokeObjectURL(url); }, 180000);
+      Server.file('print', bytes);
     },
-    /* a copy of this very application with the invoice baked in, so the file
-       can be reopened later and edited without retyping anything */
+    /* the standalone file is what gets handed over: fetch the packaged
+       single-file build and bake this invoice into it, so the download
+       still opens and edits with no server behind it */
     exportHtml: function () {
-      var clone = document.documentElement.cloneNode(true);
-      ['mainCol', 'asideCol', 'modalBody', 'modalFoot', 'toast'].forEach(function (id) {
-        var e = clone.querySelector('#' + id);
-        if (e) { e.innerHTML = ''; e.classList.remove('on'); }
-      });
-      ['modal', 'scrim'].forEach(function (id) {
-        var e = clone.querySelector('#' + id);
-        if (e) e.classList.remove('on');
-      });
-      var mt = clone.querySelector('#modalTitle'); if (mt) mt.textContent = '';
-      var mb = clone.querySelector('#mbTotal'); if (mb) mb.textContent = '0';
-      var pf = clone.querySelector('#printFrame'); if (pf) pf.parentNode.removeChild(pf);
-      var prev = clone.querySelector('#invoice-data');
-      if (prev) prev.parentNode.removeChild(prev);
+      return fetch('/assets/faktor-standalone.html', { cache: 'no-cache' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('قالب فایل مستقل در دسترس نیست.');
+          return r.text();
+        })
+        .then(function (html) {
+          var payload = JSON.stringify({ docId: S.docId, savedAt: Date.now(), state: S })
+            .replace(/</g, '\\u003c')
+            .replace(/\u2028/g, '\\u2028')
+            .replace(/\u2029/g, '\\u2029');
+          var tag = '<script id="invoice-data">window.__INVOICE_DATA__=' + payload + ';<\/script>';
+          var title = 'پیش فاکتور' + (S.customer.name ? ' — ' + S.customer.name : '');
+          html = html.replace(/<title>[\s\S]*?<\/title>/, '<title>' + title + '</title>');
+          html = html.replace('</head>', tag + '\n</head>');
+          Output.download(new Blob([html], { type: 'text/html;charset=utf-8' }), Output.fileBase() + '.html');
+          UI.toast('فایل HTML ذخیره شد؛ با باز کردن آن، همین فاکتور قابل ویرایش است.');
+          return Server.file('html');
+        });
+    }
+  };
 
-      var payload = JSON.stringify({ docId: S.docId, savedAt: Date.now(), state: S })
-        .replace(/</g, '\\u003c')
-        .replace(/\u2028/g, '\\u2028')
-        .replace(/\u2029/g, '\\u2029');
-      var sc = document.createElement('script');
-      sc.id = 'invoice-data';
-      sc.textContent = 'window.__INVOICE_DATA__=' + payload + ';';
-      var head = clone.querySelector('head');
-      head.insertBefore(sc, head.firstChild);
-      var ttl = clone.querySelector('title');
-      if (ttl) ttl.textContent = 'پیش فاکتور' + (S.customer.name ? ' — ' + S.customer.name : '');
-
-      var blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html;charset=utf-8' });
-      Output.download(blob, Output.fileBase() + '.html');
-      UI.toast('فایل HTML ذخیره شد؛ با باز کردن آن، همین فاکتور قابل ویرایش است.');
-    }  };
+  /* ==================================================================
+     Server — every output is filed, whichever page issued it
+     ------------------------------------------------------------------
+     One record per invoice: the docId makes a second output (print after
+     PDF, say) update the same row instead of creating another.
+     ================================================================== */
+  var Server = {
+    lastPdf: null,
+    /* Called after an output is produced. The PDF bytes ride along the
+       first time so the copy on the server is byte-identical to the
+       customer's. Failure here never blocks the download the user asked
+       for — it only warns. */
+    file: function (why, bytes) {
+      var payload = {
+        state: S,
+        model: Output.model(),
+        totals: Calc.totals(),
+        kind: S.kind || 'normal',
+        parentId: S.parentId || null,
+        source: IN_PANEL ? 'panel' : 'faktor',
+        why: why
+      };
+      if (bytes) {
+        payload.pdf = Server.b64(bytes);
+        Server.lastPdf = payload.pdf;
+      } else if (Server.lastPdf) {
+        payload.pdf = Server.lastPdf;
+      }
+      return API.post('invoices.php?a=save', payload).then(function (r) {
+        S.docId = r.docId || S.docId;
+        Store.save();
+        if (UI.filed) UI.filed(r);
+        return r;
+      }).catch(function (e) {
+        UI.toast('فایل ساخته شد، اما ثبت در سامانه انجام نشد: ' + e.message, { kind: 'bad' });
+      });
+    },
+    b64: function (bytes) {
+      var bin = '', chunk = 0x8000;
+      for (var i = 0; i < bytes.length; i += chunk) {
+        bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+      }
+      return btoa(bin);
+    }
+  };
 
   /* ==================================================================
      UI
@@ -796,6 +742,8 @@
       var aside = document.getElementById('asideCol');
       main.innerHTML = '';
       aside.innerHTML = '';
+      UI.binds = {};
+      if (IN_PANEL) main.appendChild(UI.lookupCard());
       main.appendChild(UI.metaCard());
       main.appendChild(UI.customerCard());
       main.appendChild(UI.itemsHeader());
@@ -811,9 +759,231 @@
       UI.refreshAll();
     },
 
+    /* ================= section 0 — reordering for an existing customer =====
+       Panel only. /faktor has no route to any of this. */
+    lookup: { mode: null, customer: null, last: null },
+
+    lookupCard: function () {
+      var c = el('div', 'card sect sect-0');
+      c.appendChild(el('div', 'card-h',
+        '<div class="sect-num">0</div><h2>اطلاعات مشتری از قبل وجود دارد؟</h2>' +
+        '<div style="flex:1"></div><div class="hint">اختیاری</div>'));
+      var b = el('div', 'card-b');
+      c.appendChild(b);
+
+      var pick = el('div', 'grid g2');
+      var bKasri = el('button', 'btn pri wide', 'کسری بار برای مشتری قدیمی');
+      var bNew = el('button', 'btn wide', 'فاکتور جدید برای مشتری قدیمی');
+      bKasri.type = bNew.type = 'button';
+      pick.appendChild(bKasri); pick.appendChild(bNew);
+      b.appendChild(pick);
+
+      var note = el('div', 'lbl');
+      note.style.cssText = 'font-size:11.5px;color:var(--muted);font-weight:500;margin-top:10px';
+      note.textContent = 'برای خریدار جدید نیازی به این بخش نیست؛ مستقیم فاکتور را پر کنید.';
+      b.appendChild(note);
+
+      var search = el('div', 'lookup-search hidden');
+      search.style.marginTop = '14px';
+      var si = el('input', 'inp'); si.type = 'text';
+      si.placeholder = 'جستجوی نام یا شماره تلفن مشتری…';
+      si.setAttribute('autocomplete', 'off');
+      var results = el('div', 'lookup-results');
+      search.appendChild(si); search.appendChild(results);
+      b.appendChild(search);
+
+      var summary = el('div', 'lookup-summary hidden');
+      summary.style.marginTop = '14px';
+      b.appendChild(summary);
+
+      var cache = null;
+      function customers() {
+        if (cache) return Promise.resolve(cache);
+        return API.get('customers.php?a=list').then(function (r) { cache = r.items || []; return cache; });
+      }
+      function render(q) {
+        customers().then(function (list) {
+          var needle = Num.normalize(q || '').toLowerCase().replace(/[يى]/g, 'ی').replace(/ك/g, 'ک').trim();
+          var hits = list.filter(function (x) {
+            if (!needle) return true;
+            var name = String(x.name || '').toLowerCase().replace(/[يى]/g, 'ی').replace(/ك/g, 'ک');
+            return name.indexOf(needle) >= 0 || String(x.phone || '').indexOf(needle) >= 0;
+          }).slice(0, 8);
+          results.innerHTML = '';
+          if (!hits.length) {
+            results.appendChild(el('div', 'lookup-empty', list.length
+              ? 'مشتری با این مشخصات پیدا نشد.'
+              : 'هنوز مشتری‌ای ثبت نشده است.'));
+            return;
+          }
+          hits.forEach(function (x) {
+            var it = el('button', 'lookup-item');
+            it.type = 'button';
+            it.innerHTML =
+              '<div class="li-main"><b>' + esc(x.name) + '</b>' +
+              '<small><span class="num">' + esc(x.phone || '—') + '</span>' +
+              (x.count ? '<span class="dot"></span><span class="num">' + Num.group(x.count) + '</span> فاکتور' : '') +
+              (x.lastDate ? '<span class="dot"></span>آخرین: ' + esc(Jalali.pretty(x.lastDate)) : '') + '</small></div>' +
+              '<div class="li-sum num">' + Num.group(x.total || 0) + '</div>';
+            it.addEventListener('click', function () { choose(x.id); });
+            results.appendChild(it);
+          });
+        }).catch(function (e) {
+          results.innerHTML = '';
+          results.appendChild(el('div', 'lookup-empty', 'خطا در دریافت فهرست: ' + esc(e.message)));
+        });
+      }
+      function choose(id) {
+        results.innerHTML = '<div class="lookup-empty">در حال دریافت…</div>';
+        API.get('customers.php?a=get', { id: id }).then(function (r) {
+          UI.lookup.customer = r.customer;
+          UI.lookup.last = r.last;
+          // the customer's details fill the invoice; the operator can still edit
+          var cu = r.customer;
+          S.customerId = cu.id;
+          S.customer.name = cu.name || '';
+          S.customer.phone = cu.phone || '';
+          S.customer.province = cu.province || '';
+          S.customer.postal = cu.postal || '';
+          S.customer.address = cu.address || '';
+          S.customer.nationalId = cu.nationalId || '';
+          S.kind = UI.lookup.mode === 'kasri' ? 'kasri' : 'normal';
+          S.parentId = (UI.lookup.mode === 'kasri' && r.last) ? r.last.id : null;
+          search.classList.add('hidden');
+          pick.classList.add('hidden');
+          note.classList.add('hidden');
+          drawSummary();
+          UI.rebuildCustomer();
+          UI.touch();
+        }).catch(function (e) {
+          results.innerHTML = '<div class="lookup-empty">' + esc(e.message) + '</div>';
+        });
+      }
+      function drawSummary() {
+        var cu = UI.lookup.customer, last = UI.lookup.last;
+        summary.classList.remove('hidden');
+        summary.innerHTML = '';
+
+        var head = el('div', 'lk-head');
+        head.innerHTML =
+          '<div class="lk-who"><b>' + esc(cu.name) + '</b>' +
+          '<small class="num">' + esc(cu.phone || '—') + '</small></div>' +
+          '<div class="lk-tag">' + (UI.lookup.mode === 'kasri' ? 'کسری بار' : 'فاکتور جدید') + '</div>';
+        var acts = el('div', 'lk-acts');
+        var bChange = el('button', 'btn sm', 'تغییر مشتری');
+        var bFresh = el('button', 'btn sm ghost', 'مشتری جدید');
+        bChange.type = bFresh.type = 'button';
+        bChange.addEventListener('click', function () { reset(UI.lookup.mode); });
+        bFresh.addEventListener('click', function () { clearAll(); });
+        acts.appendChild(bChange); acts.appendChild(bFresh);
+        head.appendChild(acts);
+        summary.appendChild(head);
+
+        if (!last) {
+          summary.appendChild(el('div', 'lookup-empty', 'برای این مشتری فاکتوری ثبت نشده است.'));
+          return;
+        }
+        var box = el('div', 'lk-box');
+        box.appendChild(el('div', 'lk-title', 'خلاصه آخرین خرید مشتری'));
+        var stats = el('div', 'lk-stats');
+        [['تاریخ خرید', Jalali.pretty(last.date)],
+         ['درصد تخفیف', Num.pct(last.pct || 0) + '٪'],
+         ['قابل پرداخت', Num.group(last.payable) + ' ریال'],
+         ['تعداد خریدها', Num.group(cu.count || 0) + ' فاکتور']].forEach(function (kv) {
+          var s = el('div', 'lk-stat');
+          s.innerHTML = '<span>' + esc(kv[0]) + '</span><b class="num">' + esc(kv[1]) + '</b>';
+          stats.appendChild(s);
+        });
+        box.appendChild(stats);
+
+        box.appendChild(el('div', 'lk-title', 'کالاهای فاکتور قبلی'));
+        var rows = el('div', 'lk-rows');
+        (last.rows || []).forEach(function (r) {
+          var line = el('div', 'lk-row');
+          var meta = [];
+          if (r.qty) meta.push('تعداد <b class="num">' + Num.group(r.qty) + '</b> ' + esc(r.unit || ''));
+          var prod = Catalog.get(r.code);
+          if (prod && prod.perM2 && r.qty && !prod.grout) {
+            meta.push('متراژ <b class="num">' + Num.pct(r.qty / prod.perM2, 2) + '</b> متر مربع');
+          }
+          if (r.price) meta.push('هر ' + esc(r.unit || 'واحد') + ' <b class="num">' + Num.group(r.price) + '</b> ریال');
+          line.innerHTML = '<div class="lk-r-main"><b>' + esc(r.desc || '—') + '</b>' +
+            '<small>' + meta.join('<span class="dot"></span>') + '</small></div>' +
+            '<div class="lk-r-code ltr">' + esc(r.code || '') + '</div>';
+          rows.appendChild(line);
+        });
+        box.appendChild(rows);
+
+        var copy = el('button', 'btn sm wide', 'کپی اقلام فاکتور قبلی در این فاکتور');
+        copy.type = 'button';
+        copy.style.marginTop = '10px';
+        copy.addEventListener('click', function () { copyRows(last); });
+        box.appendChild(copy);
+        summary.appendChild(box);
+      }
+      function copyRows(last) {
+        var n = 0;
+        (last.rows || []).forEach(function (r, i) {
+          if (i > 4) return;
+          var p = Catalog.get(r.code);
+          var row = S.rows[i];
+          var open = row.open;
+          S.rows[i] = Object.assign(newRowPublic(), {
+            mode: p ? 'catalog' : 'manual',
+            code: r.code || '', desc: r.desc || '', unit: r.unit || 'قالب',
+            grout: p ? p.grout : /بندکشی/.test(r.desc || ''),
+            refPrice: p ? p.price : null,
+            price: r.price || null,
+            perM2: p ? p.perM2 : null, perCarton: p ? p.perCarton : null, perPallet: p ? p.perPallet : null,
+            qty: null,                       // quantities belong to the new order
+            open: open || i === 0
+          });
+          n++;
+        });
+        UI.build();
+        UI.toast(Num.group(n) + ' قلم از فاکتور قبلی کپی شد؛ مقدارها را وارد کنید.');
+      }
+      function reset(mode) {
+        UI.lookup.mode = mode;
+        UI.lookup.customer = null;
+        UI.lookup.last = null;
+        S.customerId = null;
+        S.kind = mode === 'kasri' ? 'kasri' : 'normal';
+        S.parentId = null;
+        pick.classList.remove('hidden');
+        note.classList.remove('hidden');
+        summary.classList.add('hidden');
+        search.classList.remove('hidden');
+        bKasri.className = 'btn wide' + (mode === 'kasri' ? ' pri' : '');
+        bNew.className = 'btn wide' + (mode === 'new' ? ' pri' : '');
+        si.value = '';
+        render('');
+        setTimeout(function () { si.focus(); }, 40);
+      }
+      function clearAll() {
+        UI.lookup = { mode: null, customer: null, last: null };
+        S.customerId = null; S.kind = 'normal'; S.parentId = null;
+        S.customer = { name: '', phone: '', province: '', postal: '', address: '', nationalId: '' };
+        pick.classList.remove('hidden');
+        note.classList.remove('hidden');
+        summary.classList.add('hidden');
+        search.classList.add('hidden');
+        bKasri.className = 'btn pri wide';
+        bNew.className = 'btn wide';
+        UI.rebuildCustomer();
+        UI.touch();
+      }
+
+      bKasri.addEventListener('click', function () { reset('kasri'); });
+      bNew.addEventListener('click', function () { reset('new'); });
+      si.addEventListener('input', function () { render(si.value); });
+
+      return c;
+    },
+
     /* ---------------- meta ---------------- */
     metaCard: function () {
-      var c = el('div', 'card');
+      var c = el('div', 'card sect sect-1');
       c.appendChild(el('div', 'card-h',
         '<div class="sect-num">1</div><h2>مشخصات فاکتور</h2>' +
         '<div style="flex:1"></div><div class="hint">تاریخ شمسی</div>'));
@@ -831,7 +1001,7 @@
         var i = el('input', 'inp num'); i.type = 'text'; i.value = S.meta.date;
         i.placeholder = '1405.01.01'; i.setAttribute('inputmode', 'numeric');
         i.addEventListener('input', function () { S.meta.date = Num.normalize(i.value); UI.touch(); });
-        var btn = el('button', 'btn sm', 'امروز'); btn.type = 'button';
+        var btn = el('button', 'btn pri today', 'امروز'); btn.type = 'button';
         btn.addEventListener('click', function () {
           S.meta.date = Jalali.today(); i.value = S.meta.date; UI.touch();
         });
@@ -851,7 +1021,7 @@
 
     /* ---------------- customer ---------------- */
     customerCard: function () {
-      var c = el('div', 'card');
+      var c = el('div', 'card sect sect-2');
       c.appendChild(el('div', 'card-h',
         '<div class="sect-num">2</div><h2>مشخصات خریدار</h2>'));
       var b = el('div', 'card-b');
@@ -882,10 +1052,9 @@
     },
 
     itemsHeader: function () {
-      var d = el('div');
-      d.style.cssText = 'display:flex;align-items:center;gap:10px;padding:4px 4px 0';
+      var d = el('div', 'items-head');
       d.innerHTML = '<div class="sect-num">3</div>' +
-        '<h2 style="margin:0;font-size:14px;font-weight:700">اقلام فاکتور</h2>' +
+        '<h2>اقلام فاکتور</h2>' +
         '<div style="flex:1"></div>' +
         '<div class="sect-hint" style="font-size:11.5px;color:var(--muted)">پنج ردیف ثابت — ردیف‌های خالی در PDF حفظ می‌شوند</div>';
       return d;
@@ -905,6 +1074,11 @@
     fire: function (key) { (UI.binds[key] || []).forEach(function (f) { f(); }); },
 
     touch: function () { UI.refreshAll(); Store.save(); },
+
+    /* section 0 writes straight into the state; push it into the inputs */
+    rebuildCustomer: function () {
+      Object.keys(S.customer).forEach(function (k) { UI.fire('cust.' + k); });
+    },
 
     /* ================= row card ================= */
     rowCard: function (idx) {
@@ -1224,12 +1398,12 @@
           if (r.qty) bits.push('<span class="num">' + Num.group(r.qty) + '</span> ' + esc(r.unit || ''));
           if (c.pct) bits.push('تخفیف <span class="num">' + Num.pct(c.pct) + '٪</span>');
           tSub.innerHTML = bits.join(' <span style="opacity:.4">•</span> ');
-          sumB.textContent = Num.group(c.final);
+          Odo.money(sumB, c.final);
           sumS.textContent = c.discount ? '−' + Num.group(c.discount) : 'بدون تخفیف';
         } else {
           tName.textContent = 'ردیف خالی'; tName.classList.add('empty');
           tSub.innerHTML = '<span style="color:var(--muted-2)">در PDF به صورت خالی چاپ می‌شود</span>';
-          sumB.textContent = ''; sumS.textContent = '';
+          Odo.set(sumB, '', { instant: true }); sumS.textContent = '';
         }
 
         if (document.activeElement !== inCode) inCode.value = r.code || '';
@@ -1429,7 +1603,7 @@
 
     /* ================= summary ================= */
     summaryCard: function () {
-      var c = el('div', 'card');
+      var c = el('div', 'card sect sect-1');
       c.appendChild(el('div', 'card-h', '<div class="sect-num">4</div><h2>جمع‌بندی</h2>'));
       var b = el('div', 'card-b');
       b.innerHTML =
@@ -1437,7 +1611,8 @@
         '<div class="sum-row"><span>تخفیف</span><div class="sum-amt"><b class="num" id="sDisc">0</b><span class="sum-cur">ریال</span></div></div>' +
         '<div class="sum-row total"><span>قابل پرداخت</span><div class="sum-amt"><b class="num" id="sPay">0</b><span class="sum-cur">ریال</span></div></div>' +
         '<div class="divider" style="margin:14px 0 12px"></div>' +
-        '<div class="checks" id="checks"></div>';
+        '<div class="checks" id="checks"></div>' +
+        (window.INVOICE_CTX ? '<div id="filedChip" class="chip" style="margin-top:10px;display:none"></div>' : '');
       var btn = el('button', 'btn pri wide', 'صدور PDF'); btn.type = 'button';
       btn.style.marginTop = '14px';
       btn.id = 'btnPdfSide';
@@ -1458,14 +1633,22 @@
       return c;
     },
 
+    filed: function (r) {
+      var box = document.getElementById('filedChip');
+      if (!box) return;
+      box.style.display = '';
+      box.className = 'chip ok';
+      box.innerHTML = 'ثبت شد در سامانه — شمارهٔ فاکتور <span class="n">' + esc(r.id) + '</span>';
+    },
+
     refreshAll: function () {
       var t = Calc.totals();
       var g = document.getElementById('sGross'), d = document.getElementById('sDisc'), p = document.getElementById('sPay');
-      if (g) g.textContent = Num.group(t.gross);
-      if (d) d.textContent = Num.group(t.discount);
-      if (p) p.textContent = Num.group(t.payable);
+      if (g) Odo.money(g, t.gross);
+      if (d) Odo.money(d, t.discount);
+      if (p) Odo.money(p, t.payable);
       var mb = document.getElementById('mbTotal');
-      if (mb) mb.textContent = Num.group(t.payable);
+      if (mb) Odo.money(mb, t.payable);
 
       var v = Validate.run();
       var box = document.getElementById('checks');
@@ -1483,33 +1666,13 @@
       }
     },
 
-    /* ================= overlays ================= */
-    modal: function (title, bodyHtml, buttons) {
-      var m = document.getElementById('modal'), s = document.getElementById('scrim');
-      document.getElementById('modalTitle').textContent = title;
-      document.getElementById('modalBody').innerHTML = bodyHtml;
-      var f = document.getElementById('modalFoot');
-      f.innerHTML = '';
-      (buttons || []).forEach(function (b) {
-        var btn = el('button', 'btn' + (b.pri ? ' pri' : ''), esc(b.label));
-        btn.type = 'button';
-        btn.addEventListener('click', function () { UI.closeModal(); if (b.act) b.act(); });
-        f.appendChild(btn);
-      });
-      m.classList.add('on'); s.classList.add('on');
-    },
-    closeModal: function () {
-      document.getElementById('modal').classList.remove('on');
-      document.getElementById('scrim').classList.remove('on');
-    },
-    toastT: null,
-    toast: function (msg, link) {
-      var t = document.getElementById('toast');
-      t.innerHTML = esc(msg) + (link ? ' <a href="' + link.href + '" target="_blank" rel="noopener">' + esc(link.label) + '</a>' : '');
-      t.classList.add('on');
-      clearTimeout(UI.toastT);
-      UI.toastT = setTimeout(function () { t.classList.remove('on'); }, link ? 9000 : 3200);
-    }
+    /* ================= overlays — one implementation, in core.js ======= */
+    modal: function (t, b, btns, o) { return window.UI.modal(t, b, btns, o); },
+    close: function () { window.UI.close(); },
+    closeModal: function () { window.UI.close(); },
+    confirm: function (t, x, ok) { return window.UI.confirm(t, x, ok); },
+    toast: function (msg, opt) { return window.UI.toast(msg, opt); },
+    esc: esc
   };
 
   /* ==================================================================
@@ -1546,28 +1709,44 @@
      Boot
      ================================================================== */
   function boot() {
-    /* embed the invoice typeface for the interface, from the very same
-       bytes the PDF uses — no second copy, no network */
-    try {
-      if (window.FontFace && document.fonts) {
-        var mk = function (b64, weight) {
-          var bin = atob(b64), buf = new Uint8Array(bin.length);
-          for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
-          var ff = new FontFace('Vazirmatn', buf.buffer, { weight: weight, style: 'normal', display: 'swap' });
-          ff.load().then(function (f) { document.fonts.add(f); });
-        };
-        mk(FONT_DATA.R.b64, '400');
-        mk(FONT_DATA.B.b64, '700');
+    var shell = document.getElementById('mainCol');
+    if (shell) shell.innerHTML =
+      '<div class="card"><div class="card-b"><div class="skel" style="width:40%"></div>' +
+      '<div class="skel" style="margin-top:12px"></div><div class="skel" style="margin-top:8px;width:70%"></div></div></div>';
+
+    // the catalogue is small and always needed; the font tables are large and
+    // only needed to draw a PDF, so they load in the background
+    Promise.all([
+      API.boot().catch(function () { return {}; }),
+      API.get('products.php?a=list').then(function (r) { return r.items; })
+    ]).then(function (res) {
+      window.PRODUCTS = res[1] || [];
+      Catalog.load(window.PRODUCTS);
+      return fetch('/assets/data/fontdata.json').then(function (r) { return r.json(); })
+        .then(function (fd) {
+          return fetch('/assets/data/unimeta.json').then(function (r) { return r.json(); })
+            .then(function (um) { window.FONT_DATA = fd; window.UNI_META = um; });
+        });
+    }).then(function () {
+      InvoiceEngine.init(window.FONT_DATA, window.UNI_META);
+      Store.load();
+      if (window.INVOICE_PRESET) {
+        try { Store.apply(window.INVOICE_PRESET); } catch (e) { /* keep the draft */ }
       }
-    } catch (e) { /* system font fallback */ }
+      UI.build();
+      wire();
+    }).catch(function (e) {
+      if (shell) shell.innerHTML = '<div class="card"><div class="card-b empty"><b>خطا در بارگذاری</b>' +
+        UI.esc(e.message) + '<br><button class="btn sm" style="margin-top:12px" onclick="location.reload()">تلاش دوباره</button></div></div>';
+    });
+  }
 
-    InvoiceEngine.init(FONT_DATA, UNI_META);
-    Store.load();
-    UI.build();
-
+  function wire() {
     document.getElementById('btnPdfTop').addEventListener('click', doPdf);
-    document.getElementById('btnPdfMob').addEventListener('click', doPdf);
-    document.getElementById('btnPrintMob').addEventListener('click', function () { doOut('print'); });
+    var mob = document.getElementById('btnPdfMob');
+    if (mob) mob.addEventListener('click', doPdf);
+    var pmob = document.getElementById('btnPrintMob');
+    if (pmob) pmob.addEventListener('click', function () { doOut('print'); });
     document.addEventListener('click', function (e) {
       var t = e.target && e.target.closest ? e.target.closest('button') : null;
       if (!t) return;
@@ -1575,15 +1754,12 @@
       else if (t.id === 'btnPrintSide' || t.id === 'btnPrintTop') doOut('print');
       else if (t.id === 'btnHtmlSide') doOut('html');
     });
-    document.getElementById('btnNew').addEventListener('click', function () {
-      UI.modal('فاکتور جدید',
-        'اطلاعات فاکتور فعلی پاک می‌شود و فرم خالی می‌گردد. ادامه می‌دهید؟',
-        [{ label: 'بله، فاکتور جدید', pri: true, act: function () { Store.reset(); UI.build(); } },
-         { label: 'انصراف' }]);
+    var bn = document.getElementById('btnNew');
+    if (bn) bn.addEventListener('click', function () {
+      UI.confirm('فاکتور جدید', 'اطلاعات فاکتور فعلی پاک می‌شود و فرم خالی می‌گردد. ادامه می‌دهید؟', 'بله، فاکتور جدید')
+        .then(function (yes) { if (yes) { Store.reset(); UI.lookup = { mode: null, customer: null, last: null }; UI.build(); } });
     });
-    document.getElementById('scrim').addEventListener('click', UI.closeModal);
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') UI.closeModal();
       if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) { e.preventDefault(); doOut('print'); }
       if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) { e.preventDefault(); doOut('html'); }
     });

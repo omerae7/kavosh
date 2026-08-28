@@ -1,0 +1,3 @@
+# live records are the site's, not the repository's
+*.json
+invoices/

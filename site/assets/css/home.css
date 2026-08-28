@@ -1,0 +1,33 @@
+/* =====================================================================
+   Landing page — the photograph, and one line of type.
+   ===================================================================== */
+html,body{height:100%}
+body.home{
+  margin:0;min-height:100svh;background:#231A15;overflow:hidden;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.home-bg{
+  position:fixed;inset:0;
+  background-image:image-set(url(../img/bg.jpg) 1x);
+  background-image:url(../img/bg.jpg);
+  background-size:cover;background-position:center;
+  animation:drift 34s ease-in-out infinite alternate;
+  will-change:transform;
+}
+@media (max-width:900px){.home-bg{background-image:url(../img/bg-sm.jpg)}}
+@keyframes drift{from{transform:scale(1.06) translate3d(0,0,0)}to{transform:scale(1.14) translate3d(1.4%,-1.2%,0)}}
+@media (prefers-reduced-motion:reduce){.home-bg{animation:none;transform:scale(1.06)}}
+
+/* keeps the caption legible wherever the photograph is bright */
+.home-scrim{
+  position:fixed;inset:0;
+  background:linear-gradient(to top,rgba(28,20,15,.72) 0%,rgba(28,20,15,.28) 26%,rgba(28,20,15,0) 55%);
+}
+.home-foot{
+  position:relative;z-index:2;
+  padding:0 20px calc(26px + env(safe-area-inset-bottom));
+  color:rgba(255,255,255,.9);font-size:12px;letter-spacing:.02em;text-align:center;
+  direction:ltr;text-shadow:0 1px 12px rgba(0,0,0,.5);
+  animation:rise 1s cubic-bezier(.22,.75,.28,1) .25s both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
