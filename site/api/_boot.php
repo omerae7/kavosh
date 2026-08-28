@@ -19,6 +19,14 @@ define('ROOT', dirname(__DIR__));
    inside the site, which the shipped .htaccess files deny. */
 $private = dirname(ROOT) . '/brickala-data';
 if (!is_dir($private)) @mkdir($private, 0700, true);
+/* Belt and braces: on a host whose document root is the account home,
+   this folder can land inside the served tree. Deny it there too, so its
+   position never decides whether a customer list is downloadable. */
+if (is_dir($private) && !is_file($private . '/.htaccess')) {
+    @file_put_contents($private . '/.htaccess',
+        "Require all denied\n<IfModule !mod_authz_core.c>\nDeny from all\n</IfModule>\n");
+    @file_put_contents($private . '/index.php', "<?php http_response_code(404);\n");
+}
 if (is_dir($private) && is_writable($private)) {
     define('DATA', $private . '/data');
     define('PDFDIR', $private . '/pdf');

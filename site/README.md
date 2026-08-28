@@ -87,6 +87,19 @@ A written note loads locked so a stray keystroke cannot change it; the pencil
 unlocks it. `notes.php` treats a POST with no `?a=` as a save — it used to fall
 through to the read branch and drop the text.
 
+## Asset versions are fingerprints, not a counter
+
+`_cfg.php` builds `$ASSET_V` from the names, sizes and mtimes of every file
+under `assets/css` and `assets/js`. It used to be a hand-bumped `'1'`, and an
+upload went out without the bump: browsers kept the previous `panel.js` under
+the same `?v=1` URL and ran it against newer markup, where it looked for
+elements that release had and this one does not. The panel died on the first
+of them and rendered nothing. A fingerprint cannot be forgotten.
+
+`panel.js` also writes through a `text(id, …)` helper and loads its sections
+independently, so a widget the page does not have is simply a widget that is
+not filled.
+
 ## Numbers move
 
 `Odo` in `core.js` renders each digit as its own reel and rolls only the ones

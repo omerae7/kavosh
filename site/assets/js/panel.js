@@ -6,6 +6,10 @@
   'use strict';
 
   var $ = function (id) { return document.getElementById(id); };
+  /* Writing straight to $(id).textContent once took the whole dashboard
+     down when a cached script met newer markup. A widget the page does
+     not have is simply a widget that is not filled. */
+  function text(id, s) { var n = $(id); if (n) n.textContent = s; }
   var esc = UI.esc, el = UI.el;
   var WEEK = 7 * 86400;
 
@@ -16,15 +20,11 @@
   function tick() {
     var d = new Date();
     Odo.set($('wClock'), two(d.getHours()) + ':' + two(d.getMinutes()) + ':' + two(d.getSeconds()));
-    var dateEl = $('wDate');
-    if (dateEl) dateEl.textContent = Jalali.long(d);
-    var g = $('wGreet');
-    if (g) {
-      var h = d.getHours();
-      g.textContent = h < 5 ? 'شب بخیر' : h < 12 ? 'صبح بخیر' : h < 17 ? 'ظهر بخیر' : h < 20 ? 'عصر بخیر' : 'شب بخیر';
-    }
-    var ap = $('wAmPm');
-    if (ap) ap.textContent = d.getHours() < 12 ? 'AM' : 'PM';
+    var h = d.getHours();
+    text('wDate', Jalali.long(d));
+    text('wGreet', h < 5 ? 'شب بخیر' : h < 12 ? 'صبح بخیر' : h < 17 ? 'ظهر بخیر'
+                 : h < 20 ? 'عصر بخیر' : 'شب بخیر');
+    text('wAmPm', h < 12 ? 'AM' : 'PM');
   }
 
   /* ---------------------------------------------------------------
@@ -35,7 +35,7 @@
       Odo.count($('wMonth'), s.thisMonth);
       Odo.money($('wMonthSum'), s.thisMonthSum);
       var last = s.series[s.series.length - 1];
-      $('wMonthName').textContent = last ? last.label + ' ' + last.y : '';
+      text('wMonthName', last ? last.label + ' ' + last.y : '');
       var total = s.series.reduce(function (a, m) { return a + m.count; }, 0);
       var sum = s.series.reduce(function (a, m) { return a + m.sum; }, 0);
       Odo.count($('sInv'), total);
@@ -265,12 +265,24 @@
   /* ---------------------------------------------------------------
      Boot
      --------------------------------------------------------------- */
+  /* Each section loads on its own, so one that fails leaves the rest of
+     the dashboard standing rather than blanking the page. */
+  function section(name) {
+    return function (e) {
+      if (e && e.status === 401) { location.href = '/panel/login.php'; return; }
+      UI.toast(name + ' بارگذاری نشد: ' + e.message, { kind: 'bad' });
+    };
+  }
+
   API.boot().then(function () {
     tick();
     setInterval(tick, 1000);
     wireReminderAdd();
     wireNotes();
-    return Promise.all([loadStats(), loadReminders()]);
+    return Promise.all([
+      loadStats().catch(section('آمار داشبورد')),
+      loadReminders().catch(section('یادآورها'))
+    ]);
   }).catch(function (e) {
     if (e && e.status === 401) { location.href = '/panel/login.php'; return; }
     UI.toast('خطا در بارگذاری پنل: ' + e.message, { kind: 'bad' });
