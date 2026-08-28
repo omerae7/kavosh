@@ -79,8 +79,17 @@ async function rowState(page,i){ return page.evaluate(k=>{const r=window.Invoice
   await page.waitForTimeout(250);
   await page.evaluate(()=>{
     const c=document.querySelectorAll('.rowcard')[2];
-    const set=(lbl,val)=>{const f=[...c.querySelectorAll('.f')].find(f=>f.querySelector('label')&&f.querySelector('label').textContent.trim().startsWith(lbl));
-      const i=f.querySelector('input'); i.focus(); i.value=val; i.dispatchEvent(new Event('input',{bubbles:true})); i.blur();};
+    // the product facts live in the spec box now, the rest in .f fields
+    const set=(lbl,val)=>{
+      let i=null;
+      const cell=[...c.querySelectorAll('.spec-c')].find(x=>x.querySelector('.spec-l').textContent.trim().startsWith(lbl));
+      if (cell) i=cell.querySelector('input');
+      if (!i) {
+        const f=[...c.querySelectorAll('.f')].find(f=>f.querySelector('label')&&f.querySelector('label').textContent.trim().startsWith(lbl));
+        i=f.querySelector('input');
+      }
+      i.readOnly=false;
+      i.focus(); i.value=val; i.dispatchEvent(new Event('input',{bubbles:true})); i.blur();};
     set('کد کالا','X-900'); set('شرح کالا','ملات ویژه نما'); set('واحد','کیسه');
     set('بهای واحد','1250000'); set('تعداد در کارتن','12'); set('مقدار','40');
   });

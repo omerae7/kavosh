@@ -232,6 +232,9 @@ input.spec-i:focus{outline:none;box-shadow:none}
 input.spec-i:read-only{cursor:default}
 input.spec-i:disabled{background:transparent;color:var(--ink-2);opacity:1;-webkit-text-fill-color:var(--ink-2)}
 input.spec-i::placeholder{color:var(--muted-2);font-weight:500}
+/* the description and the unit are read left-to-right off the page,
+   whichever way the rest of the card runs */
+input.spec-i.spec-left{text-align:left}
 .spec.editing input.spec-i{border-bottom:1px dashed var(--line-2)}
 .spec.editing input.spec-i:focus{border-bottom-color:var(--brand)}
 @media (max-width:560px){

@@ -25,12 +25,14 @@ const GEN2 = path.join(__dirname, 'rt-out2.html');
   await p.evaluate(() => {
     const c = document.querySelectorAll('.rowcard')[0];
     const set = (lbl, v) => {
-      const f = [...c.querySelectorAll('.f')].find(f => f.querySelector('label').textContent.trim().startsWith(lbl));
+      const f = [...c.querySelectorAll('.f')].find(f =>
+        f.querySelector('label') && f.querySelector('label').textContent.indexOf(lbl) >= 0);
       const i = f.querySelector('input');
+      i.readOnly = false;              // the money fields sit behind a pencil
       i.focus(); i.value = v; i.dispatchEvent(new Event('input', { bubbles: true })); i.blur();
     };
     set('مقدار', '1764');
-    set('بهای واحد پس از تخفیف', '500000');    // drives the discount
+    set('پس از تخفیف', '500000');    // drives the discount
   });
   await p.waitForTimeout(400);
   const snap = await p.evaluate(() => {

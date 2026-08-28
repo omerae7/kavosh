@@ -1169,7 +1169,7 @@ var FOLD = (function () {
       var inCt = el('input', 'inp'); inCt.type = 'text'; inCt.placeholder = '—';
       var inPl = el('input', 'inp'); inPl.type = 'text'; inPl.placeholder = '—';
       var specEl = UI.specBox([
-        ['کد کالا', inCode], ['شرح کالا', inDesc], ['واحد', inUnit],
+        ['کد کالا', inCode], ['شرح کالا', inDesc, 'left'], ['واحد', inUnit, 'left'],
         ['تعداد در متر مربع', inM2], ['تعداد در کارتن', inCt], ['تعداد در پالت', inPl]
       ]);
       s1.appendChild(specEl);
@@ -1399,7 +1399,11 @@ var FOLD = (function () {
         r.refPrice = null; r.grout = false;
         if (!r.open) { r.open = true; card.classList.add('open'); head.setAttribute('aria-expanded', 'true'); }
         recompute();
-        setTimeout(function () { inCode.focus(); }, 60);
+        /* A manual row exists precisely to type these in, so the box opens
+           itself. The pencil guards against a stray tap, not against work
+           the person has just asked for. */
+        specEl.unlock();
+        setTimeout(function () { inCode.focus(); inCode.select(); }, 60);
       };
       combo.onClear = function () {
         var open = r.open;
@@ -1619,19 +1623,24 @@ var FOLD = (function () {
         var cell = el('div', 'spec-c');
         cell.appendChild(el('span', 'spec-l', c[0]));
         c[1].classList.add('spec-i');
+        if (c[2]) c[1].classList.add('spec-' + c[2]);
         c[1].readOnly = true;
         cell.appendChild(c[1]);
         grid.appendChild(cell);
       });
       box.appendChild(grid);
 
-      pen.addEventListener('mousedown', function (e) { e.preventDefault(); });
-      pen.addEventListener('click', function () {
-        var on = !box.classList.contains('editing');
+      function setOpen(on, focus) {
         box.classList.toggle('editing', on);
         cells.forEach(function (c) { c[1].readOnly = !on; });
-        if (on) { cells[0][1].focus(); if (cells[0][1].select) cells[0][1].select(); }
+        if (on && focus) { cells[0][1].focus(); if (cells[0][1].select) cells[0][1].select(); }
+      }
+      pen.addEventListener('mousedown', function (e) { e.preventDefault(); });
+      pen.addEventListener('click', function () {
+        setOpen(!box.classList.contains('editing'), true);
       });
+      box.unlock = function () { setOpen(true, false); };
+      box.lock = function () { setOpen(false, false); };
       return box;
     },
 

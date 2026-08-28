@@ -54,9 +54,11 @@
     '</div>' +
     '<div class="ai-b" id="aiBody"></div>' +
     '<div class="ai-chips" id="aiChips"></div>' +
+    /* The send button leads, so on an RTL page it sits on the right,
+       under the thumb that just finished typing. */
     '<form class="ai-f" id="aiForm">' +
-      '<input id="aiIn" type="text" autocomplete="off" placeholder="بپرسید…" enterkeyhint="send">' +
       '<button type="submit" aria-label="بفرست">' + ICONS.send + '</button>' +
+      '<input id="aiIn" type="text" autocomplete="off" placeholder="بپرسید…" enterkeyhint="send">' +
     '</form>';
 
   document.body.appendChild(launch);
