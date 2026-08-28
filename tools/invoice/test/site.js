@@ -38,6 +38,7 @@ async function fillRow(p,i,code,qty){
  log('has section 0 :', await p.evaluate(()=>!!document.querySelector('.sect-0')));
  await p.fill('input[placeholder="مثال: آقای یزدانی"]','آقای کریمی');
  await p.fill('input[placeholder="09xxxxxxxxx"]','09121234567');
+ await p.click('.morebtn'); await p.waitForTimeout(250);   // the address block
  await p.fill('input[placeholder="مثال: قم"]','قم');
  await fillRow(p,0,'AB51301','1764');
  await fillRow(p,1,'C-106','12');

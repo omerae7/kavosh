@@ -759,7 +759,8 @@ var FOLD = (function () {
   var K = 'brickala.fold', v = {};
   try { v = JSON.parse(localStorage.getItem(K) || '{}') || {}; } catch (e) { v = {}; }
   return {
-    get: function (k) { return !!v[k]; },
+    /* a section may prefer to start shut; a stored choice always wins */
+    get: function (k, dflt) { return (k in v) ? !!v[k] : !!dflt; },
     set: function (k, on) {
       v[k] = !!on;
       try { localStorage.setItem(K, JSON.stringify(v)); } catch (e) { /* private mode */ }
@@ -1047,11 +1048,13 @@ var FOLD = (function () {
       }));
       b.appendChild(g);
       c.appendChild(b);
+      /* Status and date are right by default and rarely touched, so the
+         section starts shut and says what it holds in one line. */
       return UI.foldable(c, 'meta', function () {
         var bits = [S.meta.status || 'پیش نویس', S.meta.date || '—'];
         if (S.meta.preparedBy) bits.push(S.meta.preparedBy);
         return bits.join('  ·  ');
-      });
+      }, true);
     },
 
     /* ---------------- customer ---------------- */
@@ -1075,13 +1078,37 @@ var FOLD = (function () {
           return i;
         }, opt.span);
       }
+      /* A name and a telephone are all most invoices need. The rest is
+         behind one button, so the common case is two fields and the
+         uncommon one is a single click away. */
       g.appendChild(txt('نام خریدار', 'name', { ph: 'مثال: آقای یزدانی' }));
       g.appendChild(txt('شماره تلفن', 'phone', { numeric: true, ph: '09xxxxxxxxx' }));
-      g.appendChild(txt('نام استان / شهر', 'province', { ph: 'مثال: قم' }));
-      g.appendChild(txt('کد پستی', 'postal', { numeric: true }));
-      g.appendChild(txt('کد ملی', 'nationalId', { numeric: true }));
-      g.appendChild(txt('نشانی', 'address', { span: true }));
       b.appendChild(g);
+
+      var more = el('div', 'more');
+      var g2 = el('div', 'grid g2');
+      g2.appendChild(txt('نام استان / شهر', 'province', { ph: 'مثال: قم' }));
+      g2.appendChild(txt('کد پستی', 'postal', { numeric: true }));
+      g2.appendChild(txt('کد ملی', 'nationalId', { numeric: true }));
+      g2.appendChild(txt('نشانی', 'address', { span: true }));
+      more.appendChild(g2);
+
+      var moreBtn = el('button', 'morebtn'); moreBtn.type = 'button';
+      moreBtn.innerHTML = '<span>بیشتر</span>' + ICON.chev;
+      function paintMore(on) {
+        more.classList.toggle('on', on);
+        moreBtn.classList.toggle('on', on);
+        moreBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
+        moreBtn.querySelector('span').textContent = on ? 'کمتر' : 'بیشتر';
+      }
+      moreBtn.addEventListener('click', function () {
+        var on = !more.classList.contains('on');
+        FOLD.set('custMore', on);
+        paintMore(on);
+      });
+      paintMore(FOLD.get('custMore', false));
+      b.appendChild(moreBtn);
+      b.appendChild(more);
       c.appendChild(b);
       return UI.foldable(c, 'cust', function () {
         if (!S.customer.name && !S.customer.phone) return 'تکمیل نشده';
@@ -1646,7 +1673,7 @@ var FOLD = (function () {
 
     /* A whole section folds away behind its own heading, the way a row
        card does, and says in one line what it holds while it is shut. */
-    foldable: function (card, key, summary) {
+    foldable: function (card, key, summary, startFolded) {
       var head = card.querySelector('.card-h');
       head.classList.add('foldable');
       head.setAttribute('role', 'button');
@@ -1670,7 +1697,7 @@ var FOLD = (function () {
       head.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
       });
-      if (FOLD.get(key)) card.classList.add('folded');
+      if (FOLD.get(key, startFolded)) card.classList.add('folded');
       paint();
       UI.bind('fold', paint);
       return card;

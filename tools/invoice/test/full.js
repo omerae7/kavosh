@@ -32,6 +32,8 @@ async function rowState(page,i){ return page.evaluate(k=>{const r=window.Invoice
 
   await page.fill('input[placeholder="مثال: آقای یزدانی"]','آقای یزدانی');
   await page.fill('input[placeholder="09xxxxxxxxx"]','09131724832');
+  // the address block sits behind «بیشتر» now
+  await page.click('.morebtn'); await page.waitForTimeout(250);
   await page.fill('input[placeholder="مثال: قم"]','قم / قم');
   await page.$$eval('input.inp', els=>{ }); // noop
 

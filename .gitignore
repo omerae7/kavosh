@@ -9,3 +9,4 @@ tools/invoice/test/specshot.js
 tools/invoice/test/rowshot.js
 tools/invoice/test/probe.js
 tools/invoice/test/dbg.js
+tools/invoice/test/shot.js
