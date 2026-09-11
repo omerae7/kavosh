@@ -3403,7 +3403,8 @@ function createFaction(c) {
   }
   const eth = kind === 'independence' && minority.length ? minority[0].eth : (W.states[c.capital - 1] ? W.states[c.capital - 1].eth : 0);
   const f = {
-    id: (W.facId = (W.facId || 0) + 1), kind: kind, name: def.n + ' ' + (leader ? leader.sur || leader.name : faNum(W.facId)),
+    id: (W.facId = (W.facId || 0) + 1), kind: kind,
+    name: def.n + ' ' + (leader ? ((leader.sur && FA_ORD.indexOf(leader.sur) < 0) ? leader.sur : leader.name) : faNum(W.facId)),
     leader: leader ? leader.id : 0, strength: RNGX.range(0.08, 0.22), eth: eth,
     wantGov: RNGX.pick(def.govs), born: Math.floor(W.year)
   };
