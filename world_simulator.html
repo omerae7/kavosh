@@ -1147,6 +1147,10 @@ function stateHist(st, text) {
 }
 function pause(reason, kind) {
   if (!W.settings.autoPause[kind]) return;
+  /* فاصله کمینه میان توقف‌های خودکار تا بازی بی‌وقفه قطع نشود */
+  const critical = kind === 'warDec' || kind === 'govChange' || kind === 'coup';
+  if (!critical && W.lastPauseYear != null && W.year - W.lastPauseYear < 2) return;
+  W.lastPauseYear = W.year;
   W.pendingPause = { r: reason, k: kind };
 }
 
@@ -2591,8 +2595,11 @@ function createCountryFrom(stateIds, opts) {
   assignGoalsFor(c);
   news('کشور تازه', 'کشور ' + name + ' با ' + faNum(stateIds.length) + ' ایالت پدید آمد. (' + (opts.reason || '') + ')', 'gov', { c: id });
   logHistory(W.year, 'پیدایش کشور ' + name);
+  const pl = W.countries[W.player];
   if (from && from.isPlayer) pause('بخشی از کشور شما جدا شد و ' + name + ' را ساخت', 'newCountry');
-  else pause('کشور تازه‌ای پدید آمد: ' + name, 'newCountry');
+  else if (pl && pl.alive && (bordersCountry(pl, c) || (from && relOf(pl, from.id).status === 'war'))) {
+    pause('کشور تازه‌ای در همسایگی شما پدید آمد: ' + name, 'newCountry');
+  }
   rebuildLists(); checkEnd();
   return c;
 }
@@ -2841,9 +2848,12 @@ function biggestThreat(c) {
 function diploOffer(c, o, kind, payload) {
   if (o.isPlayer) {
     W.requests = W.requests || [];
-    if (W.requests.length > 8) W.requests.shift();
+    for (const q of W.requests) if (q.from === c.id && q.type === kind) return { ok: true, pending: true };
+    if (W.requests.length > 4) W.requests.shift();
     W.requests.push({ id: (W.reqId = (W.reqId || 0) + 1), type: kind, from: c.id, y: W.year, payload: payload || null });
-    pause('پیشنهاد دیپلماتیک از ' + c.name, 'diploReq');
+    if (kind === 'alliance' || kind === 'defPact') {
+      pause('پیشنهاد ' + (kind === 'alliance' ? 'اتحاد' : 'پیمان دفاعی') + ' از ' + c.name, 'diploReq');
+    }
     return { ok: true, pending: true };
   }
   const acc = aiAccepts(o, c, kind, payload);
@@ -3297,13 +3307,16 @@ function aiAskPlayer(c) {
   const broke = c.treasury < avgStateRevenue(c) * c.owned.length * 0.2;
   const hungry = (c.foodShort || 0) > 0.25;
   if (!(atWar || broke || hungry)) return;
-  if (!RNGX.chance(0.12)) return;
+  if (r.trust < 55) return;
+  if (c.lastAsk != null && W.year - c.lastAsk < 45) return;
+  if (!RNGX.chance(0.02)) return;
   W.requests = W.requests || [];
   for (const q of W.requests) if (q.from === c.id && q.type === 'askAid') return;
+  c.lastAsk = W.year;
   const kind = hungry ? 'food' : (broke ? 'money' : 'join');
   const amount = kind === 'money' ? Math.round(Math.max(80, avgStateRevenue(pl) * 2)) : (kind === 'food' ? 120 : 0);
   W.requests.push({ id: (W.reqId = (W.reqId || 0) + 1), type: 'askAid', from: c.id, y: W.year, payload: { kind: kind, amount: amount } });
-  pause('درخواست کمک از ' + c.name, 'diploReq');
+  if (kind === 'join') pause('درخواست ورود به جنگ از ' + c.name, 'diploReq');
 }
 
 /* ---------- ۲۱) چرخه مالی ۵ ساله ---------- */
@@ -4221,7 +4234,8 @@ function onMsg(m) {
       else if (m.res && m.res.msg) toast(m.res.msg, m.res.rejected ? '' : 'good');
       applySnap(m.snap);
       if (G.sel) refreshState();
-      if (G.modalKind) refreshModal();
+      /* تنظیم‌های ساده نیازی به بازسازی کامل پنجره ندارند */
+      if (G.modalKind && m.cmd !== 'autoPause' && m.cmd !== 'armyTarget') refreshModal();
       break;
     case 'inspect':
       G.inspectCache[m.kind + ':' + (m.id || 0)] = m.data;
