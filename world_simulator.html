@@ -191,7 +191,7 @@ input[type=number],input[type=text],select{padding:6px 9px;background:var(--pane
   :root{--topH:42px;--botH:50px}
   #game{grid-template-columns:1fr;grid-template-rows:var(--topH) 1fr var(--botH);
     grid-template-areas:"top" "map" "bot"}
-  #sidepanel{position:fixed;left:0;right:0;bottom:var(--botH);top:auto;z-index:40;height:58vh;
+  #sidepanel{position:fixed;left:0;right:0;bottom:var(--botH);top:auto;z-index:40;height:54vh;max-height:420px;
     border-right:0;border-top:1px solid var(--line);border-radius:16px 16px 0 0;
     transform:translateY(140%);transition:transform .22s ease;box-shadow:var(--sh)}
   #sidepanel.open{transform:translateY(0)}
@@ -1168,9 +1168,10 @@ function stateOutput(st) {
   const prod = 0.25 + 1.75 * clamp(dev, 0, 1.1);
   const cond = 0.45 + 0.55 * (0.45 * st.sat / 100 + 0.30 * st.security / 100 + 0.25 * st.health / 100);
   const resB = 1 + 0.35 * resScore(st);
+  const ecoFree = c ? (0.88 + 0.24 * GOVS[c.gov].ecoFree) : 1;
   const warF = (1 - 0.7 * st.devast / 100) * (0.60 + 0.40 * st.integ) * (st.siege > 0 ? 0.55 : 1);
   const capF = st.capital ? 1.15 : 1;
-  return BAL.ECON_REF * popF * prod * cond * resB * warF * capF;
+  return BAL.ECON_REF * popF * prod * cond * resB * warF * capF * ecoFree;
 }
 function taxCollect(c) {
   const g = GOVS[c.gov];
@@ -1281,11 +1282,12 @@ function investBudget(c, pool) {
   const gAgri = perState('agri'), gSec = perState('security'), gHouse = perState('housing');
   const gHealth = perState('health'), gCult = perState('culture');
   const taxDrag = 1 - 0.85 * Math.pow(clamp(c.taxRate / 0.62, 0, 1.3), 2);
+  const ecoF = 0.70 + 0.60 * GOVS[c.gov].ecoFree;  /* آزادی اقتصادی */
   for (const sid of c.owned) {
     const st = W.states[sid - 1];
     st.infra = clamp(st.infra + gInfra * taxDrag / indexCost(st.infra), 0, 100);
-    st.industry = clamp(st.industry + gInd * taxDrag * (0.4 + 0.6 * c.tech / 60) / indexCost(st.industry), 0, 100);
-    st.trade = clamp(st.trade + gTrade * taxDrag * (st.coastalB ? 1.2 : 1) / indexCost(st.trade), 0, 100);
+    st.industry = clamp(st.industry + gInd * taxDrag * ecoF * (0.4 + 0.6 * c.tech / 60) / indexCost(st.industry), 0, 100);
+    st.trade = clamp(st.trade + gTrade * taxDrag * ecoF * (st.coastalB ? 1.2 : 1) / indexCost(st.trade), 0, 100);
     st.agri = clamp(st.agri + gAgri / indexCost(st.agri), 0, 100);
     st.security = clamp(st.security + gSec / indexCost(st.security), 0, 100);
     st.health = clamp(st.health + (gHealth * 0.6 + c.healthIdx * 0.02) / indexCost(st.health), 0, 100);
@@ -2289,7 +2291,7 @@ function revolutionYear(c) {
   const poverty = clamp(1 - avgStateRevenue(c) / 220, 0, 1);
   const inequality = g.rich * 0.6 + c.corruption / 160;
   const warLoss = clamp(c.warWeariness / 100, 0, 1);
-  const org = clamp(0.15 + c.education / 190 + (1 - g.repress) * 0.3 + (c.factions.length ? 0.15 : 0), 0, 1);
+  const org = clamp(0.12 + c.education / 240 + (1 - g.repress) * 0.26 + g.party * 0.12 + (c.factions.length ? 0.06 + c.factions.length * 0.015 : 0), 0, 1.0);
   const opposition = oppositionStrength(c);
   let p = (100 - sat) * 0.028 + unrest * 0.030 + c.corruption * 0.016 + poverty * 2.2 +
     inequality * 1.6 + warLoss * 2.4 + (100 - c.legitimacy) * 0.026 + opposition * 1.4;
@@ -3177,7 +3179,7 @@ function factionsYear(c) {
     } else d += (lead.tr[TI.charisma] - 0.45) * 0.02 + (lead.tr[TI.organize] - 0.45) * 0.012;
     if (f.kind === 'rebels' || f.kind === 'independence') d += c.unrestAvg / 2600 - g.repress * 0.012;
     if (f.kind === 'military') d += (100 - (c.army.pay || 100)) / 2400 + g.army * 0.006 - c.stability / 9000;
-    if (f.kind === 'party' || f.kind === 'movement') d += g.polFree * 0.010 + c.education / 9000 - c.stability / 12000;
+    if (f.kind === 'party' || f.kind === 'movement') d += g.polFree * 0.010 + g.party * 0.008 + c.education / 9000 - c.stability / 12000;
     if (f.kind === 'union' || f.kind === 'tech') d += c.knowledge / 12000 + g.ecoFree * 0.006;
     if (f.kind === 'faction' || f.kind === 'dynasty') d += g.central * 0.008 + c.corruption / 9000;
     if (f.wantGov === c.gov) d -= 0.012;
@@ -4005,9 +4007,12 @@ function handle(msg) {
       case 'step': {
         let n = Math.max(0, msg.n | 0);
         let stopped = false;
+        const t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
         for (let i = 0; i < n; i++) {
           if (!stepTick()) { stopped = true; break; }
           if (W.pendingPause) break;
+          const tn = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+          if (tn - t0 > 38) break; /* بودجه زمانی هر بسته برای جلوگیری از قفل شدن رابط */
         }
         post({ type: 'snap', snap: snapshot(), id: msg.id, stopped });
         break;
