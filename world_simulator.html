@@ -83,14 +83,10 @@ button{cursor:pointer;border:0;background:none}
 #sel{fill:none;stroke:#111a26;stroke-width:3;vector-effect:non-scaling-stroke;pointer-events:none;
   stroke-dasharray:7 5;animation:march 1.6s linear infinite}
 @keyframes march{to{stroke-dashoffset:-24}}
-.bob{animation:bob 3.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
-.bob.b2{animation-duration:4.3s}
-.bob.b3{animation-duration:2.9s}
-@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-1.6px) rotate(2deg)}}
 .warpulse{animation:wp 1.9s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes wp{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.18)}}
 .resicon{pointer-events:none;text-anchor:middle;paint-order:stroke;stroke:#ffffffa0;stroke-width:2px}
-.ship{pointer-events:none}
+
 .clabel{fill:#182431;text-anchor:middle;paint-order:stroke;stroke:#ffffffcc;stroke-width:3.5px;
   font-weight:700;pointer-events:none;opacity:.95}
 .snum{fill:#233040;text-anchor:middle;paint-order:stroke;stroke:#ffffffb0;stroke-width:2.2px;
@@ -121,6 +117,9 @@ button{cursor:pointer;border:0;background:none}
   border-bottom:0;font-size:11px;color:var(--dim)}
 .ntab.on{background:var(--panel);color:var(--txt);font-weight:700}
 #newslist{flex:1;overflow-y:auto;padding:4px 10px}
+#newsbox.inmodal{border-top:0;height:auto;flex:1;min-height:46vh;max-height:66vh;background:transparent;font-size:12.5px}
+#newsbox.inmodal #newstabs{padding:0 0 0 2px}
+#newsbox.inmodal #newslist{padding:6px 2px}
 .newsitem{padding:3px 0;border-bottom:1px dashed #d3dceb;color:var(--dim)}
 .newsitem b{color:var(--txt);font-weight:600}
 .newsitem.war b{color:#b91c1c} .newsitem.gov b{color:#6d28d9} .newsitem.diplo b{color:#1d4ed8}
@@ -238,6 +237,9 @@ input[type=number],input[type=text],select{padding:6px 9px;background:var(--pane
 @media (max-width:420px){
   .stat{min-width:56px;padding:2px 6px}
   .stat b{font-size:12px}
+  .sbtn{min-width:27px;height:30px;font-size:11px}
+  .spd{gap:2px;padding-left:4px;margin-left:2px}
+  .mbtn{padding:0 7px;font-size:10.5px}
 }
 </style>
 </head>
@@ -312,11 +314,6 @@ input[type=number],input[type=text],select{padding:6px 9px;background:var(--pane
         <pattern id="waves" width="90" height="46" patternUnits="userSpaceOnUse">
           <path d="M0 30 q 11 -12 22 0 t 22 0 t 22 0 t 22 0" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-opacity=".22"/>
           <path d="M-45 12 q 11 -12 22 0 t 22 0 t 22 0 t 22 0" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-opacity=".14"/>
-          <animateTransform attributeName="patternTransform" type="translate" from="0 0" to="90 0" dur="26s" repeatCount="indefinite"/>
-        </pattern>
-        <pattern id="waves2" width="140" height="70" patternUnits="userSpaceOnUse">
-          <path d="M0 50 q 17 -14 34 0 t 34 0 t 34 0 t 34 0" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-opacity=".10"/>
-          <animateTransform attributeName="patternTransform" type="translate" from="0 0" to="-140 0" dur="41s" repeatCount="indefinite"/>
         </pattern>
         <filter id="shallow" x="-25%" y="-25%" width="150%" height="150%">
           <feGaussianBlur stdDeviation="9"/>
@@ -327,7 +324,6 @@ input[type=number],input[type=text],select{padding:6px 9px;background:var(--pane
       </defs>
       <rect id="seabg" x="-600" y="-600" width="2800" height="2200" fill="url(#seagrad)"/>
       <rect id="seawaves" x="-600" y="-600" width="2800" height="2200" fill="url(#waves)"/>
-      <rect id="seawaves2" x="-600" y="-600" width="2800" height="2200" fill="url(#waves2)"/>
       <g id="vp">
         <g id="shelf"></g>
         <g id="states" filter="url(#landshadow)"></g>
@@ -335,7 +331,6 @@ input[type=number],input[type=text],select{padding:6px 9px;background:var(--pane
         <g id="coast"></g>
         <g id="borders"></g>
         <path id="sel" d=""></path>
-        <g id="ships"></g>
         <g id="resicons"></g>
         <g id="marks"></g>
         <g id="nums"></g>
@@ -4913,7 +4908,7 @@ function snapshot() {
   const cs = {};
   for (const cid in W.countries) {
     const c = W.countries[cid];
-    cs[cid] = { id: c.id, name: c.name, color: c.color, alive: c.alive, owned: c.owned.length, tech: c.tech, navy: c.army.navy || 0 };
+    cs[cid] = { id: c.id, name: c.name, color: c.color, alive: c.alive, owned: c.owned.length, tech: c.tech };
   }
   const pc = W.countries[W.player];
   const player = pc && pc.alive ? {
@@ -5951,7 +5946,6 @@ function paintMap() {
     paintLabels();
   }
   paintMarks();
-  paintShips();
   paintResIcons();
 }
 function paintColonies() {
@@ -5992,70 +5986,6 @@ function paintLabels() {
     t.textContent = c.name;
     lg.appendChild(t);
   }
-}
-/* ---------- کشتی‌ها روی دریا ---------- */
-function outwardDir(i) {
-  var c = G.geo.centers[i];
-  var nb = G.geo.neighbors[i];
-  if (!nb || !nb.length) return [0, -1];
-  var sx = 0, sy = 0;
-  for (var k = 0; k < nb.length; k++) { sx += G.geo.centers[nb[k]][0]; sy += G.geo.centers[nb[k]][1]; }
-  var dx = c[0] - sx / nb.length, dy = c[1] - sy / nb.length;
-  var len = Math.sqrt(dx * dx + dy * dy) || 1;
-  return [dx / len, dy / len];
-}
-function paintShips() {
-  var g = $('#ships'), s = G.snap, svgns = 'http://www.w3.org/2000/svg';
-  if (!g || !s) return;
-  var sig = '';
-  for (var cid in s.countries) { var cc = s.countries[cid]; if (cc.alive && cc.navy) sig += cid + ':' + Math.ceil(cc.navy / 10) + ','; }
-  sig += '|' + Math.round(G.view.s * 10);
-  if (g._sig === sig) return;
-  g._sig = sig;
-  g.textContent = '';
-  var scale = Math.max(0.55, 1.5 / Math.sqrt(G.view.s));
-  var frag = document.createDocumentFragment();
-  for (var cid2 in s.countries) {
-    var c = s.countries[cid2];
-    if (!c.alive || !c.navy) continue;
-    var n = Math.min(6, Math.ceil(c.navy / 10));
-    if (n < 1) continue;
-    /* ایالت‌های ساحلی این کشور */
-    var coast = [];
-    for (var i = 0; i < s.ctrls.length; i++) {
-      if (s.ctrls[i] === c.id && G.geo.coastal[i]) coast.push(i);
-    }
-    if (!coast.length) continue;
-    var step = Math.max(1, Math.floor(coast.length / n));
-    for (var k = 0; k < n; k++) {
-      var idx = coast[(k * step) % coast.length];
-      var ctr = G.geo.centers[idx];
-      var d = outwardDir(idx);
-      var jitter = ((idx * 37 + k * 13) % 11) - 5;
-      var x = ctr[0] + d[0] * (26 + jitter), y = ctr[1] + d[1] * (26 + jitter);
-      var outer = document.createElementNS(svgns, 'g');
-      outer.setAttribute('transform', 'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') scale(' + scale.toFixed(2) + ')');
-      outer.setAttribute('class', 'ship');
-      var inner = document.createElementNS(svgns, 'g');
-      inner.setAttribute('class', 'bob' + (k % 3 === 1 ? ' b2' : (k % 3 === 2 ? ' b3' : '')));
-      var hull = document.createElementNS(svgns, 'path');
-      hull.setAttribute('d', 'M-7 2 L7 2 L5 6 L-5 6 Z');
-      hull.setAttribute('fill', '#3a2f24');
-      var sail = document.createElementNS(svgns, 'path');
-      sail.setAttribute('d', 'M0 2 L0 -7 L6 -1 Z');
-      sail.setAttribute('fill', c.color);
-      sail.setAttribute('stroke', '#2b3543');
-      sail.setAttribute('stroke-width', '0.7');
-      var mast = document.createElementNS(svgns, 'path');
-      mast.setAttribute('d', 'M0 2 L0 -8');
-      mast.setAttribute('stroke', '#3a2f24');
-      mast.setAttribute('stroke-width', '0.9');
-      inner.appendChild(hull); inner.appendChild(sail); inner.appendChild(mast);
-      outer.appendChild(inner);
-      frag.appendChild(outer);
-    }
-  }
-  g.appendChild(frag);
 }
 /* ---------- نمادهای منابع ---------- */
 var RESGLYPH = ['', '🌾', '🌲', '⛓', '🛢', '🪙'];
@@ -6109,7 +6039,7 @@ function paintMarks() {
 }
 function applyView() {
   $('#vp').setAttribute('transform', 'translate(' + G.view.x + ',' + G.view.y + ') scale(' + G.view.s + ')');
-  if (G.geo) { paintLabels(); paintMarks(); paintNums(); paintShips(); paintResIcons(); }
+  if (G.geo) { paintLabels(); paintMarks(); paintNums(); paintResIcons(); }
 }
 function paintNums() {
   var ng = $('#nums');
@@ -6296,6 +6226,7 @@ function buildTopbar() {
   $('#topbar').innerHTML = h;
 }
 var MENUS = [
+  { k: 'news', n: 'اخبار', i: '📰' },
   { k: 'country', n: 'کشور', i: '🏛' }, { k: 'economy', n: 'اقتصاد', i: '💰' },
   { k: 'invest', n: 'سرمایه‌گذاری', i: '📊' }, { k: 'army', n: 'ارتش', i: '⚔' },
   { k: 'tech', n: 'فناوری', i: '🔬' }, { k: 'trade', n: 'تجارت', i: '⚖' },
@@ -6615,9 +6546,31 @@ function buildNewsTabs() {
     };
   });
 }
+/* جعبه اخبار برای موبایل داخل پنجره باز می‌شود */
+function newsBoxHome() {
+  var box = $('#newsbox');
+  if (box && box.parentNode && box.parentNode.id === 'mbody') {
+    box.classList.remove('inmodal');
+    $('#sidepanel').appendChild(box);
+  }
+}
+function renderNewsModal() {
+  if (!G.modalKind) return;
+  $('#mtitle').textContent = 'اخبار جهان';
+  var body = $('#mbody');
+  buildNewsTabs();
+  var box = $('#newsbox');
+  if (!box) return;
+  if (box.parentNode !== body) {
+    body.innerHTML = '';
+    box.classList.add('inmodal');
+    body.appendChild(box);
+  }
+  renderNews(true);
+}
 function renderRequests() {
   var r = G.snap.requests || [], h = '';
-  var names = { alliance: 'پیشنهاد اتحاد', nonAgg: 'پیمان عدم تعرض', defPact: 'پیمان دفاعی', trade: 'پیمان تجاری', peace: 'پیشنهاد صلح', callToArms: 'درخواست ورود به جنگ', gift: 'کمک', contract: 'پیشنهاد قرارداد بلندمدت', askAid: 'درخواست کمک' };
+  var names = { alliance: 'پیشنهاد اتحاد', nonAgg: 'پیمان عدم تعرض', defPact: 'پیمان دفاعی', trade: 'پیمان تجاری', friendship: 'پیشنهاد دوستی', guarantee: 'تضمین استقلال', peace: 'پیشنهاد صلح', callToArms: 'درخواست ورود به جنگ', gift: 'کمک', contract: 'پیشنهاد قرارداد بلندمدت', askAid: 'درخواست کمک' };
   var aidN = { money: 'کمک مالی', food: 'کمک غذایی', join: 'ورود به جنگ' };
   for (var i = Math.max(0, r.length - 3); i < r.length; i++) {
     var c = G.snap.countries[r[i].from];
@@ -6676,8 +6629,9 @@ function confirmWar(reqId, req, enemyId) {
 }
 
 /* ---------- پنجره‌های اصلی ---------- */
-function closeModal() { $('#modal').classList.add('hidden'); $('#modal').innerHTML = ''; G.modalKind = null; }
+function closeModal() { newsBoxHome(); $('#modal').classList.add('hidden'); $('#modal').innerHTML = ''; G.modalKind = null; }
 function openModal(kind, tab) {
+  newsBoxHome();
   G.modalKind = kind; G.modalTab = tab || null;
   var m = $('#modal');
   m.classList.remove('hidden');
@@ -6690,6 +6644,7 @@ function openModal(kind, tab) {
 }
 function confirmDialog(title, html, onOk, afterRender) {
   var m = $('#modal');
+  newsBoxHome();
   var prev = m.innerHTML, prevKind = G.modalKind;
   m.classList.remove('hidden');
   m.innerHTML = '<div class="mbox" style="max-width:460px"><div class="mhead"><h3>' + esc(title) + '</h3></div>' +
@@ -6706,6 +6661,7 @@ function confirmDialog(title, html, onOk, afterRender) {
 function refreshModal() {
   var k = G.modalKind;
   if (!k) return;
+  if (k === 'news') { renderNewsModal(); return; }
   if (k === 'help') { renderHelp(); return; }
   if (k === 'save') { renderSave(); return; }
   if (k === 'history') { ask('history', 0, renderHistory); return; }
