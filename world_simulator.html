@@ -80,7 +80,17 @@ button{cursor:pointer;border:0;background:none}
 .stpath{stroke:#5c6a7d;stroke-width:.6;vector-effect:non-scaling-stroke;stroke-opacity:.55}
 #borders path{fill:none;stroke:#24313f;stroke-width:2.2;vector-effect:non-scaling-stroke;stroke-linejoin:round}
 #coast path{fill:none;stroke:#3e7ba6;stroke-width:1.2;vector-effect:non-scaling-stroke;opacity:.8}
-#sel{fill:none;stroke:#111a26;stroke-width:3;vector-effect:non-scaling-stroke;pointer-events:none;stroke-dasharray:6 4}
+#sel{fill:none;stroke:#111a26;stroke-width:3;vector-effect:non-scaling-stroke;pointer-events:none;
+  stroke-dasharray:7 5;animation:march 1.6s linear infinite}
+@keyframes march{to{stroke-dashoffset:-24}}
+.bob{animation:bob 3.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.bob.b2{animation-duration:4.3s}
+.bob.b3{animation-duration:2.9s}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-1.6px) rotate(2deg)}}
+.warpulse{animation:wp 1.9s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes wp{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.18)}}
+.resicon{pointer-events:none;text-anchor:middle;paint-order:stroke;stroke:#ffffffa0;stroke-width:2px}
+.ship{pointer-events:none}
 .clabel{fill:#182431;text-anchor:middle;paint-order:stroke;stroke:#ffffffcc;stroke-width:3.5px;
   font-weight:700;pointer-events:none;opacity:.95}
 .snum{fill:#233040;text-anchor:middle;paint-order:stroke;stroke:#ffffffb0;stroke-width:2.2px;
@@ -104,8 +114,13 @@ button{cursor:pointer;border:0;background:none}
 #sidehead{padding:8px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
 #sidehead h3{margin:0;font-size:15px;flex:1}
 #sidebody{flex:1;overflow-y:auto;padding:10px 12px}
-#newsbox{border-top:1px solid var(--line);height:118px;overflow-y:auto;padding:6px 10px;font-size:12px;
+#newsbox{border-top:1px solid var(--line);height:150px;display:flex;flex-direction:column;font-size:12px;
   background:var(--panel2)}
+#newstabs{display:flex;gap:3px;padding:5px 8px 0;flex:0 0 auto}
+.ntab{padding:2px 8px;border-radius:7px 7px 0 0;background:var(--panel3);border:1px solid var(--line);
+  border-bottom:0;font-size:11px;color:var(--dim)}
+.ntab.on{background:var(--panel);color:var(--txt);font-weight:700}
+#newslist{flex:1;overflow-y:auto;padding:4px 10px}
 .newsitem{padding:3px 0;border-bottom:1px dashed #d3dceb;color:var(--dim)}
 .newsitem b{color:var(--txt);font-weight:600}
 .newsitem.war b{color:#b91c1c} .newsitem.gov b{color:#6d28d9} .newsitem.diplo b{color:#1d4ed8}
@@ -172,6 +187,15 @@ input[type=number],input[type=text],select{padding:6px 9px;background:var(--pane
 .act small{color:var(--dim2);font-size:11px;line-height:1.45}
 .act:disabled{opacity:.55}
 .act.danger{background:#fdeeea;border-color:#eebfb0}
+#alertbox{position:fixed;inset:0;z-index:55;display:flex;align-items:center;justify-content:center;
+  background:#0f172a4d;padding:16px;backdrop-filter:blur(2px)}
+.alertcard{width:min(420px,100%);background:var(--panel);border:2px solid var(--bad);border-radius:14px;
+  box-shadow:var(--sh);overflow:hidden;animation:pop .22s ease}
+.alertcard.good{border-color:var(--good)}
+.alertcard .ahead{padding:10px 14px;font-weight:800;font-size:15px;background:#fdeeea;color:#8f1d1d}
+.alertcard.good .ahead{background:#e8f7ee;color:#14532d}
+.alertcard .abody{padding:10px 14px}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
 #toast{position:fixed;bottom:64px;right:50%;transform:translateX(50%);z-index:70;display:flex;
   flex-direction:column;gap:6px;align-items:center;pointer-events:none;width:min(92vw,460px)}
 .toast{background:#ffffffF5;border:1px solid var(--line);border-radius:10px;padding:8px 14px;color:var(--txt);
@@ -288,6 +312,11 @@ input[type=number],input[type=text],select{padding:6px 9px;background:var(--pane
         <pattern id="waves" width="90" height="46" patternUnits="userSpaceOnUse">
           <path d="M0 30 q 11 -12 22 0 t 22 0 t 22 0 t 22 0" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-opacity=".22"/>
           <path d="M-45 12 q 11 -12 22 0 t 22 0 t 22 0 t 22 0" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-opacity=".14"/>
+          <animateTransform attributeName="patternTransform" type="translate" from="0 0" to="90 0" dur="26s" repeatCount="indefinite"/>
+        </pattern>
+        <pattern id="waves2" width="140" height="70" patternUnits="userSpaceOnUse">
+          <path d="M0 50 q 17 -14 34 0 t 34 0 t 34 0 t 34 0" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-opacity=".10"/>
+          <animateTransform attributeName="patternTransform" type="translate" from="0 0" to="-140 0" dur="41s" repeatCount="indefinite"/>
         </pattern>
         <filter id="shallow" x="-25%" y="-25%" width="150%" height="150%">
           <feGaussianBlur stdDeviation="9"/>
@@ -298,6 +327,7 @@ input[type=number],input[type=text],select{padding:6px 9px;background:var(--pane
       </defs>
       <rect id="seabg" x="-600" y="-600" width="2800" height="2200" fill="url(#seagrad)"/>
       <rect id="seawaves" x="-600" y="-600" width="2800" height="2200" fill="url(#waves)"/>
+      <rect id="seawaves2" x="-600" y="-600" width="2800" height="2200" fill="url(#waves2)"/>
       <g id="vp">
         <g id="shelf"></g>
         <g id="states" filter="url(#landshadow)"></g>
@@ -305,6 +335,8 @@ input[type=number],input[type=text],select{padding:6px 9px;background:var(--pane
         <g id="coast"></g>
         <g id="borders"></g>
         <path id="sel" d=""></path>
+        <g id="ships"></g>
+        <g id="resicons"></g>
         <g id="marks"></g>
         <g id="nums"></g>
         <g id="labels"></g>
@@ -334,6 +366,7 @@ input[type=number],input[type=text],select{padding:6px 9px;background:var(--pane
   <div id="bottombar"></div>
 </div>
 
+<div id="alertbox" class="hidden"></div>
 <div id="modal" class="hidden"></div>
 <div id="toast"></div>
 <div id="end" class="hidden"></div>
@@ -1415,6 +1448,20 @@ function faNum(n) {
   }
   return (neg ? '−' : '') + out;
 }
+function faDec(n, d) {
+  d = d == null ? 1 : d;
+  if (!isFinite(n)) n = 0;
+  const neg = n < 0;
+  n = Math.abs(n);
+  const s = n.toFixed(d).split('.');
+  let out = faNum(+s[0]);
+  if (s[1] && +s[1] > 0) {
+    let dec = '';
+    for (let i = 0; i < s[1].length; i++) dec += FA_DIGITS[+s[1][i]];
+    out += '٫' + dec;
+  }
+  return (neg ? '−' : '') + out;
+}
 function news(title, text, kind, extra) {
   W.news.push(Object.assign({ y: Math.floor(W.year), t: title, x: text, k: kind || 'info' }, extra || {}));
   if (W.news.length > 400) W.news.splice(0, W.news.length - 400);
@@ -1532,13 +1579,14 @@ function countryCosts(c, rev) {
     const st = W.states[sid - 1];
     colony += st.lastOut * (0.14 + st.unrest / 320);
   }
+  let strat = stratUpkeep(c);
   let war = 0;
   for (const op of W.ops) {
     if (op.att === c.id) war += op.force * soldierCost * 0.55 + 12;
     if (op.def === c.id) war += 8;
   }
   const gov = rev.revenue * (0.06 + 0.05 * GOVS[c.gov].central);
-  return { admin, army, infra, colony, war, gov, total: admin + army + infra + colony + war + gov };
+  return { admin, army: army + strat, strat, infra, colony, war, gov, total: admin + army + strat + infra + colony + war + gov };
 }
 function indexCost(level) { return Math.exp(clamp(level, 0, 100) / BAL.INDEX_COST); }
 
@@ -2195,7 +2243,7 @@ function finishExpand(c, st, op) {
   st.owner = c.id; st.controller = c.id; st.status = 'owned';
   st.integ = 0.45; st.unrest = clamp(st.unrest + 8, 0, 100);
   c.owned.push(st.id);
-  stateHist(st, 'به قلمرو ' + c.name + ' افزوده شد.');
+  stateChangeLog(st, { kind: 'expand', from: 0, to: c.id, reason: 'گسترش مسالمت‌آمیز و اسکان' });
   news('گسترش قلمرو', c.name + ' ایالت ' + faNum(st.id) + ' را به قلمرو خود افزود.', 'expand', { c: c.id, s: st.id });
   rebuildLists();
   checkEnd();
@@ -2224,12 +2272,22 @@ function finishOp(op, success) {
     st.integ = 0.15;
     st.sat = clamp(st.sat - 18, 0, 100);
     c.ctrl.push(st.id);
-    stateHist(st, 'زیر استعمار ' + c.name + ' درآمد.');
+    stateChangeLog(st, {
+      kind: 'colonize', from: prev, to: c.id,
+      reason: 'عملیات استعماری ' + faNum(Math.max(1, Math.round(W.year - op.since))) + ' ساله',
+      detail: 'کنترل‌کننده تازه حداکثر نیمی از درآمد و منابع را می‌گیرد'
+    });
     news('استعمار', c.name + ' کنترل ایالت ' + faNum(st.id) + ' را به دست گرفت (مالکیت رسمی تغییر نکرد).', 'war', { c: c.id, s: st.id });
   } else {
     warmongerAdd(c, 5, st.controller);
+    const prevOwner = st.owner;
+    const wasCap = st.capital;
     transferState(st, c.id, 'conquer');
-    stateHist(st, 'به تصرف ' + c.name + ' درآمد.');
+    stateChangeLog(st, {
+      kind: 'conquer', from: prevOwner, to: c.id, wasCapital: wasCap,
+      reason: 'نبرد ' + faNum(Math.max(1, Math.round(W.year - op.since))) + ' ساله',
+      detail: 'نیروی مهاجم ' + faNum(op.force0) + ' سرباز — تلفات مدافع ' + faNum(op.defLoss)
+    });
     news('سقوط ایالت', 'کشور ' + c.name + ' کنترل ایالت ' + faNum(st.id) + ' را به دست گرفت.', 'war', { c: c.id, s: st.id });
   }
   st.defense += op.force * 0.35;
@@ -2282,7 +2340,11 @@ function rebuildLists() {
   for (const cid in W.countries) { W.countries[cid].owned = []; W.countries[cid].ctrl = []; }
   for (const st of W.states) {
     if (st.owner && W.countries[st.owner] && W.countries[st.owner].alive) W.countries[st.owner].owned.push(st.id);
-    else if (st.owner && (!W.countries[st.owner] || !W.countries[st.owner].alive)) { st.owner = 0; }
+    else if (st.owner && (!W.countries[st.owner] || !W.countries[st.owner].alive)) {
+      const dead = st.owner;
+      st.owner = 0;
+      if (typeof stateChangeLog === 'function') stateChangeLog(st, { kind: 'collapse', from: dead, to: 0, toName: 'بدون حکومت' });
+    }
     if (st.controller && st.controller !== st.owner) {
       if (W.countries[st.controller] && W.countries[st.controller].alive) W.countries[st.controller].ctrl.push(st.id);
       else st.controller = st.owner;
@@ -2448,8 +2510,11 @@ function declareWar(a, b, reason) {
     if (r.ally || r.defPact || r.guarantee) {
       if (o.isPlayer) {
         W.requests = W.requests || [];
-        W.requests.push({ id: (W.reqId = (W.reqId || 0) + 1), type: 'callToArms', from: b.id, about: a.id, y: W.year });
-        pause('درخواست کمک نظامی از ' + b.name, 'diploReq');
+        W.requests.push({
+          id: (W.reqId = (W.reqId || 0) + 1), type: 'callToArms', from: b.id, about: a.id, y: W.year,
+          payload: { enemy: a.id, enemyName: a.name, reason: 'پیمان دفاعی' }
+        });
+        pause('درخواست ورود به جنگ از ' + b.name + ' در برابر ' + a.name, 'diploReq');
       } else {
         const willing = (relOf(o, b.id).trust / 100) * 0.6 + o.bias.militarism * 0.4 -
           relOf(o, a.id).fear / 180 - (o.warmonger || 0) / 260 - (W.un ? W.un.power * 0.15 : 0);
@@ -2829,10 +2894,14 @@ function stateRevolt(st, c) {
     const ctrl = W.countries[st.controller];
     if (ctrl) { const i = ctrl.ctrl.indexOf(st.id); if (i >= 0) ctrl.ctrl.splice(i, 1); }
     if (owner && owner.alive) {
+      const prevCtrl = st.controller;
       st.controller = st.owner;
+      stateChangeLog(st, { kind: 'colonyEnd', from: prevCtrl, to: owner.id, reason: lossReason(st, ctrl) });
       news('پایان استعمار', 'مردم ایالت ' + faNum(st.id) + ' استعمار را پس زدند؛ کنترل به ' + owner.name + ' بازگشت.', 'gov', { c: owner.id, s: st.id });
     } else {
+      const prevCtrl2 = st.controller;
       st.owner = 0; st.controller = 0; st.status = 'free';
+      stateChangeLog(st, { kind: 'revolt', from: prevCtrl2, to: 0, toName: 'حکومت مستقل محلی', reason: lossReason(st, ctrl) });
       news('استقلال', 'ایالت ' + faNum(st.id) + ' مستقل شد.', 'gov', { s: st.id });
     }
     st.unrest = clamp(st.unrest - 40, 0, 100);
@@ -2945,9 +3014,16 @@ function createCountryFrom(stateIds, opts) {
   pickHeir(c); applyLeaderBias(c);
   for (const sid of stateIds) {
     const st = W.states[sid - 1];
+    const prevOwner = st.owner;
+    const why = from ? lossReason(st, from) : '';
     transferState(st, id, 'secede');
     st.unrest = clamp(st.unrest - 35, 0, 100);
     st.integ = 0.6; st.sat = clamp(st.sat + 10, 0, 100);
+    stateChangeLog(st, {
+      kind: opts.reason === 'استقلال' ? 'independence' : (opts.reason === 'استقلال تحت نفوذ' ? 'puppet' : (opts.reason === 'شورش' ? 'revolt' : 'secede')),
+      from: prevOwner, to: id, reason: opts.reason === 'شورش' || opts.reason === 'جنگ داخلی' ? why : (opts.reason || ''),
+      detail: opts.sponsor && W.countries[opts.sponsor] ? ('با پشتیبانی ' + W.countries[opts.sponsor].name) : ''
+    });
   }
   W.states[cap - 1].capital = true;
   /* روابط */
@@ -3776,8 +3852,18 @@ function aiAskPlayer(c) {
   c.lastAsk = W.year;
   const kind = hungry ? 'food' : (broke ? 'money' : 'join');
   const amount = kind === 'money' ? Math.round(Math.max(80, avgStateRevenue(pl) * 2)) : (kind === 'food' ? 120 : 0);
-  W.requests.push({ id: (W.reqId = (W.reqId || 0) + 1), type: 'askAid', from: c.id, y: W.year, payload: { kind: kind, amount: amount } });
-  if (kind === 'join') pause('درخواست ورود به جنگ از ' + c.name, 'diploReq');
+  let enemy = 0, enemyName = '';
+  if (kind === 'join') {
+    for (const oid in c.rel) {
+      if (c.rel[oid].status === 'war' && W.countries[oid] && W.countries[oid].alive) { enemy = +oid; enemyName = W.countries[oid].name; break; }
+    }
+    if (!enemy) return;
+  }
+  W.requests.push({
+    id: (W.reqId = (W.reqId || 0) + 1), type: 'askAid', from: c.id, y: W.year,
+    payload: { kind: kind, amount: amount, enemy: enemy, enemyName: enemyName }
+  });
+  if (kind === 'join') pause('درخواست ورود به جنگ از ' + c.name + ' در برابر ' + enemyName, 'diploReq');
 }
 
 /* ---------- ۳۴) سازمان ملل: محکومیت، تحریم، رأی، رشوه و ساید‌بندی ---------- */
@@ -4333,6 +4419,229 @@ function playerAutoTrade(c) {
   aiContracts(c);
 }
 
+/* ---------- ۴۰) گزارش تغییر مالکیت ایالت و هشدار بازیکن ---------- */
+const LOSS_KIND = {
+  conquer: 'تصرف نظامی',
+  colonize: 'استعمار',
+  secede: 'جدایی و تشکیل کشور تازه',
+  revolt: 'شورش مردمی',
+  independence: 'اعطای استقلال',
+  puppet: 'استقلال تحت نفوذ',
+  colonyEnd: 'پایان استعمار',
+  collapse: 'فروپاشی کشور',
+  expand: 'گسترش قلمرو',
+  freed: 'آزاد شدن ایالت'
+};
+function alertPlayer(a) {
+  W.alerts = W.alerts || [];
+  W.alerts.push(Object.assign({ y: Math.floor(W.year) }, a));
+  if (W.alerts.length > 12) W.alerts.shift();
+}
+/* ثبت هر تغییر مالکیت یا کنترل در تاریخ ایالت و در صورت لزوم هشدار به بازیکن */
+function stateChangeLog(st, info) {
+  const from = info.from ? W.countries[info.from] : null;
+  const to = info.to ? W.countries[info.to] : null;
+  const kindName = LOSS_KIND[info.kind] || 'تغییر مالکیت';
+  const fromName = from ? from.name : (info.fromName || 'بدون حکومت');
+  const toName = to ? to.name : (info.toName || 'بدون حکومت');
+  let txt = kindName + ': ';
+  if (info.kind === 'conquer') txt += 'ارتش ' + toName + ' پس از نبرد، ایالت را از ' + fromName + ' گرفت.';
+  else if (info.kind === 'colonize') txt += toName + ' کنترل ایالت را از ' + fromName + ' به دست گرفت؛ مالکیت رسمی تغییر نکرد.';
+  else if (info.kind === 'secede') txt += 'ایالت از ' + fromName + ' جدا شد و به کشور تازه ' + toName + ' پیوست.';
+  else if (info.kind === 'revolt') txt += 'شورش مردم ایالت پیروز شد و از ' + fromName + ' جدا شد.';
+  else if (info.kind === 'independence') txt += fromName + ' به این ایالت استقلال داد و کشور ' + toName + ' زاده شد.';
+  else if (info.kind === 'puppet') txt += fromName + ' این ایالت را مستقل کرد ولی آن را دولتی وابسته نگه داشت.';
+  else if (info.kind === 'colonyEnd') txt += 'دوره استعمار ' + fromName + ' پایان یافت و کنترل به ' + toName + ' بازگشت.';
+  else if (info.kind === 'collapse') txt += 'با فروپاشی ' + fromName + ' این ایالت بی‌صاحب شد.';
+  else if (info.kind === 'expand') txt += toName + ' این سرزمین را به قلمرو خود افزود.';
+  else txt += fromName + ' ← ' + toName;
+  if (info.reason) txt += ' (' + info.reason + ')';
+  stateHist(st, txt);
+  logHistory(W.year, 'ایالت ' + faNum(st.id) + ' — ' + txt);
+  const pid = W.player;
+  const lostByPlayer = info.from === pid && info.to !== pid;
+  const gainedByPlayer = info.to === pid && info.from !== pid;
+  if (lostByPlayer) {
+    alertPlayer({
+      type: 'stateLost', state: st.id, kind: info.kind, kindName: kindName,
+      other: toName, reason: info.reason || '', detail: info.detail || '',
+      pop: Math.round(st.pop), income: Math.round(st.lastInc),
+      unrest: Math.round(st.unrest), sat: Math.round(st.sat), wasCapital: !!info.wasCapital
+    });
+    pause('ایالت ' + faNum(st.id) + ' از کشور شما جدا شد (' + kindName + ')', 'stateLost');
+  } else if (gainedByPlayer) {
+    alertPlayer({
+      type: 'stateGained', state: st.id, kind: info.kind, kindName: kindName,
+      other: fromName, reason: info.reason || '', detail: info.detail || '',
+      pop: Math.round(st.pop), income: Math.round(st.lastInc)
+    });
+  }
+}
+/* شرح علت جدایی بر پایه وضعیت ایالت */
+function lossReason(st, c) {
+  const bits = [];
+  if (st.unrest > 60) bits.push('نارضایتی ' + faNum(st.unrest) + ' درصدی مردم');
+  if (st.sat < 40) bits.push('رضایت پایین ' + faNum(st.sat) + ' درصد');
+  if (st.integ < 0.5) bits.push('ادغام ناقص در کشور (' + faNum(st.integ * 100) + '٪)');
+  if (st.eth !== stateEthOwner(st)) bits.push('تفاوت قومی با حکومت مرکزی');
+  if (c && c.taxRate > 0.35) bits.push('مالیات سنگین ' + faNum(c.taxRate * 100) + ' درصدی');
+  if (c && c.corruption > 55) bits.push('فساد گسترده دستگاه حکومت');
+  if (st.devast > 40) bits.push('ویرانی ' + faNum(st.devast) + ' درصدی از جنگ');
+  if (st.sponsor && W.countries[st.sponsor]) bits.push('حمایت خارجی ' + W.countries[st.sponsor].name + ' از شورشیان');
+  if (c && c.warWeariness > 55) bits.push('خستگی کشور از جنگ');
+  if (!bits.length) bits.push('فشار نظامی دشمن');
+  return bits.slice(0, 3).join('، ');
+}
+
+/* ---------- ۴۱) آفند و پدافند راهبردی (دوره سلاح پیشرفته و هوشمند) ---------- */
+const STRAT_TECH = 60;      /* آستانه فناوری */
+const STRAT_MAX = 50;       /* بیشینه سطح */
+function stratMaxLevel(c) {
+  if (c.tech < STRAT_TECH) return 0;
+  return clamp(Math.floor((c.tech - 55) * 1.15), 0, STRAT_MAX);
+}
+function stratLevelCost(c, current) {
+  const base = Math.max(70, avgStateRevenue(c) * 2.0);
+  return Math.round(base * Math.pow(1 + current / 8, 1.55));
+}
+function stratUpkeep(c) {
+  const unit = Math.max(2, avgStateRevenue(c) * 0.05);
+  return ((c.strike || 0) + (c.shield || 0)) * unit;
+}
+function buildStrat(c, kind, levels) {
+  if (c.tech < STRAT_TECH) return { ok: false, why: 'نیاز به فناوری ' + faNum(STRAT_TECH) + ' (دوره سلاح پیشرفته).' };
+  const max = stratMaxLevel(c);
+  const cur = kind === 'strike' ? (c.strike || 0) : (c.shield || 0);
+  if (cur >= max) return { ok: false, why: 'سقف کنونی با فناوری ' + faNum(c.tech) + ' برابر ' + faNum(max) + ' است.' };
+  const want = Math.max(1, Math.min(Math.floor(levels || 1), max - cur));
+  let cost = 0;
+  for (let i = 0; i < want; i++) cost += stratLevelCost(c, cur + i);
+  const extra = resourceNeedFor(c, kind === 'strike' ? 'air' : 'ship', Math.max(1, Math.round(want / 2)));
+  cost += extra;
+  if (c.treasury < cost) return { ok: false, why: 'هزینه ' + faNum(cost) + ' میلیون است؛ خزانه کافی نیست.' };
+  c.treasury -= cost;
+  if (kind === 'strike') c.strike = cur + want; else c.shield = cur + want;
+  return { ok: true, cost: cost, msg: (kind === 'strike' ? 'توان آفندی' : 'توان پدافندی') + ' به ' + faNum(cur + want) + ' رسید.' };
+}
+function strategicCost(c) {
+  return Math.round(Math.max(120, avgStateRevenue(c) * 3.2) * (0.5 + (c.strike || 0) / 26));
+}
+function canStrategic(c, o) {
+  if (c.tech < STRAT_TECH) return { ok: false, why: 'نیاز به فناوری ' + faNum(STRAT_TECH) + '.' };
+  if (!(c.strike > 0)) return { ok: false, why: 'توان آفندی راهبردی ندارید.' };
+  if (!o || !o.alive) return { ok: false, why: 'کشور هدف معتبر نیست.' };
+  const r = relOf(c, o.id);
+  if (r.status !== 'war') return { ok: false, why: 'این عملیات فقط در وضعیت جنگ ممکن است.' };
+  if (c.lastStrategic != null && W.year - c.lastStrategic < 3) {
+    return { ok: false, why: 'تا ' + faNum(Math.ceil(3 - (W.year - c.lastStrategic))) + ' سال دیگر امکان عملیات تازه نیست.' };
+  }
+  const cost = strategicCost(c);
+  if (c.treasury < cost) return { ok: false, why: 'هزینه ' + faNum(cost) + ' میلیون است؛ خزانه کافی نیست.' };
+  return { ok: true, cost: cost };
+}
+/* اثر بازدارندگی: پدافند برابر با آفند تا ۸۰٪ از اثر را می‌گیرد */
+function stratEffective(strike, shield) {
+  const s = Math.max(0, strike || 0), d = Math.max(0, shield || 0);
+  if (s <= 0) return 0;
+  const block = 0.8 * Math.min(1, d / s);
+  return s * (1 - block);
+}
+const STRAT_TARGETS = [
+  { k: 'infra', n: 'زیرساخت' }, { k: 'industry', n: 'صنعت' }, { k: 'trade', n: 'تجارت' },
+  { k: 'agri', n: 'کشاورزی' }, { k: 'health', n: 'سلامت' }, { k: 'security', n: 'امنیت' }
+];
+function strategicStrike(c, o) {
+  const chk = canStrategic(c, o);
+  if (!chk.ok) return chk;
+  c.treasury -= chk.cost;
+  c.lastStrategic = W.year;
+  const eff = stratEffective(c.strike, o.shield);
+  const power = clamp(eff / STRAT_MAX, 0, 1);
+  const rand = RNGX.range(0.88, 1.12);
+  const p = power * rand;
+  /* عقب‌گرد فناوری و دانش */
+  const techLoss = (0.25 + 1.6 * p);
+  o.tech = clamp(o.tech - techLoss, 0, 100);
+  o.knowledge = clamp(o.knowledge - techLoss * 0.6, 0, 100);
+  o.education = clamp(o.education - techLoss * 0.45, 0, 100);
+  o.healthIdx = clamp(o.healthIdx - techLoss * 0.5, 0, 100);
+  /* ارتش */
+  o.army.readiness = clamp(o.army.readiness - (5 + 25 * p), 5, 100);
+  o.army.morale = clamp(o.army.morale - (3 + 12 * p), 5, 100);
+  const troopLoss = o.army.troops * (0.01 + 0.06 * p);
+  o.army.troops = Math.max(0, o.army.troops - troopLoss);
+  if (o.army.navy > 0 && RNGX.chance(0.25 + p * 0.4)) o.army.navy = Math.max(0, o.army.navy - 1);
+  if (o.army.air > 0 && RNGX.chance(0.2 + p * 0.4)) o.army.air = Math.max(0, o.army.air - 1);
+  /* تأسیسات ایالت‌ها: از توسعه‌یافته‌ترین‌ها شروع می‌شود */
+  const targets = o.owned.slice().sort((a, b) => (W.states[b - 1].infra + W.states[b - 1].industry) - (W.states[a - 1].infra + W.states[a - 1].industry));
+  const n = Math.min(targets.length, 2 + Math.round(6 * p));
+  const hitList = [];
+  const drop = 0.8 + 5 * p;
+  for (let i = 0; i < n; i++) {
+    const st = W.states[targets[i] - 1];
+    for (const t of STRAT_TARGETS) st[t.k] = clamp(st[t.k] - drop * RNGX.range(0.7, 1.3), 0, 100);
+    st.devast = clamp(st.devast + (2 + 10 * p), 0, 100);
+    st.extractDamage = clamp((st.extractDamage || 0) + (3 + 14 * p), 0, 60);
+    st.sat = clamp(st.sat - (1 + 5 * p), 0, 100);
+    st.unrest = clamp(st.unrest + (1 + 5 * p), 0, 100);
+    st.pop = Math.max(8, st.pop * (1 - (0.002 + 0.012 * p)));
+    stateHist(st, 'هدف حمله راهبردی ' + c.name + ' قرار گرفت؛ تأسیسات آسیب دید.');
+    hitList.push(st.id);
+  }
+  /* فرسایش تجهیزات دو طرف */
+  c.strike = Math.max(0, (c.strike || 0) - (RNGX.chance(0.35) ? 1 : 0));
+  if (o.shield > 0 && RNGX.chance(0.4)) o.shield = Math.max(0, o.shield - 1);
+  o.warWeariness = clamp(o.warWeariness + 3 + 6 * p, 0, 100);
+  c.warWeariness = clamp(c.warWeariness + 1.5, 0, 100);
+  warmongerAdd(c, 4, o.id);
+  /* واکنش جهانی */
+  for (const cid in W.countries) {
+    const x = W.countries[cid];
+    if (!x.alive || x.id === c.id) continue;
+    const r = relOf(x, c.id);
+    r.trust = clamp(r.trust - (0.8 + 2.5 * (W.un ? W.un.power : 0)), 0, 100);
+  }
+  const blocked = Math.round((1 - (c.strike ? eff / c.strike : 0)) * 100);
+  const report = {
+    attacker: c.name, defender: o.name, strike: c.strike, shield: o.shield || 0,
+    effective: r3(eff), blocked: blocked, techLoss: r3(techLoss), states: hitList,
+    troopLoss: Math.round(troopLoss), year: Math.floor(W.year)
+  };
+  o.lastStrategicHit = report;
+  news('حمله راهبردی', c.name + ' با توان آفندی ' + faNum(c.strike) + ' به تأسیسات ' + o.name +
+    ' حمله کرد؛ پدافند ' + faNum(blocked) + '٪ از حمله را خنثی کرد. فناوری ' + faDec(techLoss, 1) + ' واحد عقب رفت.',
+    'war', { c: c.id, c2: o.id });
+  logHistory(W.year, 'حمله راهبردی ' + c.name + ' به ' + o.name);
+  if (o.isPlayer) {
+    alertPlayer({
+      type: 'strategicHit', other: c.name, kindName: 'حمله راهبردی',
+      reason: 'پدافند ' + faNum(blocked) + '٪ از حمله را خنثی کرد',
+      detail: 'عقب‌گرد فناوری ' + faDec(techLoss, 1) + ' واحد، آسیب به ' + faNum(hitList.length) + ' ایالت، تلفات ' + faNum(Math.round(troopLoss)) + ' سرباز',
+      states: hitList
+    });
+    pause('حمله راهبردی ' + c.name + ' به تأسیسات کشور شما', 'stateLost');
+  }
+  return { ok: true, msg: 'حمله راهبردی انجام شد؛ ' + faNum(blocked) + '٪ خنثی شد و فناوری هدف ' + faDec(techLoss, 1) + ' واحد عقب رفت.', report: report };
+}
+/* ساخت و استفاده هوش مصنوعی */
+function aiStrategic(c) {
+  if (c.isPlayer || c.tech < STRAT_TECH) return;
+  const max = stratMaxLevel(c);
+  const wantShield = Math.round(max * clamp(0.3 + (1 - c.bias.militarism) * 0.5, 0.2, 0.85));
+  const wantStrike = Math.round(max * clamp(0.2 + c.bias.militarism * 0.6, 0.1, 0.85));
+  const budget = c.treasury * 0.25;
+  if ((c.shield || 0) < wantShield && budget > stratLevelCost(c, c.shield || 0) * 2) buildStrat(c, 'shield', 1);
+  else if ((c.strike || 0) < wantStrike && budget > stratLevelCost(c, c.strike || 0) * 2) buildStrat(c, 'strike', 1);
+  if ((c.strike || 0) > 0 && RNGX.chance(0.35)) {
+    for (const oid in c.rel) {
+      const o = W.countries[oid];
+      if (!o || !o.alive || c.rel[oid].status !== 'war') continue;
+      const chk = canStrategic(c, o);
+      if (chk.ok && c.treasury > chk.cost * 2.5) { strategicStrike(c, o); break; }
+    }
+  }
+}
+
 /* ---------- ۲۱) چرخه مالی ۵ ساله ---------- */
 function cycleStep() {
   W.cycle++;
@@ -4445,7 +4754,7 @@ function yearStep() {
     if (c.credibility == null) c.credibility = 70;
     c.credibility = clamp(c.credibility + 0.6, 0, 100);
     if ((y + c.aiOffset) % 2 === 0) aiDecide(c);
-    if (c.isPlayer) playerAutoDiplo(c);
+    if (c.isPlayer) playerAutoDiplo(c); else aiStrategic(c);
   }
   /* جنگ‌های بسیار طولانی و بی‌حاصل به صلح سفید می‌رسند */
   for (const cid in W.countries) {
@@ -4604,7 +4913,7 @@ function snapshot() {
   const cs = {};
   for (const cid in W.countries) {
     const c = W.countries[cid];
-    cs[cid] = { id: c.id, name: c.name, color: c.color, alive: c.alive, owned: c.owned.length, tech: c.tech };
+    cs[cid] = { id: c.id, name: c.name, color: c.color, alive: c.alive, owned: c.owned.length, tech: c.tech, navy: c.army.navy || 0 };
   }
   const pc = W.countries[W.player];
   const player = pc && pc.alive ? {
@@ -4625,7 +4934,8 @@ function snapshot() {
   const out = {
     year: W.year, cycle: W.cycle, over: W.over, owners, ctrls, pops, incs, sats, unr, devs, stt, res,
     countries: cs, player, ops, market: W.market, news: W.news.slice(-40),
-    requests: (W.requests || []).slice(-6), pause: W.pendingPause, nCountries: Object.values(W.countries).filter(c => c.alive).length,
+    requests: (W.requests || []).slice(-6), alerts: (W.alerts || []).slice(),
+    pause: W.pendingPause, nCountries: Object.values(W.countries).filter(c => c.alive).length,
     settings: W.settings,
     un: W.un ? {
       stage: unStage().name, power: r3(W.un.power), pending: !!W.un.pending,
@@ -4638,6 +4948,7 @@ function snapshot() {
     } : null
   };
   W.pendingPause = null;
+  W.alerts = [];
   return out;
 }
 
@@ -4753,7 +5064,9 @@ function inspectCountry(id) {
       fear: Math.round(r.fear), tension: Math.round(r.tension), grudge: Math.round(r.grudge),
       trade: Math.round(r.trade), ally: r.ally, defPact: r.defPact, nonAgg: r.nonAgg,
       guarantee: r.guarantee, embargo: r.embargo, truce: r.truce,
-      owned: o.owned.length, power: Math.round(estimatePower(c, o).est), info: r3(estimatePower(c, o).info)
+      owned: o.owned.length, power: Math.round(estimatePower(c, o).est), info: r3(estimatePower(c, o).info),
+      shield: (c.intelLevel || 0) > 25 || r.trade > 300 ? (o.shield || 0) : -1,
+      canStrategic: canStrategic(c, o).ok, stratWhy: canStrategic(c, o).why || ''
     });
   }
   rels.sort((a, b) => b.trade - a.trade);
@@ -4773,6 +5086,13 @@ function inspectCountry(id) {
     maxManpower: Math.round(maxManpower(c)), pendingTrain: Math.round(pendingTrain(c)),
     recruitCost: r3(BAL.RECRUIT_COST * (1 + c.tech / 12)), soldierUpkeep: r3(0.30 * (1 + c.tech / 10)),
     shipCost: Math.round(500 * (0.35 + c.tech / 60)), airCost: Math.round(700 * (0.4 + c.tech / 70)),
+    strike: c.strike || 0, shield: c.shield || 0, stratMax: stratMaxLevel(c),
+    stratTech: STRAT_TECH, stratCap: STRAT_MAX,
+    strikeCost: stratMaxLevel(c) > (c.strike || 0) ? stratLevelCost(c, c.strike || 0) : 0,
+    shieldCost: stratMaxLevel(c) > (c.shield || 0) ? stratLevelCost(c, c.shield || 0) : 0,
+    stratUpkeep: Math.round(stratUpkeep(c)), stratStrikeCost: strategicCost(c),
+    lastStrategicHit: c.lastStrategicHit || null,
+    stratReady: c.lastStrategic == null || (W.year - c.lastStrategic) >= 3,
     knowledge: c.knowledge, education: c.education, healthIdx: c.healthIdx,
     stock: c.stock, goals: c.goals, rels, court, lastCycle: c.lastCycle,
     revPressure: c.revPressure, coupRisk: c.coupRisk, credibility: c.credibility,
@@ -5043,14 +5363,16 @@ function command(cmd, a) {
           applyDiplo(pc, from, 'giftRes', { res: 'food', amount: pl.amount });
           return { ok: true, msg: 'غذا ارسال شد.' };
         }
+        const tgt = pl.enemy && W.countries[pl.enemy] && W.countries[pl.enemy].alive ? W.countries[pl.enemy] : null;
+        if (tgt) { declareWar(pc, tgt, 'کمک به ' + from.name); return { ok: true, msg: 'شما در برابر ' + tgt.name + ' وارد جنگ شدید.' }; }
         const enemies = Object.keys(from.rel).filter(x => from.rel[x].status === 'war');
         if (enemies.length) { declareWar(pc, W.countries[enemies[0]], 'کمک به ' + from.name); return { ok: true, msg: 'شما وارد جنگ شدید.' }; }
         return { ok: true, msg: 'جنگی برای پیوستن وجود ندارد.' };
       }
       if (req.type === 'callToArms') {
         const enemy = W.countries[req.about];
-        if (enemy && enemy.alive) declareWar(pc, enemy, 'تعهد دفاعی');
-        return { ok: true, msg: 'شما وارد جنگ شدید.' };
+        if (enemy && enemy.alive) { declareWar(pc, enemy, 'تعهد دفاعی'); return { ok: true, msg: 'شما در برابر ' + enemy.name + ' وارد جنگ شدید.' }; }
+        return { ok: true, msg: 'کشور هدف دیگر وجود ندارد.' };
       }
       applyDiplo(from, pc, req.type, req.payload);
       return { ok: true, msg: 'پذیرفته شد.' };
@@ -5094,6 +5416,12 @@ function command(cmd, a) {
       pc.army.readiness = clamp(pc.army.readiness + gain, 5, 100);
       pc.army.morale = clamp(pc.army.morale + gain * 0.55, 5, 100);
       return { ok: true, msg: 'آمادگی رزمی ' + faNum(gain) + ' واحد بالا رفت.' };
+    }
+    case 'buildStrike': return buildStrat(pc, 'strike', +a.n || 1);
+    case 'buildShield': return buildStrat(pc, 'shield', +a.n || 1);
+    case 'strategic': {
+      const o = W.countries[a.target];
+      return strategicStrike(pc, o);
     }
     case 'setGov': return playerChangeGov(pc, +a.gov);
     case 'unPropose': {
@@ -5561,7 +5889,7 @@ function buildMap() {
     var t = document.createElementNS(svgns, 'text');
     t.setAttribute('class', 'snum');
     t.setAttribute('x', G.geo.centers[k][0]);
-    t.setAttribute('y', G.geo.centers[k][1] + 3);
+    t.setAttribute('y', G.geo.centers[k][1] + 9);
     t.textContent = fa(k + 1);
     nf.appendChild(t);
     G.numEls.push(t);
@@ -5623,6 +5951,8 @@ function paintMap() {
     paintLabels();
   }
   paintMarks();
+  paintShips();
+  paintResIcons();
 }
 function paintColonies() {
   var cg = $('#colonies'), s = G.snap, svgns = 'http://www.w3.org/2000/svg';
@@ -5663,6 +5993,98 @@ function paintLabels() {
     lg.appendChild(t);
   }
 }
+/* ---------- کشتی‌ها روی دریا ---------- */
+function outwardDir(i) {
+  var c = G.geo.centers[i];
+  var nb = G.geo.neighbors[i];
+  if (!nb || !nb.length) return [0, -1];
+  var sx = 0, sy = 0;
+  for (var k = 0; k < nb.length; k++) { sx += G.geo.centers[nb[k]][0]; sy += G.geo.centers[nb[k]][1]; }
+  var dx = c[0] - sx / nb.length, dy = c[1] - sy / nb.length;
+  var len = Math.sqrt(dx * dx + dy * dy) || 1;
+  return [dx / len, dy / len];
+}
+function paintShips() {
+  var g = $('#ships'), s = G.snap, svgns = 'http://www.w3.org/2000/svg';
+  if (!g || !s) return;
+  var sig = '';
+  for (var cid in s.countries) { var cc = s.countries[cid]; if (cc.alive && cc.navy) sig += cid + ':' + Math.ceil(cc.navy / 10) + ','; }
+  sig += '|' + Math.round(G.view.s * 10);
+  if (g._sig === sig) return;
+  g._sig = sig;
+  g.textContent = '';
+  var scale = Math.max(0.55, 1.5 / Math.sqrt(G.view.s));
+  var frag = document.createDocumentFragment();
+  for (var cid2 in s.countries) {
+    var c = s.countries[cid2];
+    if (!c.alive || !c.navy) continue;
+    var n = Math.min(6, Math.ceil(c.navy / 10));
+    if (n < 1) continue;
+    /* ایالت‌های ساحلی این کشور */
+    var coast = [];
+    for (var i = 0; i < s.ctrls.length; i++) {
+      if (s.ctrls[i] === c.id && G.geo.coastal[i]) coast.push(i);
+    }
+    if (!coast.length) continue;
+    var step = Math.max(1, Math.floor(coast.length / n));
+    for (var k = 0; k < n; k++) {
+      var idx = coast[(k * step) % coast.length];
+      var ctr = G.geo.centers[idx];
+      var d = outwardDir(idx);
+      var jitter = ((idx * 37 + k * 13) % 11) - 5;
+      var x = ctr[0] + d[0] * (26 + jitter), y = ctr[1] + d[1] * (26 + jitter);
+      var outer = document.createElementNS(svgns, 'g');
+      outer.setAttribute('transform', 'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') scale(' + scale.toFixed(2) + ')');
+      outer.setAttribute('class', 'ship');
+      var inner = document.createElementNS(svgns, 'g');
+      inner.setAttribute('class', 'bob' + (k % 3 === 1 ? ' b2' : (k % 3 === 2 ? ' b3' : '')));
+      var hull = document.createElementNS(svgns, 'path');
+      hull.setAttribute('d', 'M-7 2 L7 2 L5 6 L-5 6 Z');
+      hull.setAttribute('fill', '#3a2f24');
+      var sail = document.createElementNS(svgns, 'path');
+      sail.setAttribute('d', 'M0 2 L0 -7 L6 -1 Z');
+      sail.setAttribute('fill', c.color);
+      sail.setAttribute('stroke', '#2b3543');
+      sail.setAttribute('stroke-width', '0.7');
+      var mast = document.createElementNS(svgns, 'path');
+      mast.setAttribute('d', 'M0 2 L0 -8');
+      mast.setAttribute('stroke', '#3a2f24');
+      mast.setAttribute('stroke-width', '0.9');
+      inner.appendChild(hull); inner.appendChild(sail); inner.appendChild(mast);
+      outer.appendChild(inner);
+      frag.appendChild(outer);
+    }
+  }
+  g.appendChild(frag);
+}
+/* ---------- نمادهای منابع ---------- */
+var RESGLYPH = ['', '🌾', '🌲', '⛓', '🛢', '🪙'];
+function paintResIcons() {
+  var g = $('#resicons'), s = G.snap, svgns = 'http://www.w3.org/2000/svg';
+  if (!g || !s) return;
+  if (G.mode !== 'resources') {
+    if (g.childNodes.length) { g.textContent = ''; g._sig = ''; }
+    return;
+  }
+  var sig = 'r' + s.res.join('') + '|' + Math.round(G.view.s * 10);
+  if (g._sig === sig) return;
+  g._sig = sig;
+  g.textContent = '';
+  var fs = Math.max(6, 15 / Math.sqrt(G.view.s));
+  var frag = document.createDocumentFragment();
+  for (var i = 0; i < s.res.length; i++) {
+    var r = s.res[i];
+    if (!r) continue;
+    var t = document.createElementNS(svgns, 'text');
+    t.setAttribute('class', 'resicon');
+    t.setAttribute('x', G.geo.centers[i][0]);
+    t.setAttribute('y', G.geo.centers[i][1] - 4);
+    t.setAttribute('font-size', fs);
+    t.textContent = RESGLYPH[r] || '';
+    frag.appendChild(t);
+  }
+  g.appendChild(frag);
+}
 function paintMarks() {
   var mg = $('#marks'), s = G.snap, svgns = 'http://www.w3.org/2000/svg';
   mg.textContent = '';
@@ -5677,6 +6099,7 @@ function paintMarks() {
     t.setAttribute('x', ctr[0]); t.setAttribute('y', ctr[1] + 4);
     t.setAttribute('text-anchor', 'middle');
     t.setAttribute('font-size', Math.max(9, 15 / Math.sqrt(G.view.s)));
+    t.setAttribute('class', 'opmark warpulse');
     t.textContent = op.type === 'expand' ? '⚑' : '⚔';
     mg.appendChild(t);
   }
@@ -5686,7 +6109,7 @@ function paintMarks() {
 }
 function applyView() {
   $('#vp').setAttribute('transform', 'translate(' + G.view.x + ',' + G.view.y + ') scale(' + G.view.s + ')');
-  if (G.geo) { paintLabels(); paintMarks(); paintNums(); }
+  if (G.geo) { paintLabels(); paintMarks(); paintNums(); paintShips(); paintResIcons(); }
 }
 function paintNums() {
   var ng = $('#nums');
@@ -6144,17 +6567,53 @@ function bindStateActions(d) {
 }
 
 /* ---------- اخبار و درخواست‌ها ---------- */
-function renderNews() {
+function newsIsInternal(item) {
+  var p = G.snap.player;
+  if (!p) return false;
+  if (item.c === p.id || item.c2 === p.id) return true;
+  if (item.s && G.snap.ctrls[item.s - 1] === p.id) return true;
+  return false;
+}
+function renderNews(force) {
   var n = G.snap.news, h = '';
+  var mode = G.newsTab || 'all';
+  var shown = 0;
   for (var i = n.length - 1; i >= 0; i--) {
-    h += '<div class="newsitem ' + n[i].k + '"><span class="y">سال ' + fa(n[i].y) + '</span> — <b>' + esc(n[i].t) + '</b>: ' + esc(n[i].x) + '</div>';
+    var it = n[i];
+    var inside = newsIsInternal(it);
+    if (mode === 'in' && !inside) continue;
+    if (mode === 'out' && inside) continue;
+    shown++;
+    h += '<div class="newsitem ' + it.k + '"><span class="y">سال ' + fa(it.y) + '</span> ' +
+      (inside ? '<span class="tag" style="font-size:9.5px;padding:0 4px">داخلی</span> ' : '') +
+      '— <b>' + esc(it.t) + '</b>: ' + esc(it.x) + '</div>';
   }
-  var box = $('#newsbox');
-  if (box._n !== n.length || box._last !== (n.length ? n[n.length - 1].x : '')) {
+  if (!shown) h = '<div style="color:var(--dim2);padding:6px">خبری در این دسته نیست.</div>';
+  var box = $('#newslist');
+  if (!box) return;
+  if (force || box._n !== n.length || box._mode !== mode || box._last !== (n.length ? n[n.length - 1].x : '')) {
     box.innerHTML = h;
     box._n = n.length;
+    box._mode = mode;
     box._last = n.length ? n[n.length - 1].x : '';
   }
+}
+function buildNewsTabs() {
+  var box = $('#newsbox');
+  if (!box || box._built) return;
+  box._built = true;
+  box.innerHTML = '<div id="newstabs">' +
+    '<button class="ntab on" data-nt="all">همه</button>' +
+    '<button class="ntab" data-nt="in">اخبار داخلی</button>' +
+    '<button class="ntab" data-nt="out">اخبار خارجی</button></div>' +
+    '<div id="newslist"></div>';
+  $$('#newstabs .ntab').forEach(function (b) {
+    b.onclick = function () {
+      G.newsTab = b.getAttribute('data-nt');
+      $$('#newstabs .ntab').forEach(function (x) { x.classList.toggle('on', x === b); });
+      renderNews(true);
+    };
+  });
 }
 function renderRequests() {
   var r = G.snap.requests || [], h = '';
@@ -6165,7 +6624,14 @@ function renderRequests() {
     var extra = '';
     var pl = r[i].payload;
     if (r[i].type === 'contract' && pl) extra = '<div style="font-size:11px;color:var(--dim)">' + fa(pl.amount) + ' واحد ' + (G.meta.resNames[pl.res] || pl.res) + ' × ' + fa(pl.cycles) + ' چرخه، قیمت ' + faf(pl.price, 2) + '</div>';
-    if (r[i].type === 'askAid' && pl) extra = '<div style="font-size:11px;color:var(--dim)">' + (aidN[pl.kind] || '') + (pl.amount ? ' — ' + fa(pl.amount) : '') + '</div>';
+    if (r[i].type === 'askAid' && pl) {
+      extra = '<div style="font-size:11px;color:var(--dim)">' + (aidN[pl.kind] || '') + (pl.amount ? ' — ' + fa(pl.amount) : '') +
+        (pl.enemyName ? ' در برابر <b>' + esc(pl.enemyName) + '</b>' : '') + '</div>';
+    }
+    if (r[i].type === 'callToArms') {
+      var en = G.snap.countries[r[i].about];
+      extra = '<div style="font-size:11px;color:var(--dim)">ورود به جنگ در برابر <b>' + esc(en ? en.name : '—') + '</b></div>';
+    }
     h += '<div class="req"><b>' + esc(names[r[i].type] || r[i].type) + '</b> از ' + esc(c ? c.name : '—') + extra +
       '<div class="btns"><button class="btn sm" data-req="' + r[i].id + '" data-acc="1">پذیرش</button>' +
       '<button class="btn sm" data-req="' + r[i].id + '" data-acc="0">رد</button></div></div>';
@@ -6173,7 +6639,39 @@ function renderRequests() {
   var bar = $('#reqbar');
   if (bar._h !== h) { bar.innerHTML = h; bar._h = h; }
   $$('#reqbar [data-req]').forEach(function (b) {
-    b.onclick = function () { cmd('respond', { id: +b.getAttribute('data-req'), accept: b.getAttribute('data-acc') === '1' }); };
+    b.onclick = function () {
+      var id = +b.getAttribute('data-req');
+      var accept = b.getAttribute('data-acc') === '1';
+      var req = null;
+      for (var q = 0; q < r.length; q++) if (r[q].id === id) req = r[q];
+      var enemyId = req ? (req.about || (req.payload && req.payload.enemy)) : 0;
+      if (accept && enemyId) confirmWar(id, req, enemyId);
+      else cmd('respond', { id: id, accept: accept });
+    };
+  });
+}
+/* تأیید ورود به جنگ با نام کشور هدف و هشدار درباره دوستان */
+function confirmWar(reqId, req, enemyId) {
+  var from = G.snap.countries[req.from];
+  var enemy = G.snap.countries[enemyId];
+  ask('country', 0, function (d) {
+    var rel = null;
+    if (d && d.rels) for (var i = 0; i < d.rels.length; i++) if (d.rels[i].id === enemyId) rel = d.rels[i];
+    var warn = '';
+    if (rel && (rel.ally || rel.friend || rel.status === 'friendly')) {
+      warn = '<div class="card" style="border-color:var(--bad);background:#fdeeea;margin-top:8px">' +
+        '<b style="color:var(--bad)">هشدار</b><div style="font-size:12.5px">' +
+        esc(enemy ? enemy.name : '') + ' هم‌اکنون ' +
+        (rel.ally ? 'متحد شماست' : (rel.friend ? 'با شما پیمان دوستی دارد' : 'رابطه دوستانه با شما دارد')) +
+        '. ورود به جنگ با او این پیمان را از بین می‌برد، اعتماد جهانی شما را کم می‌کند و درآمد کشورتان را پایین می‌آورد.</div></div>';
+    }
+    confirmDialog('ورود به جنگ در برابر ' + (enemy ? enemy.name : '—'),
+      '<div style="font-size:13px;line-height:2">' +
+      '<b>' + esc(from ? from.name : '—') + '</b> از شما می‌خواهد در برابر <b>' + esc(enemy ? enemy.name : '—') + '</b> وارد جنگ شوید.' +
+      (rel ? '<br>وضعیت کنونی شما با ' + esc(enemy ? enemy.name : '') + ': ' + statusTag(rel.status) +
+        ' — اعتماد ' + fa(rel.trust) + '، ایالت‌ها ' + fa(rel.owned) + '، توان برآوردی ' + fa(rel.power) : '') +
+      '</div>' + warn,
+      function () { cmd('respond', { id: reqId, accept: true }); });
   });
 }
 
@@ -6465,6 +6963,46 @@ function renderArmy(d) {
     '<div class="hint">بودجه «ارتش» هر چرخه تا این درصد از سقف نیروی انسانی سرباز می‌گیرد و بقیه را صرف آمادگی و روحیه می‌کند. ' +
     'روی صفر یعنی هیچ سربازگیری خودکاری انجام نشود.</div></div>';
 
+  if (s.tech >= (d.stratTech || 60) || (d.strike || d.shield)) {
+    var canMore = (d.stratMax || 0) > 0;
+    h += '<div class="card"><h4>آفند و پدافند راهبردی</h4>' +
+      '<div class="hint">در دوره سلاح پیشرفته و هوشمند می‌توانید به‌جای گرفتن ایالت، تأسیسات یک کشور را هدف بگیرید: ' +
+      'فناوری، صنعت، کشاورزی، سلامت، تجارت و زیرساخت آن عقب می‌رود. پدافند برابر با آفند دشمن تا ۸۰٪ اثر حمله را خنثی می‌کند.</div>' +
+      '<div class="grid2" style="margin-top:6px">' +
+      '<div>' + kv('توان آفندی', fa(d.strike || 0) + ' از ' + fa(d.stratCap || 50)) + bar(d.strike || 0, d.stratCap || 50, '#c0392b') + '</div>' +
+      '<div>' + kv('توان پدافندی', fa(d.shield || 0) + ' از ' + fa(d.stratCap || 50)) + bar(d.shield || 0, d.stratCap || 50, '#2563eb') + '</div>' +
+      '</div>' +
+      kv('سقف کنونی با فناوری ' + faf(s.tech, 0), fa(d.stratMax || 0)) +
+      kv('هزینه نگهداری در چرخه', money(d.stratUpkeep || 0)) +
+      kv('هزینه هر عملیات راهبردی', money(d.stratStrikeCost || 0)) +
+      '<div class="actgrid" style="margin-top:6px">' +
+      '<button class="act" data-a="strike1"' + (canMore && (d.strike || 0) < d.stratMax ? '' : ' disabled') + '><b>+۱ سطح آفند</b><small>' +
+      ((d.strike || 0) < d.stratMax ? money(d.strikeCost) : 'به سقف فناوری رسیده') + '</small></button>' +
+      '<button class="act" data-a="strike5"' + (canMore && (d.strike || 0) + 4 < d.stratMax ? '' : ' disabled') + '><b>+۵ سطح آفند</b><small>' +
+      ((d.strike || 0) + 4 < d.stratMax ? 'حدود ' + money(d.strikeCost * 5.6) : '—') + '</small></button>' +
+      '<button class="act" data-a="shield1"' + (canMore && (d.shield || 0) < d.stratMax ? '' : ' disabled') + '><b>+۱ سطح پدافند</b><small>' +
+      ((d.shield || 0) < d.stratMax ? money(d.shieldCost) : 'به سقف فناوری رسیده') + '</small></button>' +
+      '<button class="act" data-a="shield5"' + (canMore && (d.shield || 0) + 4 < d.stratMax ? '' : ' disabled') + '><b>+۵ سطح پدافند</b><small>' +
+      ((d.shield || 0) + 4 < d.stratMax ? 'حدود ' + money(d.shieldCost * 5.6) : '—') + '</small></button>' +
+      '</div>';
+    var warsL = (G.snap.player && G.snap.player.wars) || [];
+    if (warsL.length && (d.strike || 0) > 0) {
+      h += '<div style="margin-top:8px;color:var(--accent);font-size:12px">حمله راهبردی به کشورهای در حال جنگ</div><div class="actgrid">';
+      for (var wq = 0; wq < warsL.length; wq++) {
+        var cw = G.snap.countries[warsL[wq]];
+        h += '<button class="act danger" data-strat="' + warsL[wq] + '"' + (d.stratReady ? '' : ' disabled') + '><b>' +
+          esc(cw ? cw.name : '—') + '</b><small>' + (d.stratReady ? 'هزینه ' + money(d.stratStrikeCost) : 'در حال بازسازی تجهیزات') + '</small></button>';
+      }
+      h += '</div>';
+    }
+    if (d.lastStrategicHit) {
+      var lh = d.lastStrategicHit;
+      h += '<div style="margin-top:8px;color:var(--bad);font-size:12px">آخرین حمله راهبردی به کشور شما</div>' +
+        '<div style="font-size:12px;color:var(--dim)">سال ' + fa(lh.year) + ' — ' + esc(lh.attacker) + ' با آفند ' + fa(lh.strike) +
+        ' در برابر پدافند ' + fa(lh.shield) + '؛ ' + fa(lh.blocked) + '٪ خنثی شد، افت فناوری ' + faf(lh.techLoss, 2) + ' واحد.</div>';
+    }
+    h += '</div>';
+  }
   h += '<div class="card"><h4>دوره نظامی: ' + esc(era.name) + '</h4>' +
     '<div style="color:var(--dim);font-size:12.5px">فناوری ' + faf(s.tech, 1) + ' — بازه ' + fa(era.min) + ' تا ' + fa(Math.min(100, era.max)) + '</div>' +
     '<div style="margin-top:6px">' + era.items.map(function (x) { return '<span class="tag">' + esc(x) + '</span>'; }).join(' ') + '</div>' +
@@ -6504,10 +7042,24 @@ function renderArmy(d) {
       else if (a === 'navy') cmd('buildNavy', { n: 1 });
       else if (a === 'air') cmd('buildAir', { n: 1 });
       else if (a === 'dis') cmd('disband', { n: Math.max(1, Math.floor(cur * 0.1)) });
+      else if (a === 'strike1') cmd('buildStrike', { n: 1 });
+      else if (a === 'strike5') cmd('buildStrike', { n: 5 });
+      else if (a === 'shield1') cmd('buildShield', { n: 1 });
+      else if (a === 'shield5') cmd('buildShield', { n: 5 });
     };
   });
   $$('#mbody [data-peace]').forEach(function (b) {
     b.onclick = function () { cmd('diplo', { target: +b.getAttribute('data-peace'), kind: 'peace' }); };
+  });
+  $$('#mbody [data-strat]').forEach(function (b) {
+    b.onclick = function () {
+      var id = +b.getAttribute('data-strat');
+      var cc = G.snap.countries[id];
+      confirmDialog('حمله راهبردی به ' + (cc ? cc.name : ''),
+        '<div style="font-size:12.5px;color:var(--dim)">این حمله خاک نمی‌گیرد؛ تأسیسات فناوری، صنعت، کشاورزی، سلامت، تجارت و زیرساخت کشور هدف را عقب می‌برد ' +
+        'و آمادگی ارتشش را پایین می‌آورد. هرچه پدافند هدف نزدیک‌تر به آفند شما باشد، اثر کمتری دارد.</div>',
+        function () { cmd('strategic', { target: id }); });
+    };
   });
 }
 function renderTech(d) {
@@ -6691,6 +7243,7 @@ function diploActions(id, d) {
   var atWar = x.status === 'war';
   var acts = [];
   if (atWar) {
+    if (x.canStrategic) acts.push(['strategic', 'حمله راهبردی', 'تخریب تأسیسات و عقب‌گرد فناوری بدون گرفتن خاک']);
     acts.push(['peace', 'درخواست صلح', 'پایان جنگ در صورت پذیرش طرف مقابل']);
     acts.push(['askHelp', 'درخواست ورود متحدان به جنگ', 'از این کشور بخواهید به جنگ بپیوندد']);
   } else {
@@ -6725,6 +7278,12 @@ function diploActions(id, d) {
           $('#daExtra').innerHTML = '<div class="row"><select id="gRes">' + G.meta.resKeys.map(function (r) { return '<option value="' + r + '">' + G.meta.resNames[r] + '</option>'; }).join('') + '</select>' +
             '<input type="number" id="gRAmt" value="50" min="1"><button class="btn" id="gRGo">ارسال</button></div>';
           $('#gRGo').onclick = function () { cmd('diplo', { target: id, kind: 'giftRes', res: $('#gRes').value, amount: +$('#gRAmt').value }); closeModal(); };
+        } else if (k === 'strategic') {
+          confirmDialog('حمله راهبردی به ' + esc(x.name),
+            '<div style="font-size:12.5px;color:var(--dim)">تأسیسات فناوری، صنعت، کشاورزی، سلامت، تجارت و زیرساخت ' + esc(x.name) +
+            ' آسیب می‌بیند و پیشرفت آن عقب می‌رود. مالکیت هیچ ایالتی تغییر نمی‌کند.' +
+            (x.shield >= 0 ? '<br>پدافند برآوردی هدف: ' + fa(x.shield) : '<br>از پدافند هدف آگاهی دقیقی ندارید.') + '</div>',
+            function () { cmd('strategic', { target: id }); });
         } else if (k === 'war') {
           confirmDialog('اعلان جنگ', '<div style="font-size:12.5px;color:var(--dim)">آیا به ' + esc(x.name) + ' اعلان جنگ می‌دهید؟ جنگ هزینه سنگین اقتصادی و انسانی دارد.</div>',
             function () { cmd('diplo', { target: id, kind: 'war' }); });
@@ -7135,6 +7694,17 @@ function renderHelp() {
     'برای حمله زمینی باید مرز زمینی مستقیم داشته باشید (مرز قطری کافی نیست). ایالت ساحلی را می‌توان با ناو و فناوری کافی از دریا هدف گرفت. ' +
     'هر عملیات زمان‌بر است و خط تدارکات، فاصله، زمین، استحکامات، روحیه و فناوری بر نتیجه اثر می‌گذارند. نسبت قدرت ۱ یعنی نبرد برابر و ۲ یعنی احتمال پیروزی بسیار بالا — اما هیچ برتری‌ای پیروزی تضمین‌شده نیست.' +
     '</div></div>';
+  h += '<div class="card"><h4>جنگ راهبردی (دوره سلاح پیشرفته و هوشمند)</h4><div style="font-size:13px;line-height:2">' +
+    'از فناوری ۶۰ به بالا دو توان تازه باز می‌شود: <b>آفند</b> و <b>پدافند</b>، هرکدام تا سطح ۵۰ (سقف هر لحظه به فناوری شما بسته است). ' +
+    'با آفند می‌توانید به‌جای گرفتن ایالت، به تأسیسات یک کشور حمله کنید: فناوری، دانش، آموزش، سلامت، صنعت، کشاورزی، تجارت، زیرساخت و آمادگی ارتش آن عقب می‌رود ' +
+    'ولی هیچ خاکی جابه‌جا نمی‌شود. پدافند برابر با آفند دشمن تا ۸۰٪ اثر حمله را خنثی می‌کند؛ برای نمونه آفند ۲۰ در برابر پدافند ۲۰ تنها حدود یک‌پنجم اثر را می‌گذارد. ' +
+    'هر عملیات هزینه دارد، تجهیزات دو طرف فرسوده می‌شود و اعتماد جهانی مهاجم کاهش می‌یابد.' +
+    '</div></div>';
+  h += '<div class="card"><h4>گزارش‌ها و هشدارها</h4><div style="font-size:13px;line-height:2">' +
+    'هر تغییر مالکیت یا کنترل در «تاریخ ایالت» ثبت می‌شود: چه کسی، چگونه و به چه علت. ' +
+    'اگر ایالتی از کشور شما جدا شود، پیام کاملی با نحوه جدایی (تصرف نظامی، شورش، جدایی، پایان استعمار…)، علت‌های زمینه‌ای، ' +
+    'جمعیت و درآمد از دست رفته نمایش داده می‌شود. اخبار هم به دو دسته <b>داخلی</b> و <b>خارجی</b> تقسیم شده است.' +
+    '</div></div>';
   h += '<div class="card"><h4>استعمار و شورش</h4><div style="font-size:13px;line-height:2">' +
     'استعمار آسان‌تر از تصرف کامل است (حدود ۶۰٪ توان لازم) ولی مالکیت رسمی را تغییر نمی‌دهد: حداکثر ۵۰٪ درآمد و منابع را می‌گیرید و هزینه پادگان، امنیت و اداره می‌پردازید؛ سود خالص معمولاً ۲۰ تا ۳۵٪ ارزش ایالت است. ' +
     'حمایت از شورشیان به‌طور خودکار خاک را به شما نمی‌دهد؛ نتیجه می‌تواند استقلال، کشور تازه یا حکومتی همسو باشد.' +
@@ -7154,15 +7724,71 @@ function renderHelp() {
   }
 }
 
+/* ---------- هشدارهای مهم بازیکن ---------- */
+function queueAlerts(list) {
+  G.alertQueue = (G.alertQueue || []).concat(list);
+  if (G.alertQueue.length > 8) G.alertQueue = G.alertQueue.slice(-8);
+  if (!G.alertShown) showNextAlert();
+}
+function showNextAlert() {
+  var q = G.alertQueue || [];
+  if (!q.length) { G.alertShown = false; return; }
+  var a = q.shift();
+  G.alertShown = true;
+  var box = $('#alertbox');
+  var isLoss = a.type === 'stateLost';
+  var isHit = a.type === 'strategicHit';
+  var title = isLoss ? ('ایالت ' + fa(a.state) + ' از کشور شما جدا شد')
+    : (isHit ? ('حمله راهبردی ' + esc(a.other) + ' به کشور شما')
+      : ('ایالت ' + fa(a.state) + ' به قلمرو شما افزوده شد'));
+  var h = '<div class="alertcard ' + (isLoss || isHit ? 'bad' : 'good') + '">' +
+    '<div class="ahead">' + (isLoss ? '⚑ ' : (isHit ? '✸ ' : '★ ')) + esc(title) + '</div>' +
+    '<div class="abody">';
+  h += '<div class="kv"><span>سال</span><b>' + fa(a.y) + '</b></div>';
+  h += '<div class="kv"><span>نحوه</span><b>' + esc(a.kindName || '') + '</b></div>';
+  if (a.other) h += '<div class="kv"><span>' + (isLoss ? 'به سود' : (isHit ? 'مهاجم' : 'از')) + '</span><b>' + esc(a.other) + '</b></div>';
+  if (a.reason) h += '<div class="kv"><span>علت</span><b>' + esc(a.reason) + '</b></div>';
+  if (a.detail) h += '<div class="kv"><span>جزئیات</span><b>' + esc(a.detail) + '</b></div>';
+  if (a.pop) h += '<div class="kv"><span>جمعیت از دست رفته</span><b>' + ppl(a.pop) + '</b></div>';
+  if (a.income) h += '<div class="kv"><span>درآمد چرخه‌ای</span><b>' + money(a.income) + '</b></div>';
+  if (isLoss && a.unrest != null) h += '<div class="kv"><span>نارضایتی هنگام جدایی</span><b>' + pc(a.unrest) + '</b></div>';
+  if (a.wasCapital) h += '<div style="color:var(--bad);margin-top:4px">این ایالت پایتخت شما بود؛ پایتخت تازه تعیین شد.</div>';
+  if (a.states && a.states.length) h += '<div class="kv"><span>ایالت‌های آسیب‌دیده</span><b>' + a.states.map(fa).join('، ') + '</b></div>';
+  h += '</div><div class="row" style="margin-top:10px">';
+  if (a.state) h += '<button class="btn sm" id="alShow">نمایش روی نقشه</button>';
+  h += '<button class="btn sm primary" id="alOk">باشد</button>' +
+    (q.length ? '<span style="align-self:center;color:var(--dim2);font-size:11px">' + fa(q.length) + ' پیام دیگر</span>' : '') +
+    '</div></div>';
+  box.innerHTML = h;
+  box.classList.remove('hidden');
+  $('#alOk').onclick = function () { box.classList.add('hidden'); showNextAlert(); };
+  if ($('#alShow')) $('#alShow').onclick = function () {
+    box.classList.add('hidden');
+    selectState(a.state);
+    focusState(a.state);
+    showNextAlert();
+  };
+}
+function focusState(id) {
+  if (!G.geo || !id) return;
+  var c = G.geo.centers[id - 1];
+  G.view.s = Math.max(G.view.s, 2.6);
+  G.view.x = 800 - c[0] * G.view.s;
+  G.view.y = 500 - c[1] * G.view.s;
+  clampView(); applyView();
+}
+
 /* ---------- به‌روزرسانی وضعیت ---------- */
 function applySnap(snap) {
   G.snap = snap;
   if (!G.started) return;
   paintMap();
   buildTopbar();
+  buildNewsTabs();
   renderNews();
   renderRequests();
   if (!G.sel) renderOverview();
+  if (snap.alerts && snap.alerts.length) queueAlerts(snap.alerts);
   if (snap.pause && !snap.over) showPause(snap.pause.r);
   if (snap.over && !G.over) { G.over = true; showEnd(snap.over); }
 }
