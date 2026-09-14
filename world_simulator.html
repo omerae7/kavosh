@@ -91,6 +91,8 @@ button{cursor:pointer;border:0;background:none}
   font-weight:700;pointer-events:none;opacity:.95}
 .snum{fill:#233040;text-anchor:middle;paint-order:stroke;stroke:#ffffffb0;stroke-width:2.2px;
   pointer-events:none;opacity:.8;font-weight:600}
+/* روی نماهای تیره (مثل منابع سرشار) هاله سفید پررنگ‌تر تا شماره ایالت خوانا بماند */
+#nums.onDark .snum{stroke:#ffffff;stroke-width:3.1px;opacity:1;font-weight:700}
 .opmark{pointer-events:none}
 
 #mapctl{position:absolute;top:8px;left:8px;display:flex;flex-direction:column;gap:6px;z-index:5}
@@ -332,6 +334,7 @@ input[type=number],input[type=text],select{padding:6px 9px;background:var(--pane
         <g id="borders"></g>
         <path id="sel" d=""></path>
         <g id="resicons"></g>
+        <g id="energyicons"></g>
         <g id="marks"></g>
         <g id="nums"></g>
         <g id="labels"></g>
@@ -465,17 +468,13 @@ const ETHNICS = [
 ];
 const ETH_DATA = [
   { /* ایرانی */
-    lands: ['پارس', 'ماد', 'خوارزم', 'سغد', 'طبرستان', 'خراسان', 'آذربایگان', 'کرمان', 'گرگان', 'سیستان', 'ری', 'بلخ', 'هرات', 'مرو', 'شوش'],
+    lands: [['ایران',4],['پاکستان',2.2],['قزاقستان',1.6],['ازبکستان',1.3],['افغانستان',1.2],['آذربایجان',1],['ترکمنستان',0.9],['تاجیکستان',0.8],['قرقیزستان',0.8],['ارمنستان',0.8],['گرجستان',0.8],['کردستان',0.8]],
     m: ['داریوش', 'کوروش', 'اردشیر', 'بهرام', 'شاپور', 'خسرو', 'کاوه', 'رستم', 'سیاوش', 'فریدون', 'کامبیز', 'هرمز', 'پیروز', 'نرسی', 'یزدگرد', 'بابک'],
     f: ['آناهیتا', 'پوراندخت', 'آذرمیدخت', 'شیرین', 'گردآفرید', 'رودابه', 'فرنگیس', 'آتوسا', 'روشنک', 'مهرآذر'],
     dyn: ['هخامنش', 'ساسان', 'اشکان', 'سامان', 'بویه', 'صفار', 'کیانی', 'سپهبد']
   },
   { /* اروپایی */
-    lands: ['فرانکیا', 'باواریا', 'کاستیل', 'آراگون', 'لومباردی', 'ساکسونی', 'نورماندی', 'فلاندر', 'بورگاندی', 'توسکانی',
-      'ونیز', 'لئون', 'بوهم', 'موراویا', 'آستوریا', 'بریتانیا', 'کالدونیا', 'هیبرنیا', 'وسکس', 'مرسیا',
-      'نورثامبریا', 'آکیتن', 'پروونس', 'شامپاین', 'برتاین', 'سیلزیا', 'پومرانیا', 'براندنبورگ', 'تیرول', 'کارینتیا',
-      'ژنوا', 'میلان', 'ناوار', 'گالیسیا', 'کاتالونیا', 'ساردنی', 'سیسیل', 'داکیا', 'پانونیا', 'ایلیریا',
-      'روتنیا', 'لیتوانیا', 'ماسوویا', 'لیوونیا', 'کورلند', 'گوتلند', 'اسکانیا', 'یوتلند', 'فینمارک', 'نوریکوم'],
+    lands: [['روسیه',4.6],['آلمان',4.2],['فرانسه',4],['بریتانیا',4],['ایتالیا',3],['اسپانیا',2.8],['ترکیه',2.6],['لهستان',2.2],['اوکراین',2],['هلند',1.9],['سوئد',1.6],['اتریش',1.5],['سوئیس',1.5],['پرتغال',1.4],['یونان',1.4],['بلژیک',1.3],['نروژ',1.3],['دانمارک',1.3],['فنلاند',1.2],['مجارستان',1.2],['رومانی',1.2],['چک',1.2],['بلاروس',1.1],['صربستان',1],['بلغارستان',1],['ایرلند',1],['اسکاتلند',1],['کرواسی',0.9],['اسلواکی',0.9],['لیتوانی',0.8],['لتونی',0.7],['استونی',0.7],['اسلوونی',0.7],['آلبانی',0.7],['مولداوی',0.6],['مقدونیه',0.6],['ایسلند',0.6],['لوکزامبورگ',0.5]],
     m: ['کارل', 'هنری', 'لویی', 'ویلیام', 'فردریک', 'اتو', 'فیلیپ', 'ریچارد', 'آلبرت', 'رابرت', 'لوتار', 'کنراد',
       'ادوارد', 'شارل', 'رودولف', 'هارالد', 'کنوت', 'اریک', 'گوستاو', 'زیگموند', 'کازیمیر', 'ولادیسلاو', 'آلفونسو',
       'فردیناند', 'رنه', 'هوگو', 'لئوپولد', 'ماکسیمیلیان', 'تئودوریک', 'بالدوین'],
@@ -485,40 +484,37 @@ const ETH_DATA = [
       'یاگلون', 'آنژو', 'اسفورتزا', 'ویزکونتی', 'اولدنبورگ', 'ساووی']
   },
   { /* عربی */
-    lands: ['حجاز', 'نجد', 'یمن', 'عمان', 'شام', 'بصره', 'کوفه', 'حضرموت', 'بحرین', 'مغرب', 'قیروان', 'حلب', 'دمشق', 'صنعا', 'طائف'],
+    lands: [['عربستان',3],['مصر',3],['عراق',2.6],['امارات',2],['الجزایر',1.6],['مراکش',1.5],['سوریه',1.5],['قطر',1.5],['کویت',1.4],['لیبی',1.3],['عمان',1.2],['تونس',1.1],['اردن',1],['لبنان',1],['یمن',1],['سودان',1],['بحرین',0.8],['موریتانی',0.7]],
     m: ['هارون', 'مأمون', 'عمر', 'خالد', 'طارق', 'زیاد', 'معتصم', 'ولید', 'مروان', 'سلیمان', 'عبدالله', 'یوسف', 'قتیبه', 'عمرو'],
     f: ['زبیده', 'خدیجه', 'عایشه', 'فاطمه', 'سکینه', 'رابعه', 'سلمی', 'هند', 'لیلی', 'نائله'],
     dyn: ['عباس', 'امیه', 'فاطمی', 'هاشم', 'غسان', 'مهلب', 'کنده']
   },
   { /* چینی */
-    lands: ['هان', 'تانگ', 'سونگ', 'وی', 'شو', 'وو', 'چو', 'چین', 'یان', 'ژائو', 'لیانگ', 'یوئه', 'شیا', 'جین'],
+    lands: [['چین',5],['اندونزی',2.2],['ویتنام',1.7],['تایلند',1.6],['مالزی',1.5],['فیلیپین',1.5],['سنگاپور',1.5],['تایوان',1.4],['میانمار',1.1],['مغولستان',1],['کامبوج',0.8],['هنگ‌کنگ',0.8],['لائوس',0.7],['برونئی',0.6]],
     m: ['لی', 'وو', 'ژائو', 'هان', 'مینگ', 'شی', 'یانگ', 'چن', 'ژو', 'سون', 'کانگ', 'شیائو', 'گائو', 'لیو'],
     f: ['مِی', 'لینگ', 'شیائو', 'یان', 'هوآ', 'چون', 'فِی', 'یینگ', 'لان'],
     dyn: ['لیو', 'ژو', 'سویی', 'مینگ', 'چینگ', 'شیا', 'سیما']
   },
   { /* ژاپنی */
-    lands: ['یاماتو', 'ادو', 'ساتسوما', 'چوشو', 'اوواری', 'کای', 'ایزومو', 'مینو', 'سوروگا', 'اچیگو', 'هیزن', 'تسوشیما'],
+    lands: [['ژاپن',4.2],['کره جنوبی',2.6],['کره شمالی',1.6],['منچوری',0.9],['هوکایدو',0.7],['ریوکیو',0.6]],
     m: ['تاکدا', 'اودا', 'هیده‌یوشی', 'ماسامونه', 'یوشی‌تسونه', 'کنشین', 'نوبونگا', 'ییه‌یاسو', 'شینگن', 'تادا', 'هیرو', 'کازو'],
     f: ['هیمیکو', 'ساکورا', 'آیکو', 'میچیکو', 'تومو', 'هانا', 'کیکو', 'یوری'],
     dyn: ['فوجیوارا', 'میناموتو', 'تایرا', 'توکوگاوا', 'هوجو', 'آشیکاگا']
   },
   { /* هندی */
-    lands: ['مگده', 'گوجارات', 'بنگال', 'دکن', 'راجستان', 'مالوا', 'کلینگه', 'چولا', 'پنجاب', 'سند', 'کشمیر', 'میسور', 'اودیشا'],
+    lands: [['هند',5],['بنگلادش',2],['سریلانکا',1.2],['نپال',1],['بوتان',0.6],['مالدیو',0.5],['آسام',0.7],['دکن',0.8]],
     m: ['چاندرا', 'آشوکا', 'راجندرا', 'ویکرام', 'هارشا', 'سامودرا', 'بیمبیسار', 'کریشنا', 'ارجون', 'ناگا', 'دِوا'],
     f: ['لاکشمی', 'سیتا', 'رادها', 'پریا', 'دویا', 'اندرا', 'میرا', 'شاکونتالا'],
     dyn: ['موریا', 'گوپتا', 'چولا', 'پالا', 'راشتراکوتا', 'چالوکیا']
   },
   { /* آفریقایی */
-    lands: ['مالی', 'غنا', 'سونگهای', 'اکسوم', 'نوبیا', 'زیمبابوه', 'کانم', 'بنین', 'اویو', 'کوش', 'دارفور', 'سوکوتو', 'واداغی'],
+    lands: [['نیجریه',2.6],['آفریقای جنوبی',2.5],['اتیوپی',2],['کنگو',1.6],['کنیا',1.5],['غنا',1.3],['تانزانیا',1.2],['آنگولا',1.2],['کامرون',1.1],['موزامبیک',1],['اوگاندا',1],['سنگال',1],['ساحل عاج',1],['زیمبابوه',1],['سومالی',0.9],['زامبیا',0.9],['ماداگاسکار',0.9],['مالی',0.9],['نیجر',0.8],['چاد',0.8],['گینه',0.7],['بورکینافاسو',0.7],['بوتسوانا',0.7],['نامیبیا',0.7],['رواندا',0.7],['گابن',0.6],['بنین',0.6],['توگو',0.6]],
     m: ['منسا', 'سونی', 'عزانا', 'شاکا', 'کانکان', 'اسکیا', 'سوندیاتا', 'اوبا', 'تووُدروس', 'کاشتا'],
     f: ['آمینا', 'ندیا', 'زارا', 'ایموزا', 'ناندی', 'ماکدا', 'یِنِنگا', 'آبِنا'],
     dyn: ['کیتا', 'آسکیا', 'زاگوه', 'سولایمان', 'دیارا', 'اوانگو']
   },
   { /* آمریکایی */
-    lands: ['آزتک', 'مایا', 'اینکا', 'تولتک', 'زاپوتک', 'چیمو', 'موچه', 'کچوا', 'داکوتا', 'چروکی',
-      'تیوتیواکان', 'تاراسک', 'ناسکا', 'میشتک', 'اولمک', 'توپیناما', 'گوارانی', 'ماپوچه', 'آیمارا', 'وانکا',
-      'کاخامارکا', 'تیاواناکو', 'پوئبلو', 'ناواهو', 'آپاچی', 'ایروکوا', 'هورون', 'شاینی', 'کومانچی', 'اوتاوا',
-      'کریک', 'سمینول', 'پاونی', 'کادو', 'تلینگیت', 'هایدا', 'کالوسا', 'تاینو', 'کاریب', 'موئیسکا'],
+    lands: [['آمریکا',5],['برزیل',3.5],['کانادا',3],['مکزیک',2.6],['آرژانتین',2.5],['استرالیا',2.5],['کلمبیا',1.8],['شیلی',1.8],['پرو',1.6],['ونزوئلا',1.5],['نیوزیلند',1.5],['کوبا',1.2],['اکوادور',1.1],['بولیوی',1],['اروگوئه',1],['پاراگوئه',0.9],['گواتمالا',0.9],['پاناما',0.9],['کاستاریکا',0.8],['هندوراس',0.7],['نیکاراگوئه',0.7],['السالوادور',0.6],['جامائیکا',0.6],['هائیتی',0.6],['دومینیکن',0.6],['گویان',0.5],['سورینام',0.5],['ترینیداد',0.5]],
     m: ['پاکال', 'موکتزوما', 'آتاوالپا', 'ایتزامنا', 'کوآوتموک', 'توپاک', 'ویراکوچا', 'ناکسون', 'اوکسلوتل',
       'سیتلالی', 'یوپانکی', 'هواینا', 'ماناکو', 'تِکوم', 'آهویتزوتل', 'نزاهوال', 'شیکوتنکاتل', 'پوما'],
     f: ['مالینال', 'آتزیری', 'ناهویی', 'ایکسچل', 'کوریکویا', 'ییاتل', 'ساچا', 'آناکائونا', 'کوسامالوتل', 'ییکتل'],
@@ -616,8 +612,15 @@ const TERRAINS = [
 ];
 
 const RES_KEYS = ['food', 'wood', 'iron', 'oil', 'gold'];
-const RES_NAMES = { food: 'غذا', wood: 'چوب', iron: 'آهن', oil: 'نفت', gold: 'طلا' };
-const RES_ICON = { food: '🌾', wood: '🪵', iron: '⛓️', oil: '🛢️', gold: '🪙' };
+/* سوخت و انرژی کالای ساخته‌شده است: استخراج نمی‌شود ولی خرید و فروش می‌شود */
+const TRADE_KEYS = ['food', 'wood', 'iron', 'oil', 'gold', 'energy'];
+const MINE_KEYS = ['iron', 'oil', 'gold'];
+const RES_NAMES = { food: 'غذا', wood: 'چوب', iron: 'آهن', oil: 'نفت', gold: 'طلا', energy: 'سوخت و انرژی' };
+const RES_ICON = { food: '🌾', wood: '🪵', iron: '⛓️', oil: '🛢️', gold: '🪙', energy: '⚡' };
+/* ترتیب کشف: چوب و غذا از آغاز، سپس آهن، سپس طلا، سپس نفت */
+const RES_TECH = { food: 0, wood: 0, iron: 12, gold: 22, oil: 40 };
+/* توان رزمی هر دوره نظامی — سرباز دوره بالاتر به‌روشنی قوی‌تر است */
+const ERA_POWER = [1.00, 1.22, 1.58, 2.15, 3.00];
 
 const ERAS = [
   { id: 0, name: 'سلاح اولیه', min: 0, max: 15, items: ['سنگ', 'چوب', 'چماق', 'نیزه ساده', 'کمان ابتدایی'] },
@@ -631,12 +634,13 @@ function eraOf(tech) {
   return ERAS[0];
 }
 
-const BUDGET_KEYS = ['army', 'science', 'welfare', 'economy', 'housing', 'culture', 'diplomacy', 'security'];
+const BUDGET_KEYS = ['army', 'science', 'welfare', 'economy', 'factory', 'housing', 'culture', 'diplomacy', 'security'];
 const BUDGET_NAMES = {
   army: 'ارتش و ناوگان',
   science: 'دانش، فناوری و آموزش',
   welfare: 'سلامت و غذا',
   economy: 'کشاورزی، صنعت، تجارت و زیرساخت',
+  factory: 'کارخانه، کمپانی و تأسیسات',
   housing: 'مسکن',
   culture: 'فرهنگ و هنر',
   diplomacy: 'دیپلماسی',
@@ -647,6 +651,7 @@ const BUDGET_DESC = {
   science: 'دانش پایه، آموزش عمومی و تحقیق که فناوری را جلو می‌برد',
   welfare: 'سلامت مردم، طول عمر و تأمین غذا',
   economy: 'زیرساخت، صنعت، تجارت و کشاورزی ایالت‌ها',
+  factory: 'کارخانه، کمپانی و تأسیسات صنعتی — رضایت مردم و ارزش سهام در بورس جهانی',
   housing: 'مسکن و رفاه که رضایت مردم را بالا می‌برد',
   culture: 'هنر، فرهنگ و مشروعیت حکومت',
   diplomacy: 'بهبود روابط با کشورها و نفوذ در سازمان ملل',
@@ -680,7 +685,29 @@ const BAL = {
   CYCLE_YEARS: 5,
   MAX_STATES: 350,
   NEW_WORLD: 50,          // ایالت‌های دو قاره تازه در دل اقیانوس
-  COUNTRIES: 25           // تعداد کشورهای آغازین
+  COUNTRIES: 25,          // تعداد کشورهای آغازین
+
+  /* ---- منابع ---- */
+  RICH_CHANCE: 0.28,      // سهم ذخایر سرشار از کل ذخایر
+  MINE_RATE: { iron: 18, oil: 24, gold: 3.4 },      // برداشت پایه هر چرخه از یک معدن معمولی
+  RICH_YIELD: 1.75,       // برداشت معدن سرشار نسبت به معمولی
+  RICH_LIFE: 108,         // چرخه‌های عمر معدن سرشار (۱۰۸ × ۵ = ۵۴۰ سال)
+  NORM_LIFE: 34,          // چرخه‌های عمر معدن معمولی (حدود ۱۷۰ سال)
+  EXPLORE_BASE: 0.010,    // شانس پایه کشف ذخیره تازه در هر ایالت مستعد
+  SCARCITY_REF: { iron: 420000, oil: 400000, gold: 62000 }, // کف ذخایر جهانی؛ کمتر از این، اکتشاف شتاب می‌گیرد
+
+  /* ---- سوخت و انرژی ---- */
+  ENERGY_PER_OIL: 2.20,   // واحد انرژی از هر واحد نفت مصرف داخلی
+  ENERGY_CAP_ST: 3.2,     // سقف ذخیره سوخت = این ضریب × نیاز راهبردی
+  ENERGY_CIV: 0.55,        // مصرف غیرنظامی انرژی هر ایالت در چرخه
+  ENERGY_ATTACK: 0.012,   // انرژی لازم برای هر سرباز مهاجم در هر تیک نبرد
+  ENERGY_DEFEND: 0.20,    // نسبت مصرف پدافند به آفند (۸۰٪ کمتر)
+  ENERGY_TECH: 40,        // فناوری لازم برای تبدیل نفت به سوخت
+
+  /* ---- کارخانه، کمپانی و بورس ---- */
+  FACTORY_K: 14,         // سرعت رشد شاخص کارخانه (عمداً کند)
+  STOCK_MIN: 15,          // درصد لازم برای ورود به بورس جهانی
+  STOCK_K: 0.22           // بیشترین سهم بورس از مقیاس درآمد کشور
 };
 
 /* ---------- ۵) نویز و ساخت هندسه نقشه ---------- */
@@ -1103,6 +1130,9 @@ function baseCountry(id, name, color, capital) {
     revPressure: 0, coupRisk: 0, unrestAvg: 0,
     warmonger: 0, unRep: 50, diploPower: 0, counterBribes: {},
     autoBudget: {}, royalName: '', regnal: 1,
+    energy: 0, lastEnergyMade: 0, lastEnergyUse: 0, energyShort: 0,
+    factory: 0, stockValue: 0, stockIncome: 0, stockActive: false,
+    resPolicy: defaultResPolicy(), autoRes: defaultAutoRes(), lastProd: {}, tradeAccess: 1,
     owned: [], ctrl: [], vassalOf: 0, vassals: [],
     lastCycle: null, aiOffset: id % 3, isPlayer: false,
     intel: {}, factions: [], deficitYears: 0, dynasty: ''
@@ -1132,12 +1162,33 @@ function distributeResources(rng) {
     const ironP = clamp(0.25 + east * 0.55 + nC * 0.5 + (GEO.terrain[i] === 2 ? 0.35 : 0) + (GEO.terrain[i] === 1 ? 0.15 : 0), 0, 1.6);
     const oilP = clamp(0.15 + south * 0.60 + nA * 0.55 + (GEO.terrain[i] === 4 ? 0.30 : 0) + (GEO.coastal[i] ? 0.10 : 0), 0, 1.6);
     const goldP = clamp(0.10 + (south * 0.35 + east * 0.35) + nB * 0.55 + (GEO.terrain[i] === 2 ? 0.25 : 0), 0, 1.5);
-    st.iron = rng.chance(clamp(ironP * 0.55, 0.03, 0.85)) ? Math.round(rng.range(180, 1500) * ironP) : 0;
-    st.oil = rng.chance(clamp(oilP * 0.40, 0.02, 0.6)) ? Math.round(rng.range(300, 2600) * oilP) : 0;
-    st.gold = rng.chance(clamp(goldP * 0.30, 0.02, 0.45)) ? Math.round(rng.range(60, 520) * goldP) : 0;
-    st.ironMax = st.iron; st.oilMax = st.oil; st.goldMax = st.gold;
-    st.known = { food: true, wood: true, gold: st.gold > 0 ? rng.chance(0.6) : true, iron: false, oil: false };
+    /* استعداد زمین‌شناسی هر ایالت: پایه کشف ذخایر تازه در آینده */
+    st.pot = { iron: r3(ironP), oil: r3(oilP), gold: r3(goldP) };
+    st.rich = { iron: 0, oil: 0, gold: 0, wood: 0, food: 0 };
+    st.iron = st.oil = st.gold = 0;
+    st.ironMax = st.oilMax = st.goldMax = 0;
+    if (rng.chance(clamp(ironP * 0.55, 0.03, 0.85))) seedDeposit(st, 'iron', rng, ironP);
+    if (rng.chance(clamp(oilP * 0.40, 0.02, 0.60))) seedDeposit(st, 'oil', rng, oilP);
+    if (rng.chance(clamp(goldP * 0.30, 0.02, 0.45))) seedDeposit(st, 'gold', rng, goldP);
+    /* جنگل و کشتزار سرشار: بازده پایدار بالاتر */
+    if (rng.chance(0.24) && st.forestCap > 25) { st.rich.wood = 1; st.forestCap = clamp(st.forestCap * 1.45, 0, 140); st.forest = st.forestCap; }
+    if (rng.chance(0.22) && st.foodBase > 0.7) { st.rich.food = 1; st.foodBase = clamp(st.foodBase * 1.40, 0.15, 3.0); }
+    st.known = { food: true, wood: true, gold: false, iron: false, oil: false };
   }
+}
+
+/* یک ذخیره تازه در ایالت می‌سازد؛ حجم آن از روی عمر هدف و نرخ برداشت تعیین می‌شود */
+function seedDeposit(st, k, rng, potential) {
+  const isRich = rng.chance(BAL.RICH_CHANCE);
+  const rate = BAL.MINE_RATE[k] * (isRich ? BAL.RICH_YIELD : 1);
+  /* نرخ برداشت در فناوری بالا تا ۱٫۹ برابر می‌شود؛ عمر هدف را با همان حساب می‌کنیم */
+  const life = (isRich ? BAL.RICH_LIFE : BAL.NORM_LIFE) * rng.range(0.92, 1.18);
+  const size = rate * 1.85 * life * clamp(0.55 + (potential || 1) * 0.45, 0.55, 1.6);
+  st[k] = Math.round(size);
+  st[k + 'Max'] = st[k];
+  if (!st.rich) st.rich = { iron: 0, oil: 0, gold: 0, wood: 0, food: 0 };
+  st.rich[k] = isRich ? 1 : 0;
+  return st[k];
 }
 
 function rebalanceResources(rng) {
@@ -1165,7 +1216,10 @@ function rebalanceResources(rng) {
             const take = Math.min(st[k] * 0.6, move);
             st[k] -= take; st[k + 'Max'] = st[k];
             const tgt = free[Math.floor(rng.f() * free.length)];
-            if (tgt) { tgt[k] += take; tgt[k + 'Max'] = tgt[k]; }
+            if (tgt) {
+              tgt[k] += take; tgt[k + 'Max'] = tgt[k];
+              if (tgt.rich && st.rich && st.rich[k]) tgt.rich[k] = 1;
+            }
             move -= take; fixed = true;
           }
         }
@@ -1369,6 +1423,8 @@ function generateWorld(opts) {
   RES_KEYS.forEach(k => {
     W.market[k] = { price: k === 'gold' ? 6.0 : (k === 'oil' ? 2.2 : (k === 'iron' ? 1.8 : (k === 'wood' ? 0.9 : 1.0))), supply: 0, demand: 0, hist: [] };
   });
+  W.stockMood = 1;
+  worldReserveScan();
 
   /* روابط اولیه */
   const ids = Object.keys(W.countries).map(Number);
@@ -1649,6 +1705,9 @@ function investBudget(c, pool) {
   const gTrade = perState(eco * 0.20), gAgri = perState(eco * 0.25);
   const sec = spend['security'] / scale;
   const gSec = perState(sec * 0.62);
+  /* کارخانه، کمپانی و تأسیسات: رشد کند، اثر بر رضایت و ارزش سهام */
+  factoryGrow(c, spend['factory'] / scale * eff);
+  const facSat = clamp((c.factory || 0) / 100, 0, 1);
   const gHouse = perState(spend['housing'] / scale);
   const gHealth = perState((spend['welfare'] / scale) * 0.55);
   const gCult = perState(spend['culture'] / scale);
@@ -1662,7 +1721,7 @@ function investBudget(c, pool) {
     st.agri = clamp(st.agri + gAgri / indexCost(st.agri), 0, 100);
     st.security = clamp(st.security + gSec / indexCost(st.security), 0, 100);
     st.health = clamp(st.health + (gHealth * 0.6 + c.healthIdx * 0.02) / indexCost(st.health), 0, 100);
-    st.sat = clamp(st.sat + gHouse * 0.5 + gCult * 0.4, 0, 100);
+    st.sat = clamp(st.sat + gHouse * 0.5 + gCult * 0.4 + facSat * 0.55, 0, 100);
   }
   c.legitimacy = clamp(c.legitimacy + perState(spend['culture'] / scale) * 0.12, 0, 100);
   /* ارتش: تجهیز و آموزش نیرو */
@@ -1731,6 +1790,12 @@ function popYear(st) {
   if (!isFinite(st.pop)) st.pop = 8;
   if (st.pop > K * 1.12) st.unrest = clamp(st.unrest + 0.8, 0, 100);
 }
+const MINE_LABEL = { iron: 'آهن', oil: 'نفت', gold: 'طلا' };
+/* برداشت هر چرخه از یک معدن: نرخ ثابتِ درجه‌بندی‌شده، نه درصدی از باقی‌مانده */
+function mineRate(st, k, tech) {
+  const grade = (st.rich && st.rich[k]) ? BAL.RICH_YIELD : 1;
+  return BAL.MINE_RATE[k] * grade * (0.55 + clamp(tech, 0, 100) / 110);
+}
 function resourceCycle(c) {
   const prod = { food: 0, wood: 0, iron: 0, oil: 0, gold: 0 };
   const all = c.owned.concat(c.ctrl);
@@ -1742,56 +1807,294 @@ function resourceCycle(c) {
     prod.food += foodProduction(st, c.tech) * share;
     const cut = Math.min(st.forest * 0.055 * (0.6 + c.tech / 90), st.forest);
     st.forest = clamp(st.forest - cut + (st.forestCap - st.forest) * 0.09, 0, st.forestCap);
-    prod.wood += cut * 2.2 * damp * share;
-    if (st.known.iron && st.iron > 0) {
-      const ex = Math.min(st.iron, st.iron * 0.016 * (0.4 + c.tech / 70) + 2);
-      st.iron = Math.max(0, st.iron - ex); prod.iron += ex * damp * share;
-      if (st.iron <= 0) { stateHist(st, 'ذخایر آهن به پایان رسید.'); }
-    }
-    if (st.known.oil && st.oil > 0 && c.tech >= 40) {
-      const ex = Math.min(st.oil, st.oil * 0.020 * (0.3 + c.tech / 60) + 3);
-      st.oil = Math.max(0, st.oil - ex); prod.oil += ex * damp * share;
-      if (st.oil <= 0) { stateHist(st, 'میدان نفتی خشک شد.'); }
-    }
-    if (st.known.gold && st.gold > 0) {
-      const ex = Math.min(st.gold, st.gold * 0.013 * (0.5 + c.tech / 80) + 0.8);
-      st.gold = Math.max(0, st.gold - ex); prod.gold += ex * damp * share;
+    prod.wood += cut * 5.5 * (st.rich && st.rich.wood ? 1.25 : 1) * damp * share;
+    for (const k of MINE_KEYS) {
+      if (!st.known[k] || st[k] <= 0) continue;
+      if (c.tech < RES_TECH[k]) continue;
+      const ex = Math.min(st[k], mineRate(st, k, c.tech));
+      st[k] = Math.max(0, st[k] - ex);
+      prod[k] += ex * damp * share;
+      if (st[k] <= 0) {
+        st.rich[k] = 0; st.known[k] = false;
+        stateHist(st, 'ذخایر ' + MINE_LABEL[k] + ' این ایالت تمام شد.');
+        if (c.isPlayer) news('پایان یک معدن', 'ذخایر ' + MINE_LABEL[k] + ' در ایالت ' + faNum(st.id) + ' به پایان رسید؛ باید ذخیره تازه‌ای یافت.', 'econ', { c: c.id, s: st.id });
+      }
     }
   }
   return prod;
 }
+const MINE_FOUND = {
+  iron: ['کشف آهن', 'ذخایر آهن در ایالت '],
+  gold: ['کشف طلا', 'رگه‌های طلا در ایالت '],
+  oil: ['کشف نفت', 'میدان نفتی در ایالت ']
+};
+/* کمیابی جهانی هر منبع: هرچه ذخایر شناخته‌شده جهان کمتر، اکتشاف پرشتاب‌تر */
+function scarcityPush(k) {
+  const w = (W.resWorld && W.resWorld[k] != null) ? W.resWorld[k] : BAL.SCARCITY_REF[k];
+  const ratio = w / BAL.SCARCITY_REF[k];
+  if (ratio >= 1) return 1;
+  return clamp(1 + Math.pow(1 - ratio, 1.6) * 9, 1, 10);
+}
 function discoverCheck(st) {
   const c = st.controller ? W.countries[st.controller] : null;
   const tech = c ? c.tech : 1;
-  if (!st.known.gold && st.gold > 0 && RNGX.chance(0.02 + tech / 900)) {
-    st.known.gold = true; stateHist(st, 'معدن طلا کشف شد.');
-    if (c) news('کشف معدن', 'در ایالت ' + faNum(st.id) + ' معدن طلا کشف شد.', 'discovery', { c: c.id, s: st.id });
+  for (const k of MINE_KEYS) {
+    if (tech < RES_TECH[k]) continue;
+    const over = tech - RES_TECH[k];
+    if (!st.known[k] && st[k] > 0) {
+      /* ذخیره موجود ولی ناشناخته */
+      if (RNGX.chance(0.012 + over / 1300)) {
+        st.known[k] = true;
+        stateHist(st, (st.rich[k] ? 'ذخایر سرشار ' : 'ذخایر ') + MINE_LABEL[k] + ' کشف شد.');
+        if (c) news(MINE_FOUND[k][0], MINE_FOUND[k][1] + faNum(st.id) + ' شناسایی شد' + (st.rich[k] ? ' و سرشار است' : '') + '.', 'discovery', { c: c.id, s: st.id });
+      }
+      continue;
+    }
+    /* اکتشاف ذخیره تازه در ایالتی که استعداد دارد ولی ذخیره‌اش تمام شده */
+    if (st[k] <= 0 && st.pot && st.pot[k] > 0.25) {
+      const p = BAL.EXPLORE_BASE * st.pot[k] * (0.35 + over / 90) * scarcityPush(k) * 0.25;
+      if (RNGX.chance(clamp(p, 0, 0.3))) {
+        seedDeposit(st, k, RNGX, st.pot[k]);
+        st.known[k] = true;
+        stateHist(st, 'ذخیره تازه‌ای از ' + MINE_LABEL[k] + ' یافت شد.');
+        if (c) news('ذخیره تازه', 'اکتشاف در ایالت ' + faNum(st.id) + ' به ذخیره تازه‌ای از ' + MINE_LABEL[k] + ' رسید.', 'discovery', { c: c.id, s: st.id });
+      }
+    }
   }
-  if (!st.known.iron && st.iron > 0 && tech > 12 && RNGX.chance(0.010 + (tech - 12) / 1400)) {
-    st.known.iron = true; stateHist(st, 'ذخایر آهن کشف شد.');
-    if (c) news('کشف آهن', 'ذخایر آهن در ایالت ' + faNum(st.id) + ' شناسایی شد.', 'discovery', { c: c.id, s: st.id });
+}
+/* ذخایر جهانی را می‌شمارد تا کمیابی محاسبه شود و هیچ منبعی به‌کلی تمام نشود */
+function worldReserveScan() {
+  const tot = { iron: 0, oil: 0, gold: 0 }, known = { iron: 0, oil: 0, gold: 0 };
+  for (const st of W.states) {
+    for (const k of MINE_KEYS) {
+      tot[k] += st[k] || 0;
+      if (st.known[k]) known[k] += st[k] || 0;
+    }
   }
-  if (!st.known.oil && st.oil > 0 && tech > 38 && RNGX.chance(0.012 + (tech - 38) / 1200)) {
-    st.known.oil = true; stateHist(st, 'میدان نفتی کشف شد.');
-    if (c) news('کشف نفت', 'میدان نفتی بزرگی در ایالت ' + faNum(st.id) + ' کشف شد؛ ارزش این سرزمین دگرگون شد.', 'discovery', { c: c.id, s: st.id });
+  W.resWorld = tot;
+  W.resKnown = known;
+  /* سازوکار ایمنی: اگر ذخایر جهانی یک منبع به کف برسد، چند ایالت مستعد ذخیره تازه می‌گیرند */
+  for (const k of MINE_KEYS) {
+    if (tot[k] > BAL.SCARCITY_REF[k] * 0.22) continue;
+    const cand = W.states.filter(s => s[k] <= 0 && s.pot && s.pot[k] > 0.2);
+    if (!cand.length) continue;
+    const n = Math.min(cand.length, 6 + Math.floor(RNGX.f() * 6));
+    for (let i = 0; i < n; i++) {
+      const st = cand[Math.floor(RNGX.f() * cand.length)];
+      if (st[k] > 0) continue;
+      seedDeposit(st, k, RNGX, st.pot[k]);
+      stateHist(st, 'اکتشاف گسترده به ذخیره تازه‌ای از ' + MINE_LABEL[k] + ' رسید.');
+    }
   }
 }
 
 /* ---------- ۱۰) بازار جهانی ---------- */
+/* بهای پایه هر کالا؛ بهای بازار حول آن و بر پایه نسبت تقاضا به عرضه نوسان می‌کند */
+const BASE_PRICE = { food: 1.0, wood: 0.9, iron: 1.8, oil: 2.2, gold: 6.0 };
 function marketCycle(worldProd, worldDemand) {
   for (const k of RES_KEYS) {
     const m = W.market[k];
     const sup = Math.max(1, worldProd[k]), dem = Math.max(1, worldDemand[k]);
-    const target = clamp(dem / sup, 0.35, 3.2);
-    const desired = m.price * target;
-    let crisis = W.crisis && W.crisis[k] ? 1 : 0;
-    const lim = crisis ? 0.28 : 0.10;
-    const maxP = m.price * (1 + lim), minP = m.price * (1 - lim);
-    m.price = clamp(clamp(desired, minP, maxP), 0.18, 60);
+    const ratio = clamp(dem / sup, 0.30, 3.4);
+    const base = BASE_PRICE[k];
+    let target = base * Math.pow(ratio, 1.25);
+    if (W.crisis && W.crisis[k]) target *= 1.55;
+    /* حرکت آرام به سوی بهای هدف؛ قیمت هرگز بی‌مهار بالا یا پایین نمی‌رود */
+    m.price = clamp(m.price * 0.78 + target * 0.22, base * 0.28, base * 6.5);
     m.supply = sup; m.demand = dem;
     m.hist.push(r3(m.price));
     if (m.hist.length > 60) m.hist.shift();
   }
+}
+
+/* ---------- ۲۵) منابع، سوخت و انرژی، کارخانه و بورس جهانی ---------- */
+
+/* نیاز داخلی هر کشور در یک چرخه، به تفکیک منبع */
+function resDemand(c) {
+  const pop = countryPop(c);
+  const t = 0.75 + clamp(c.tech, 0, 100) / 160;    /* جامعه پیشرفته‌تر بیشتر مصرف می‌کند */
+  const n = Math.max(1, c.owned.length + c.ctrl.length * 0.5) * t;
+  return {
+    food: pop * 0.7,
+    wood: n * 7 + c.army.troops * 0.05,
+    iron: n * 8 + c.army.troops * 0.08,
+    oil: c.tech >= RES_TECH.oil ? (n * 4 + c.army.air * 12) : 0,
+    gold: 0,
+    /* ذخیره هدف سوخت = مصرف غیرنظامی + اندوخته جنگی (انگیزه خرید برای کشورهای نظامی) */
+    energy: hasFuelTech(c) ? energyCivUse(c) + c.army.troops * 0.35 : 0
+  };
+}
+function hasFuelTech(c) { return c.tech >= BAL.ENERGY_TECH; }
+/* مصرف غیرنظامی سوخت در هر چرخه — جدا از اندوخته جنگی */
+function energyCivUse(c) {
+  const n = Math.max(1, c.owned.length + c.ctrl.length * 0.5);
+  return n * BAL.ENERGY_CIV * (0.6 + 0.4 * c.tech / 100) + c.army.air * 2;
+}
+/* سقف ذخیره سوخت متناسب با نیاز راهبردی کشور است، نه صرفاً وسعت آن */
+function energyCap(c) {
+  const strat = energyCivUse(c) + c.army.troops * 0.35;
+  return Math.max(200, strat * BAL.ENERGY_CAP_ST);
+}
+/* آیا این کشور عملاً به سوخت و انرژی رسیده است؟ */
+function hasEnergy(c) { return hasFuelTech(c) && ((c.energy || 0) > 0.5 || (c.lastEnergyMade || 0) > 0.5); }
+
+function defaultResPolicy() {
+  /* سهمی که برای مصرف داخلی نگه داشته می‌شود؛ باقی برای فروش */
+  return { food: 0.85, wood: 0.75, iron: 0.75, oil: 0.80, gold: 0.20, energy: 0.80 };
+}
+function defaultAutoRes() {
+  const o = {};
+  for (const k of TRADE_KEYS) o[k] = true;
+  return o;
+}
+/* نسبت نگهداری مؤثر: بخش‌های واگذارشده را دولت بر پایه نیاز تنظیم می‌کند */
+function effectiveResPolicy(c) {
+  const pol = c.resPolicy || defaultResPolicy();
+  const out = {};
+  const need = resDemand(c);
+  for (const k of TRADE_KEYS) {
+    const auto = (!c.isPlayer) || !c.autoRes || c.autoRes[k];
+    if (!auto) { out[k] = clamp(pol[k] != null ? pol[k] : 0.8, 0, 1); continue; }
+    const have = (k === 'energy' ? (c.energy || 0) : (c.stock[k] || 0)) + (c.lastProd ? (c.lastProd[k] || 0) : 0);
+    const want = need[k] || 0;
+    if (want <= 0) { out[k] = k === 'gold' ? 0.15 : 0.25; continue; }
+    const cover = have / Math.max(want, 1);
+    /* هرچه پوشش نیاز بیشتر، سهم فروش بیشتر */
+    out[k] = clamp(1.05 - 0.32 * cover, 0.22, 0.96);
+  }
+  return out;
+}
+
+/* نفتِ مصرف داخلی به سوخت و انرژی تبدیل می‌شود */
+function energyCycle(c) {
+  c.lastEnergyMade = 0;
+  c.lastEnergyUse = 0;
+  if (!hasFuelTech(c)) { c.energy = 0; return; }
+  const pol = effectiveResPolicy(c);
+  const civOil = resDemand(c).oil;
+  const spare = Math.max(0, (c.stock.oil || 0) - civOil * 0.55);
+  const oilHome = spare * clamp(pol.oil, 0, 1);
+  const refine = clamp(0.35 + c.tech / 150 + (c.factory || 0) / 320, 0.35, 1.25);
+  const made = oilHome * BAL.ENERGY_PER_OIL * refine;
+  if (made > 0) {
+    c.stock.oil = Math.max(0, c.stock.oil - oilHome);
+    c.energy = (c.energy || 0) + made;
+    c.lastEnergyMade = made;
+  }
+  /* مصرف غیرنظامی */
+  const civ = energyCivUse(c);
+  const use = Math.min(c.energy || 0, civ);
+  c.energy = Math.max(0, (c.energy || 0) - use);
+  c.lastEnergyUse = use;
+  c.energyShort = civ > 0 ? clamp(1 - use / civ, 0, 1) : 0;
+  c.energy = Math.min(c.energy, energyCap(c));
+}
+
+/* برداشت سوخت برای عملیات نظامی؛ خروجی: ضریب اثرگذاری ۰٫۵ تا ۱ */
+function drawEnergy(c, amount) {
+  if (!c || amount <= 0) return 1;
+  if (!hasFuelTech(c)) return 1;                    /* دوره‌های پیش از سوخت درگیر نیستند */
+  const have = c.energy || 0;
+  if (have >= amount) { c.energy = have - amount; return 1; }
+  c.energy = 0;
+  const ratio = amount > 0 ? have / amount : 0;
+  return clamp(0.5 + 0.5 * ratio, 0.5, 1);
+}
+function warEnergyCost(c, force, isDefense) {
+  if (!hasFuelTech(c)) return 0;
+  const era = eraOf(c.tech).id;
+  if (era < 3) return 0;
+  const base = force * BAL.ENERGY_ATTACK * (era >= 4 ? 1.25 : 1);
+  return isDefense ? base * BAL.ENERGY_DEFEND : base;
+}
+
+/* ---------- کارخانه، کمپانی و تأسیسات ---------- */
+function factoryGrow(c, relSpend) {
+  if (!hasEnergy(c)) {
+    /* بدون سوخت و انرژی این بخش رشد نمی‌کند و به‌کندی فرسوده می‌شود */
+    if ((c.factory || 0) > 0) c.factory = clamp(c.factory - 0.15, 0, 100);
+    return;
+  }
+  const eff = (0.6 + 0.4 * GOVS[c.gov].ecoFree) * (1 - c.corruption / 220);
+  const fuel = clamp(0.35 + 0.65 * (1 - (c.energyShort || 0)), 0.35, 1);
+  const g = relSpend * BAL.FACTORY_K * eff * fuel * (0.45 + 0.55 * c.tech / 100) / indexCost((c.factory || 0) * 0.85);
+  c.factory = clamp((c.factory || 0) + Math.max(0, g), 0, 100);
+}
+
+/* ---------- بورس جهانی ---------- */
+/* چهار پایه ارزش سهام: پیشرفت کارخانه، منابع در اختیار، حجم تجارت و جمعیت */
+function stockParts(c) {
+  const fac = clamp((c.factory - BAL.STOCK_MIN) / (100 - BAL.STOCK_MIN), 0, 1);
+  const resHold = MINE_KEYS.reduce((a, k) => a + (c.stock[k] || 0), 0) + (c.energy || 0) * 0.8;
+  const resF = clamp(Math.pow(resHold / 900, 0.45), 0, 1.35);
+  let tradeVol = 0;
+  for (const oid in c.rel) {
+    const r = c.rel[oid], o = W.countries[oid];
+    if (o && o.alive && r.status !== 'war' && !r.embargo) tradeVol += r.trade;
+  }
+  const trF = clamp(Math.pow(tradeVol / 500, 0.5), 0, 1.35);
+  const popF = clamp(Math.pow(countryPop(c) / 7000, 0.42), 0, 1.35);
+  const stab = 0.6 + 0.4 * c.stability / 100;
+  return { fac: r3(fac), res: r3(resF), trade: r3(trF), pop: r3(popF), stab: r3(stab), tradeVol: Math.round(tradeVol) };
+}
+function stockStrength(c) {
+  if ((c.factory || 0) < BAL.STOCK_MIN) return 0;
+  const p = stockParts(c);
+  const s = Math.pow(p.fac, 0.72) * (0.42 + 0.58 * p.res) * (0.42 + 0.58 * p.trade) * (0.45 + 0.55 * p.pop) * p.stab;
+  return clamp(s * (W.stockMood || 1), 0, 1.6);
+}
+function stockValueOf(c) { return stockStrength(c) * 100; }
+function stockCycle(c) {
+  const s = stockStrength(c);
+  c.stockValue = s * 100;
+  c.stockActive = s > 0;
+  if (s <= 0) { c.stockIncome = 0; return 0; }
+  const scale = Math.max(6, avgStateRevenue(c)) * Math.max(1, c.owned.length);
+  const inc = scale * BAL.STOCK_K * s;
+  c.stockIncome = inc;
+  return inc;
+}
+function stockMoodCycle() {
+  /* حال‌وهوای بازار جهانی: آرام نوسان می‌کند و در جنگ‌های بزرگ پایین می‌آید */
+  let wars = 0;
+  for (const cid in W.countries) {
+    const c = W.countries[cid];
+    if (!c.alive) continue;
+    for (const oid in c.rel) if (c.rel[oid].status === 'war') wars++;
+  }
+  wars = wars / 2;
+  const target = clamp(1.12 - wars * 0.035, 0.55, 1.15);
+  W.stockMood = (W.stockMood == null ? 1 : W.stockMood) * 0.7 + target * 0.3;
+}
+
+/* ---------- گزارش منابع برای رابط کاربری ---------- */
+function resReport(c) {
+  const need = resDemand(c);
+  const pol = effectiveResPolicy(c);
+  const prod = c.lastProd || {};
+  const out = [];
+  for (const k of TRADE_KEYS) {
+    const have = k === 'energy' ? (c.energy || 0) : (c.stock[k] || 0);
+    const keep = clamp(pol[k], 0, 1);
+    const forSale = Math.max(0, have * (1 - keep));
+    const want = need[k] || 0;
+    out.push({
+      k, name: RES_NAMES[k], icon: RES_ICON[k],
+      have: r3(have), prod: r3(prod[k] || 0), need: r3(want),
+      keep: r3(keep), sale: r3(forSale),
+      salePct: r3((1 - keep) * 100),
+      cover: want > 0 ? r3(clamp(have / want, 0, 9)) : null,
+      price: W.market[k] ? r3(W.market[k].price) : r3(energyPrice()),
+      auto: !c.autoRes || !!c.autoRes[k],
+      locked: k === 'energy' ? !hasFuelTech(c) : (c.tech < (RES_TECH[k] || 0))
+    });
+  }
+  return out;
+}
+function energyPrice() {
+  /* بهای سوخت از بهای نفت می‌آید با حاشیه پالایش */
+  const oil = W.market.oil ? W.market.oil.price : 2.2;
+  return clamp(oil * 1.55 + 0.6, 0.9, 90);
 }
 
 /* ---------- ۱۱) ارتش ---------- */
@@ -1820,8 +2123,8 @@ function committedOf(c) {
   for (const op of W.ops) if (op.att === c.id) f += op.force;
   return f;
 }
-function unitQuality(c) { return (1 + c.tech / 17) * govFx(c).army; }
-function resourceNeedFor(c, kind, amount) {
+function unitQuality(c) { return (1 + c.tech / 17) * govFx(c).army * ERA_POWER[eraOf(c.tech).id]; }
+function resourceNeedFor(c, kind, amount, dryRun) {
   /* کمبود منابع هزینه را بالا می‌برد (واردات) */
   let extra = 0;
   const need = kind === 'ship' ? { iron: amount * 6, wood: amount * 9, oil: c.tech > 45 ? amount * 5 : 0 }
@@ -1832,11 +2135,28 @@ function resourceNeedFor(c, kind, amount) {
     if (want <= 0) continue;
     const have = c.stock[k] || 0;
     const use = Math.min(have, want);
-    c.stock[k] = have - use;
+    if (!dryRun) c.stock[k] = have - use;
     const missing = want - use;
     if (missing > 0) extra += missing * W.market[k].price * 1.35;
   }
   return extra;
+}
+/* بهای واقعی سربازگیری n نفر، شامل هزینه واردات منابع کم‌داشته */
+function recruitQuote(c, n) {
+  if (n <= 0) return 0;
+  const base = BAL.RECRUIT_COST * (1 + c.tech / 12);
+  return n * base + resourceNeedFor(c, 'troops', n, true);
+}
+/* بیشترین تعداد سربازی که با مبلغ داده‌شده می‌توان گرفت */
+function recruitAffordable(c, money) {
+  if (money <= 0) return 0;
+  const unit = recruitQuote(c, 1);
+  let n = Math.floor(money / Math.max(unit, 0.01));
+  for (let i = 0; i < 14 && n > 0; i++) {
+    if (recruitQuote(c, n) <= money) break;
+    n = Math.floor(n * money / Math.max(recruitQuote(c, n), 0.01));
+  }
+  return Math.max(0, n);
 }
 function spendArmyFund(c) {
   let fund = c.pendingArmyFund || 0;
@@ -1995,7 +2315,8 @@ function defensePower(st, attackerId) {
     const r = c.rel[oid], o = W.countries[oid];
     if (o && o.alive && r.ally && c.rel[attackerId] && attackerId && o.rel[attackerId] && o.rel[attackerId].status === 'war') allies += 0.12;
   }
-  return Math.pow(troops, 0.92) * q * morale * terr * fort * loyal * allies * (1 - 0.25 * st.devast / 100);
+  const fuel = st.fuelF == null ? 1 : st.fuelF;
+  return Math.pow(troops, 0.92) * q * morale * terr * fort * loyal * allies * fuel * (1 - 0.25 * st.devast / 100);
 }
 function attackPower(op) {
   const c = W.countries[op.att];
@@ -2004,7 +2325,7 @@ function attackPower(op) {
   return Math.pow(Math.max(op.force, 1), 0.92) * unitQuality(c) *
     (0.55 + 0.45 * c.army.morale / 100) * (0.55 + 0.45 * c.army.readiness / 100) *
     cmd * (0.30 + 0.70 * op.supply) * (1 - 0.35 * clamp(op.fatigue, 0, 1)) *
-    (1 - 0.20 * clamp(c.warWeariness / 100, 0, 1));
+    (1 - 0.20 * clamp(c.warWeariness / 100, 0, 1)) * (op.fuelF == null ? 1 : op.fuelF);
 }
 function requiredForce(c, st, type) {
   const dp = defensePower(st, c.id);
@@ -2199,6 +2520,14 @@ function opTick(op) {
     op.force = Math.max(0, op.force - op.force * 0.09);
     op.fatigue = clamp(op.fatigue + 0.10, 0, 1);
   }
+  /* سوخت و انرژی: در دوره سلاح پیشرفته و هوشمند، حمله و دفاع سوخت می‌خورند */
+  const attFuel = warEnergyCost(c, op.force, false);
+  op.fuelF = attFuel > 0 ? drawEnergy(c, attFuel) : 1;
+  const dc0 = W.countries[st.controller];
+  if (dc0) {
+    const defFuel = warEnergyCost(dc0, Math.max(st.defense, 1), true);
+    st.fuelF = defFuel > 0 ? drawEnergy(dc0, defFuel) : 1;
+  } else st.fuelF = 1;
   const ap = attackPower(op);
   const dp = defensePower(st, c.id);
   const ratio = ap / Math.max(dp, 1);
@@ -2957,17 +3286,26 @@ function secession(c, reason) {
   if (group.length < 2) return null;
   return createCountryFrom(group, { reason, fromCountry: c });
 }
+/* انتخاب وزن‌دار از فهرست کشورها: کشورهای قدرتمند شانس بیشتری دارند */
+function pickWeighted(list) {
+  let tot = 0;
+  for (const it of list) tot += it[1];
+  if (tot <= 0) return list.length ? list[0][0] : '';
+  let r = RNGX.f() * tot;
+  for (const it of list) { r -= it[1]; if (r <= 0) return it[0]; }
+  return list[list.length - 1][0];
+}
 function makeCountryName(eth) {
   const d = ethNames(eth == null ? RNGX.int(0, 7) : eth);
-  const avail = d.lands.filter(n => W.namesUsed.indexOf(n) < 0);
-  if (avail.length) { const n = RNGX.pick(avail); W.namesUsed.push(n); return n; }
+  const avail = d.lands.filter(n => W.namesUsed.indexOf(n[0]) < 0);
+  if (avail.length) { const n = pickWeighted(avail); W.namesUsed.push(n); return n; }
   for (let i = 0; i < 300; i++) {
-    const n = RNGX.pick(d.lands) + RNGX.pick(LAND_SUFFIX);
+    const n = pickWeighted(d.lands) + RNGX.pick(LAND_SUFFIX);
     if (W.namesUsed.indexOf(n) < 0) { W.namesUsed.push(n); return n; }
   }
   const all = [];
-  for (const e of ETH_DATA) for (const l of e.lands) if (W.namesUsed.indexOf(l) < 0) all.push(l);
-  if (all.length) { const n = RNGX.pick(all); W.namesUsed.push(n); return n; }
+  for (const e of ETH_DATA) for (const l of e.lands) if (W.namesUsed.indexOf(l[0]) < 0) all.push(l);
+  if (all.length) { const n = pickWeighted(all); W.namesUsed.push(n); return n; }
   const n2 = 'سرزمین ' + faNum(W.nextCountry);
   W.namesUsed.push(n2);
   return n2;
@@ -3481,47 +3819,72 @@ function applyDiplo(a, b, kind, payload) {
   }
 }
 /* ---------- ۱۹) تجارت و بودجه AI ---------- */
+/* دسترسی تجاری کشور: جنگ تجارت را می‌بندد و دشمنی آن را بسیار کم می‌کند */
+function tradeAccess(c) {
+  let open = 0, total = 0, best = 0;
+  for (const oid in c.rel) {
+    const r = c.rel[oid], o = W.countries[oid];
+    if (!o || !o.alive) continue;
+    total += 1;
+    let w = 0;
+    if (r.status === 'war') w = 0;
+    else if (r.embargo) w = 0.05;
+    else if (r.status === 'hostile') w = 0.18;
+    else if (r.ally) w = 1.35;
+    else if (r.friend) w = 1.20;
+    else if (r.nonAgg || r.trade > 40) w = 1.0;
+    else w = 0.55 + 0.45 * clamp(r.trust / 100, 0, 1);
+    if (isSanctioned(c.id)) w *= 0.45;
+    open += w;
+    if (w > best) best = w;
+  }
+  if (total === 0) return 0.35;
+  /* دسترسی مؤثر: میانگین وزنی شرکا، با کف کوچک برای بازار خاکستری */
+  return clamp(0.12 + 0.88 * (open / Math.max(total, 1)), 0.10, 1.25);
+}
 function tradeCycle(c) {
   const need = {}, sur = {};
-  const pop = countryPop(c);
-  const want = {
-    food: pop * 0.5,
-    wood: c.owned.length * 12 + c.army.troops * 0.05,
-    iron: c.owned.length * 8 + c.army.troops * 0.08,
-    oil: c.tech >= 40 ? (c.owned.length * 10 + c.army.air * 12) : 0,
-    gold: 0
-  };
+  const want = resDemand(c);
+  const pol = effectiveResPolicy(c);
+  const access = tradeAccess(c);
+  c.tradeAccess = r3(access);
   let bought = 0, sold = 0;
-  for (const k of RES_KEYS) {
-    const have = c.stock[k];
-    const w = want[k];
+  for (const k of TRADE_KEYS) {
+    const have = k === 'energy' ? (c.energy || 0) : (c.stock[k] || 0);
+    const w = want[k] || 0;
     if (have < w) need[k] = w - have; else sur[k] = have - w;
   }
-  /* فروش مازاد */
+  /* فروش مازاد — فقط سهمی که سیاست منابع برای فروش گذاشته است */
   for (const k in sur) {
     if (sur[k] <= 0) continue;
-    const amt = sur[k] * (k === 'gold' ? 1 : 0.55);
-    const price = W.market[k].price;
+    const have = k === 'energy' ? (c.energy || 0) : (c.stock[k] || 0);
+    const offer = Math.min(sur[k], have * (1 - clamp(pol[k], 0, 1)));
+    const amt = offer * access;
+    if (amt <= 0) continue;
+    const price = k === 'energy' ? energyPrice() : W.market[k].price;
     const income = amt * price * 0.92;
-    c.stock[k] -= amt; c.treasury += income; sold += income;
+    if (k === 'energy') c.energy = Math.max(0, c.energy - amt); else c.stock[k] -= amt;
+    c.treasury += income; sold += income;
   }
-  /* خرید کمبود در حد توان */
+  /* خرید کمبود در حد توان و در حد دسترسی تجاری */
   for (const k in need) {
     if (need[k] <= 0) continue;
-    const price = W.market[k].price;
-    const canBuy = Math.min(need[k], Math.max(0, c.treasury * 0.25) / Math.max(price * 1.08, 0.05));
+    const price = k === 'energy' ? energyPrice() : W.market[k].price;
+    const budget = Math.max(0, c.treasury * 0.25) / Math.max(price * 1.08, 0.05);
+    const canBuy = Math.min(need[k] * access, budget);
     if (canBuy > 0) {
-      c.stock[k] += canBuy; const cost = canBuy * price * 1.08;
+      const cost = canBuy * price * 1.08;
+      if (k === 'energy') c.energy = Math.min(energyCap(c), (c.energy || 0) + canBuy); else c.stock[k] += canBuy;
       c.treasury -= cost; bought += cost;
     }
   }
   c.foodShort = clamp((want.food - c.stock.food) / Math.max(want.food, 1), 0, 1);
   c.stock.food = Math.max(0, c.stock.food - want.food * 0.85);
-  for (const k of ['wood', 'iron', 'oil']) c.stock[k] = Math.max(0, c.stock[k] - want[k] * 0.35);
+  for (const k of ['wood', 'iron', 'oil']) c.stock[k] = Math.max(0, c.stock[k] - (want[k] || 0) * 0.35);
   /* حجم تجارت با شرکا */
   const partners = Object.keys(c.rel).map(Number).filter(o => {
     const r = c.rel[o], oc = W.countries[o];
-    return oc && oc.alive && r.status !== 'war' && !r.embargo;
+    return oc && oc.alive && r.status !== 'war' && !r.embargo && r.status !== 'hostile';
   });
   const vol = (bought + sold) / Math.max(1, partners.length);
   for (const oid of partners) {
@@ -3533,14 +3896,18 @@ function tradeCycle(c) {
   }
   for (const oid in c.rel) {
     const r = c.rel[oid];
-    if (r.status === 'war' || r.embargo) r.trade *= 0.35;
+    if (r.status === 'war') r.trade *= 0.06;
+    else if (r.embargo) r.trade *= 0.12;
+    else if (r.status === 'hostile') r.trade *= 0.35;
   }
+  c.lastTrade = { bought: r3(bought), sold: r3(sold) };
   return { bought, sold };
 }
 function aiBudgetWeights(c) {
   const g = GOVS[c.gov];
   const threat = clamp(Object.values(c.rel).reduce((s, r) => s + (r.status === 'war' ? 1.4 : r.status === 'hostile' ? 0.5 : 0), 0), 0, 4);
   const w = {
+    factory: hasEnergy(c) ? (0.05 + c.bias.trade * 0.09 + (c.factory < 40 ? 0.05 : 0.02)) : 0,
     army: 0.09 + c.bias.militarism * 0.26 + threat * 0.09 + g.army * 0.10,
     science: 0.09 + c.bias.science * 0.24,
     welfare: 0.07 + c.bias.welfare * 0.13 + (c.foodShort || 0) * 0.26,
@@ -4646,22 +5013,32 @@ function cycleStep() {
   const wd = { food: 0, wood: 0, iron: 0, oil: 0, gold: 0 };
   const alive = [];
   for (const cid in W.countries) if (W.countries[cid].alive) alive.push(W.countries[cid]);
+  worldReserveScan();
   for (const c of alive) {
     const prod = resourceCycle(c);
     for (const k of RES_KEYS) { c.stock[k] += prod[k]; wp[k] += prod[k]; }
-    const pop = countryPop(c);
-    wd.food += pop * 0.5;
-    wd.wood += c.owned.length * 12 + c.army.troops * 0.05;
-    wd.iron += c.owned.length * 8 + c.army.troops * 0.08;
-    wd.oil += c.tech >= 40 ? (c.owned.length * 10 + c.army.air * 12) : c.owned.length * 0.5;
-    wd.gold += c.owned.length * 2;
+    c.lastProd = { food: r3(prod.food), wood: r3(prod.wood), iron: r3(prod.iron), oil: r3(prod.oil), gold: r3(prod.gold) };
+    /* نفت مصرف داخلی به سوخت و انرژی تبدیل می‌شود */
+    energyCycle(c);
+    c.lastProd.energy = r3(c.lastEnergyMade || 0);
+    const dem = resDemand(c);
+    wd.food += dem.food;
+    wd.wood += dem.wood;
+    wd.iron += dem.iron;
+    wd.oil += dem.oil > 0 ? dem.oil : c.owned.length * 0.5;
+    wd.gold += (c.owned.length + c.ctrl.length * 0.5) * 1.2;
   }
+  stockMoodCycle();
   marketCycle(wp, wd);
   contractsCycle();
   unSession();
   for (const c of alive) {
     tradeCycle(c);
     const rev = countryRevenue(c);
+    /* درآمد بورس جهانی */
+    const stockInc = stockCycle(c);
+    rev.stock = r3(stockInc);
+    rev.revenue += stockInc;
     const costs = countryCosts(c, rev);
     const net = rev.revenue - costs.total;
     c.treasury += net;
@@ -4708,7 +5085,7 @@ function cycleStep() {
     c.legitimacy = clamp(c.legitimacy * 0.985 + GOVS[c.gov].legitBase * 1.5 + (avgSat(c) - 50) * 0.03, 0, 100);
     c.corruption = clamp(c.corruption * 0.97 + GOVS[c.gov].corrupt * 3.2 - (c.education / 900) - ((c.lastBudget || c.budget).security || 0) * 4, 2, 92);
     c.lastCycle = {
-      y0, y1, revenue: rev.revenue, gross: rev.gross, trade: rev.trade, tribute: rev.tribute,
+      y0, y1, revenue: rev.revenue, gross: rev.gross, trade: rev.trade, tribute: rev.tribute, stock: rev.stock || 0,
       costs, net, treasury: c.treasury, pool, spend, tax: c.taxRate
     };
     if (c.isPlayer) {
@@ -4886,7 +5263,9 @@ function countrySummary(c) {
     troops: c.army.troops, navy: c.army.navy, air: c.army.air, morale: c.army.morale, readiness: c.army.readiness,
     pop: countryPop(c), sat: avgSat(c), stability: c.stability, legitimacy: c.legitimacy, corruption: c.corruption,
     capital: c.capital, leader: c.leader, isPlayer: !!c.isPlayer, vassalOf: c.vassalOf,
-    power: militaryPower(c), unrest: c.unrestAvg, tax: c.taxRate, era: eraOf(c.tech).name
+    power: militaryPower(c), unrest: c.unrestAvg, tax: c.taxRate, era: eraOf(c.tech).name,
+    energy: r3(c.energy || 0), hasEnergy: hasEnergy(c), factory: r3(c.factory || 0),
+    stockValue: r3(c.stockValue || 0)
   };
 }
 function snapshot() {
@@ -4900,15 +5279,19 @@ function snapshot() {
     sats[i] = Math.round(st.sat); unr[i] = Math.round(st.unrest);
     devs[i] = Math.round(st.devast);
     stt[i] = st.status === 'owned' ? 2 : (st.status === 'tribal' ? 1 : 0);
-    let rk = 0;
-    if (st.known.oil && st.oil > 0) rk = 4; else if (st.known.gold && st.gold > 0) rk = 5;
-    else if (st.known.iron && st.iron > 0) rk = 3; else if (st.forest > 45) rk = 2; else if (st.foodBase > 1.1) rk = 1;
-    res[i] = rk;
+    let rk = 0, rich = 0;
+    if (st.known.oil && st.oil > 0) { rk = 4; rich = st.rich.oil; }
+    else if (st.known.gold && st.gold > 0) { rk = 5; rich = st.rich.gold; }
+    else if (st.known.iron && st.iron > 0) { rk = 3; rich = st.rich.iron; }
+    else if (st.forest > 45) { rk = 2; rich = st.rich.wood; }
+    else if (st.foodBase > 1.1) { rk = 1; rich = st.rich.food; }
+    /* رمزگذاری: ۱۰ اضافه یعنی ذخیره سرشار */
+    res[i] = rk + (rich && rk ? 10 : 0);
   }
   const cs = {};
   for (const cid in W.countries) {
     const c = W.countries[cid];
-    cs[cid] = { id: c.id, name: c.name, color: c.color, alive: c.alive, owned: c.owned.length, tech: c.tech };
+    cs[cid] = { id: c.id, name: c.name, color: c.color, alive: c.alive, owned: c.owned.length, tech: c.tech, energy: hasEnergy(c) ? 1 : 0 };
   }
   const pc = W.countries[W.player];
   const player = pc && pc.alive ? {
@@ -4923,7 +5306,11 @@ function snapshot() {
     stability: pc.stability, legitimacy: pc.legitimacy, corruption: pc.corruption,
     unrest: pc.unrestAvg, revPressure: pc.revPressure, coupRisk: pc.coupRisk,
     lastCycle: pc.lastCycle, capital: pc.capital, wars: Object.keys(pc.rel).filter(o => pc.rel[o].status === 'war').map(Number),
-    manpower: maxManpower(pc), warWeariness: pc.warWeariness, foodShort: pc.foodShort || 0
+    manpower: maxManpower(pc), warWeariness: pc.warWeariness, foodShort: pc.foodShort || 0,
+    energy: r3(pc.energy || 0), energyCap: Math.round(energyCap(pc)),
+    fuelPct: r3(clamp((pc.energy || 0) / Math.max(energyCap(pc), 1) * 100, 0, 100)),
+    hasFuelTech: hasFuelTech(pc), hasEnergy: hasEnergy(pc),
+    factory: r3(pc.factory || 0), stockValue: r3(pc.stockValue || 0), stockIncome: r3(pc.stockIncome || 0)
   } : null;
   const ops = W.ops.map(o => ({ id: o.id, att: o.att, target: o.target, type: o.type, progress: Math.round(o.progress), force: Math.round(o.force), supply: r3(o.supply) }));
   const out = {
@@ -5079,7 +5466,18 @@ function inspectCountry(id) {
     warmonger: Math.round(c.warmonger || 0), unRep: Math.round(c.unRep == null ? 50 : c.unRep),
     condemned: !!(W.un && activeRes(c.id, 'condemn')), sanctioned: !!(W.un && activeRes(c.id, 'sanction')),
     maxManpower: Math.round(maxManpower(c)), pendingTrain: Math.round(pendingTrain(c)),
-    recruitCost: r3(BAL.RECRUIT_COST * (1 + c.tech / 12)), soldierUpkeep: r3(0.30 * (1 + c.tech / 10)),
+    recruitCost: r3(recruitQuote(c, 1)), recruitBase: r3(BAL.RECRUIT_COST * (1 + c.tech / 12)),
+    soldierUpkeep: r3(0.30 * (1 + c.tech / 10)),
+    recruitQuotes: (function () {
+      const mm = maxManpower(c), cur = c.army.troops + pendingTrain(c);
+      const gap = Math.max(0, Math.floor(mm - cur));
+      const q = n => ({ n: Math.floor(n), cost: r3(recruitQuote(c, Math.floor(n))) });
+      const byMoney = m => { const n = Math.min(gap, recruitAffordable(c, m)); return { n, cost: r3(recruitQuote(c, n)) }; };
+      return {
+        gap: q(gap), half: q(Math.floor(gap / 2)), quarter: q(Math.floor(gap / 4)),
+        allMoney: byMoney(Math.max(0, c.treasury)), halfMoney: byMoney(Math.max(0, c.treasury) * 0.5)
+      };
+    })(),
     shipCost: Math.round(500 * (0.35 + c.tech / 60)), airCost: Math.round(700 * (0.4 + c.tech / 70)),
     strike: c.strike || 0, shield: c.shield || 0, stratMax: stratMaxLevel(c),
     stratTech: STRAT_TECH, stratCap: STRAT_MAX,
@@ -5090,6 +5488,29 @@ function inspectCountry(id) {
     stratReady: c.lastStrategic == null || (W.year - c.lastStrategic) >= 3,
     knowledge: c.knowledge, education: c.education, healthIdx: c.healthIdx,
     stock: c.stock, goals: c.goals, rels, court, lastCycle: c.lastCycle,
+    /* منابع، سوخت و انرژی، کارخانه و بورس */
+    resources: resReport(c),
+    resPolicy: c.resPolicy || defaultResPolicy(), autoRes: c.autoRes || defaultAutoRes(),
+    energy: r3(c.energy || 0), energyCap: Math.round(energyCap(c)),
+    energyMade: r3(c.lastEnergyMade || 0), energyUse: r3(c.lastEnergyUse || 0),
+    energyShort: r3(c.energyShort || 0), energyPrice: r3(energyPrice()),
+    hasFuelTech: hasFuelTech(c), hasEnergy: hasEnergy(c), fuelTech: BAL.ENERGY_TECH,
+    factory: r3(c.factory || 0), stockMin: BAL.STOCK_MIN,
+    stockValue: r3(c.stockValue || 0), stockIncome: r3(c.stockIncome || 0), stockActive: !!c.stockActive,
+    stockParts: stockParts(c),
+    stockBoard: (function () {
+      const b = [];
+      for (const oid in W.countries) {
+        const o = W.countries[oid];
+        if (!o.alive || (o.factory || 0) < BAL.STOCK_MIN) continue;
+        b.push({ name: o.name, color: o.color, factory: r3(o.factory), value: r3(o.stockValue || 0), me: o.id === c.id });
+      }
+      b.sort((x, y) => y.value - x.value);
+      return b.slice(0, 14);
+    })(),
+    stockMood: r3(W.stockMood == null ? 1 : W.stockMood),
+    tradeAccess: r3(c.tradeAccess == null ? 1 : c.tradeAccess),
+    resTech: RES_TECH,
     revPressure: c.revPressure, coupRisk: c.coupRisk, credibility: c.credibility,
     vassals: c.vassals.map(v => W.countries[v] ? W.countries[v].name : '').filter(Boolean),
     era: eraOf(c.tech), mem: c.mem.slice(-12).map(m => ({ y: Math.floor(m.y), x: memText({ t: m.t, y: m.y, other: m.other }) })),
@@ -5226,16 +5647,21 @@ function command(cmd, a) {
     case 'puppet': return grantIndependence(pc, st, true);
     case 'market': {
       const k = a.res, amt = Math.max(0, +a.amount);
-      if (RES_KEYS.indexOf(k) < 0 || !amt) return { ok: false, why: 'درخواست نامعتبر.' };
-      const price = W.market[k].price;
+      if (TRADE_KEYS.indexOf(k) < 0 || !amt) return { ok: false, why: 'درخواست نامعتبر.' };
+      if (k === 'energy' && !hasFuelTech(pc)) return { ok: false, why: 'فناوری شما هنوز به سوخت و انرژی نرسیده است (نیاز به فناوری ' + faNum(BAL.ENERGY_TECH) + ').' };
+      const price = k === 'energy' ? energyPrice() : W.market[k].price;
+      const have = k === 'energy' ? (pc.energy || 0) : pc.stock[k];
       if (a.side === 'buy') {
         const cost = amt * price * 1.08;
         if (pc.treasury < cost) return { ok: false, why: 'خزانه کافی نیست (' + faNum(cost) + ' میلیون).' };
-        pc.treasury -= cost; pc.stock[k] += amt;
+        if (k === 'energy' && have + amt > energyCap(pc)) return { ok: false, why: 'ظرفیت ذخیره سوخت ' + faNum(energyCap(pc)) + ' واحد است.' };
+        pc.treasury -= cost;
+        if (k === 'energy') pc.energy = have + amt; else pc.stock[k] += amt;
         return { ok: true, msg: 'خرید انجام شد.', cost };
       } else {
-        if (pc.stock[k] < amt) return { ok: false, why: 'ذخیره کافی ندارید.' };
-        pc.stock[k] -= amt; const inc = amt * price * 0.92; pc.treasury += inc;
+        if (have < amt) return { ok: false, why: 'ذخیره کافی ندارید.' };
+        if (k === 'energy') pc.energy = have - amt; else pc.stock[k] -= amt;
+        const inc = amt * price * 0.92; pc.treasury += inc;
         return { ok: true, msg: 'فروش انجام شد.', income: inc };
       }
     }
@@ -5378,6 +5804,46 @@ function command(cmd, a) {
     }
     case 'autoTrade': { pc.autoTrade = !!a.value; return { ok: true, autoTrade: pc.autoTrade }; }
     case 'autoDiplo': { pc.autoDiplo = !!a.value; return { ok: true, autoDiplo: pc.autoDiplo }; }
+    case 'resPolicy': {
+      pc.resPolicy = pc.resPolicy || defaultResPolicy();
+      if (a.key && TRADE_KEYS.indexOf(a.key) >= 0) pc.resPolicy[a.key] = clamp(+a.value, 0, 1);
+      else if (a.value && typeof a.value === 'object') {
+        for (const k of TRADE_KEYS) if (a.value[k] != null) pc.resPolicy[k] = clamp(+a.value[k], 0, 1);
+      }
+      return { ok: true, resPolicy: pc.resPolicy };
+    }
+    case 'autoRes': {
+      pc.autoRes = pc.autoRes || defaultAutoRes();
+      if (a.key && TRADE_KEYS.indexOf(a.key) >= 0) pc.autoRes[a.key] = !!a.value;
+      else if (a.value && typeof a.value === 'object') pc.autoRes = Object.assign({}, a.value);
+      return { ok: true, autoRes: pc.autoRes };
+    }
+    case 'buyEnergy': {
+      if (!hasFuelTech(pc)) return { ok: false, why: 'فناوری شما هنوز به سوخت و انرژی نرسیده است (نیاز به فناوری ' + faNum(BAL.ENERGY_TECH) + ').' };
+      const amt = Math.max(1, Math.floor(+a.amount || 0));
+      const room = energyCap(pc) - (pc.energy || 0);
+      if (room <= 0) return { ok: false, why: 'ذخیره سوخت پر است.' };
+      const n = Math.min(amt, Math.floor(room));
+      const access = pc.tradeAccess == null ? 1 : pc.tradeAccess;
+      if (access < 0.2) return { ok: false, why: 'با این وضع روابط، فروشنده‌ای برای سوخت پیدا نمی‌شود.' };
+      const price = energyPrice() * (1.10 + 0.25 * (1 - clamp(access, 0, 1)));
+      const cost = n * price;
+      if (pc.treasury < cost) return { ok: false, why: 'هزینه ' + faNum(cost) + ' میلیون است؛ خزانه کافی نیست.' };
+      pc.treasury -= cost;
+      pc.energy = clamp((pc.energy || 0) + n, 0, energyCap(pc));
+      return { ok: true, cost, msg: faNum(n) + ' واحد سوخت و انرژی خریداری شد.' };
+    }
+    case 'recruitTreasury': {
+      const share = clamp(+a.share || 1, 0.05, 1);
+      const money = Math.max(0, pc.treasury) * share;
+      const mm = maxManpower(pc);
+      const cur = pc.army.troops + pendingTrain(pc);
+      const gap = Math.max(0, Math.floor(mm - cur));
+      if (gap < 1) return { ok: false, why: 'ارتش شما به سقف نیروی انسانی رسیده است.' };
+      const n = Math.min(gap, recruitAffordable(pc, money));
+      if (n < 1) return { ok: false, why: 'با این مبلغ حتی یک سرباز هم نمی‌توان گرفت.' };
+      return command('recruit', { n });
+    }
     case 'autoBudget': {
       pc.autoBudget = pc.autoBudget || {};
       if (a.key) pc.autoBudget[a.key] = !!a.value;
@@ -5530,7 +5996,9 @@ function metaPayload() {
   return {
     govs: GOVS.map(g => ({ id: g.id, name: g.name })), eras: ERAS, traits: TRAITS,
     ethnics: ETHNICS, terrains: TERRAINS.map(t => t.name), budgetKeys: BUDGET_KEYS,
-    budgetNames: BUDGET_NAMES, resKeys: RES_KEYS, resNames: RES_NAMES, resIcon: RES_ICON,
+    budgetNames: BUDGET_NAMES, resKeys: RES_KEYS, tradeKeys: TRADE_KEYS, mineKeys: MINE_KEYS,
+    resNames: RES_NAMES, resIcon: RES_ICON, resTech: RES_TECH,
+    fuelTech: BAL.ENERGY_TECH, stockMin: BAL.STOCK_MIN, eraPower: ERA_POWER,
     seed: W.seed, playerId: W.player, startYear: W.startYear,
     maxStates: BAL.MAX_STATES, difficulty: W.difficulty || 'normal',
     difficulties: Object.keys(DIFFICULTY).map(k => ({ key: k, name: DIFFICULTY[k].name, desc: DIFFICULTY[k].desc })),
@@ -5631,6 +6099,7 @@ function ppl(v) {
   if (v >= 1000) return faf(v / 1000, 1) + ' هزار نفر';
   return fa(v) + ' نفر';
 }
+function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
 function pc(v) { return faf(v, 0) + '٪'; }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
 function bar(v, max, color) {
@@ -5741,14 +6210,14 @@ function cmd(name, args) {
 
 /* ---------- صفحه شروع ---------- */
 var NAME_POOL = [
-  'پارس','ماد','خوارزم','سغد','طبرستان','خراسان','آذربایگان','کرمان',
-  'فرانکیا','باواریا','کاستیل','آراگون','لومباردی','ساکسونی','نورماندی','توسکانی',
-  'حجاز','نجد','یمن','عمان','شام','بصره','مغرب','حضرموت',
-  'هان','تانگ','سونگ','وی','شو','وو','یان','ژائو',
-  'یاماتو','ادو','ساتسوما','چوشو','ایزومو','مینو',
-  'مگده','گوجارات','بنگال','دکن','راجستان','مالوا','چولا',
-  'مالی','غنا','سونگهای','اکسوم','نوبیا','زیمبابوه','بنین',
-  'آزتک','مایا','اینکا','تولتک','زاپوتک','چیمو','کچوا'
+  'ایران','پاکستان','قزاقستان','ازبکستان','افغانستان','آذربایجان',
+  'آلمان','فرانسه','بریتانیا','روسیه','ایتالیا','اسپانیا','لهستان','اوکراین','هلند','سوئد','یونان','پرتغال',
+  'عربستان','مصر','عراق','امارات','مراکش','الجزایر','سوریه',
+  'چین','ویتنام','تایلند','مالزی','اندونزی','فیلیپین','مغولستان',
+  'ژاپن','کره جنوبی','کره شمالی',
+  'هند','بنگلادش','سریلانکا','نپال',
+  'نیجریه','آفریقای جنوبی','اتیوپی','کنیا','غنا','کنگو','تانزانیا',
+  'آمریکا','برزیل','کانادا','مکزیک','آرژانتین','استرالیا','کلمبیا','شیلی','پرو','کوبا'
 ];
 var KING_POOL = [
   'کوروش','داریوش','اردشیر','بهرام','شاپور','خسرو','کاوه','رستم',
@@ -5833,8 +6302,14 @@ var MODES = [
   { k: 'political', n: 'سیاسی' }, { k: 'resources', n: 'منابع' }, { k: 'income', n: 'درآمد' },
   { k: 'tech', n: 'فناوری' }, { k: 'sat', n: 'رضایت' }, { k: 'war', n: 'جنگ' }, { k: 'pop', n: 'جمعیت' }
 ];
-var RESCOL = ['#dfdccf', '#8cc45f', '#3f8f5f', '#9aa3ad', '#4b5563', '#e0b53a'];
+/* منابع معمولی (کم‌رنگ) و سرشار (پررنگ) */
+var RESCOL = ['#dfdccf', '#bfe39a', '#8fc0a2', '#c3cad2', '#9aa1ab', '#f0dc9a'];
+var RESCOL_RICH = ['#dfdccf', '#5da22c', '#1f6b42', '#6b7684', '#2b333f', '#c99310'];
 var RESNM = ['بدون منبع شاخص', 'غذا', 'چوب', 'آهن', 'نفت', 'طلا'];
+/* کد منبع در snapshot: ۱..۵ معمولی، ۱۱..۱۵ سرشار */
+function resKind(v) { return v >= 10 ? v - 10 : v; }
+function resRich(v) { return v >= 10; }
+function resFill(v) { return resRich(v) ? RESCOL_RICH[resKind(v)] : RESCOL[resKind(v)]; }
 var statePaths = [], colonyPaths = {}, labelEls = {};
 
 function buildMap() {
@@ -5912,7 +6387,7 @@ function paintMap() {
     if (m === 'political') {
       fill = s.ctrls[i] ? colorOf(s.ctrls[i]) : (s.stt[i] === 1 ? '#cbb994' : '#ddd8cc');
     } else if (m === 'resources') {
-      fill = RESCOL[s.res[i]];
+      fill = resFill(s.res[i]);
     } else if (m === 'income') {
       fill = s.ctrls[i] ? scaleColor(s.incs[i], 0, 320, '#e8eef0', '#1f8a4c') : '#ddd8cc';
     } else if (m === 'tech') {
@@ -5947,6 +6422,7 @@ function paintMap() {
   }
   paintMarks();
   paintResIcons();
+  paintEnergyIcons();
 }
 function paintColonies() {
   var cg = $('#colonies'), s = G.snap, svgns = 'http://www.w3.org/2000/svg';
@@ -6003,14 +6479,45 @@ function paintResIcons() {
   var fs = Math.max(6, 15 / Math.sqrt(G.view.s));
   var frag = document.createDocumentFragment();
   for (var i = 0; i < s.res.length; i++) {
-    var r = s.res[i];
+    var rv = s.res[i], r = resKind(rv);
     if (!r) continue;
     var t = document.createElementNS(svgns, 'text');
     t.setAttribute('class', 'resicon');
     t.setAttribute('x', G.geo.centers[i][0]);
     t.setAttribute('y', G.geo.centers[i][1] - 4);
+    t.setAttribute('font-size', resRich(rv) ? fs * 1.25 : fs);
+    t.textContent = (RESGLYPH[r] || '') + (resRich(rv) ? '+' : '');
+    frag.appendChild(t);
+  }
+  g.appendChild(frag);
+}
+/* نماد برق روی ایالت‌های کشورهایی که به سوخت و انرژی رسیده‌اند (حالت فناوری) */
+function paintEnergyIcons() {
+  var g = $('#energyicons'), s = G.snap, svgns = 'http://www.w3.org/2000/svg';
+  if (!g || !s) return;
+  if (G.mode !== 'tech') {
+    if (g.childNodes.length) { g.textContent = ''; g._sig = ''; }
+    return;
+  }
+  var sig = 'e';
+  for (var k in s.countries) sig += (s.countries[k].energy ? '1' : '0');
+  sig += '|' + Math.round(G.view.s * 10) + '|' + s.ctrls.join(',').length;
+  if (g._sig === sig) return;
+  g._sig = sig;
+  g.textContent = '';
+  var fs = Math.max(6, 13 / Math.sqrt(G.view.s));
+  var frag = document.createDocumentFragment();
+  for (var i = 0; i < s.ctrls.length; i++) {
+    var cid = s.ctrls[i];
+    if (!cid) continue;
+    var c = s.countries[cid];
+    if (!c || !c.energy) continue;
+    var t = document.createElementNS(svgns, 'text');
+    t.setAttribute('class', 'resicon');
+    t.setAttribute('x', G.geo.centers[i][0]);
+    t.setAttribute('y', G.geo.centers[i][1] - 4);
     t.setAttribute('font-size', fs);
-    t.textContent = RESGLYPH[r] || '';
+    t.textContent = '⚡';
     frag.appendChild(t);
   }
   g.appendChild(frag);
@@ -6039,13 +6546,14 @@ function paintMarks() {
 }
 function applyView() {
   $('#vp').setAttribute('transform', 'translate(' + G.view.x + ',' + G.view.y + ') scale(' + G.view.s + ')');
-  if (G.geo) { paintLabels(); paintMarks(); paintNums(); paintResIcons(); }
+  if (G.geo) { paintLabels(); paintMarks(); paintNums(); paintResIcons(); paintEnergyIcons(); }
 }
 function paintNums() {
   var ng = $('#nums');
   if (!ng || !G.numEls) return;
   var show = G.showNums && G.view.s > 1.6;
   ng.style.display = show ? '' : 'none';
+  ng.classList.toggle('onDark', G.mode === 'resources' || G.mode === 'tech' || G.mode === 'war');
   if (!show) return;
   var fs = Math.max(5, 11 / G.view.s);
   if (ng._fs !== fs) {
@@ -6183,8 +6691,12 @@ function buildLegend() {
   if (G.mode === 'political') {
     h = row('#ddd8cc', 'بدون حکومت') + row('#cbb994', 'قبایل مستقل') + '<div class="lgrow"><i class="sw" style="background:repeating-linear-gradient(45deg,#9ab 0 3px,#fff 3px 6px)"></i>استعمارشده</div>';
   } else if (G.mode === 'resources') {
-    for (var i = 1; i < RESCOL.length; i++) h += row(RESCOL[i], RESNM[i]);
+    for (var i = 1; i < RESCOL.length; i++) {
+      h += '<div class="lgrow"><i class="sw" style="background:' + RESCOL_RICH[i] + '"></i>' +
+        '<i class="sw" style="background:' + RESCOL[i] + '"></i>' + RESNM[i] + '</div>';
+    }
     h += row(RESCOL[0], RESNM[0]);
+    h += '<div style="color:var(--dim2);font-size:10px">پررنگ = سرشار · کم‌رنگ = معمولی</div>';
   } else if (G.mode === 'income') h = row('#e8eef0', 'کم') + row('#1f8a4c', 'زیاد') + '<div style="color:var(--dim2)">درآمد هر ایالت در چرخه</div>';
   else if (G.mode === 'tech') h = row('#e7e6f2', 'فناوری پایین') + row('#5b21b6', 'فناوری بالا');
   else if (G.mode === 'sat') h = row('#c0392b', 'نارضایتی') + row('#2e9e5b', 'رضایت بالا');
@@ -6216,6 +6728,10 @@ function buildTopbar() {
   h += '<div class="stat"><b>' + faf(p.tech, 1) + '</b><span>فناوری</span></div>';
   h += '<div class="stat"><b>' + fa(p.troops) + '</b><span>سرباز</span></div>';
   h += '<div class="stat"><b>' + fa(p.power) + '</b><span>قدرت نظامی</span></div>';
+  if (p.hasFuelTech) {
+    var fp = p.fuelPct || 0;
+    h += '<div class="stat ' + (fp < 15 ? 'bad' : (fp > 55 ? 'good' : '')) + '"><b>⚡' + pc(fp) + '</b><span>سوخت و انرژی</span></div>';
+  }
   h += '<div class="stat"><b>' + fa(p.owned) + (p.ctrl ? '+' + fa(p.ctrl) : '') + '</b><span>ایالت</span></div>';
   h += '<div class="stat"><b>' + pc(p.tax * 100) + '</b><span>مالیات</span></div>';
   h += '<div class="stat"><b>' + fa(p.leaderAge) + '</b><span>سن فرمانروا</span></div>';
@@ -6228,7 +6744,8 @@ function buildTopbar() {
 var MENUS = [
   { k: 'news', n: 'اخبار', i: '📰' },
   { k: 'country', n: 'کشور', i: '🏛' }, { k: 'economy', n: 'اقتصاد', i: '💰' },
-  { k: 'invest', n: 'سرمایه‌گذاری', i: '📊' }, { k: 'army', n: 'ارتش', i: '⚔' },
+  { k: 'invest', n: 'سرمایه‌گذاری', i: '📊' }, { k: 'res', n: 'منابع', i: '⛏' },
+  { k: 'stock', n: 'بورس', i: '📈' }, { k: 'army', n: 'ارتش', i: '⚔' },
   { k: 'tech', n: 'فناوری', i: '🔬' }, { k: 'trade', n: 'تجارت', i: '⚖' },
   { k: 'diplo', n: 'دیپلماسی', i: '🕊' }, { k: 'un', n: 'سازمان ملل', i: '🌍' },
   { k: 'gov', n: 'حکومت', i: '🏛️' }, { k: 'people', n: 'مردم', i: '👥' },
@@ -6662,6 +7179,8 @@ function refreshModal() {
   var k = G.modalKind;
   if (!k) return;
   if (k === 'news') { renderNewsModal(); return; }
+  if (k === 'res') { ask('country', 0, function (d) { if (d) renderRes(d); }); return; }
+  if (k === 'stock') { ask('country', 0, function (d) { if (d) renderStock(d); }); return; }
   if (k === 'help') { renderHelp(); return; }
   if (k === 'save') { renderSave(); return; }
   if (k === 'history') { ask('history', 0, renderHistory); return; }
@@ -6805,6 +7324,12 @@ function renderInvest(d) {
   for (var i = 0; i < keys.length; i++) if (!auto[keys[i]]) manual += (d.budget[keys[i]] || 0);
   for (var j = 0; j < keys.length; j++) {
     var k = keys[j], isAuto = !!auto[k];
+    if (k === 'factory' && !d.hasEnergy) {
+      h += '<div style="border-bottom:1px solid var(--line);padding:6px 0;opacity:.55">' +
+        '<b style="font-size:12.5px">' + names[k] + '</b>' +
+        '<div class="hint">تا زمانی که کشور به سوخت و انرژی نرسد این بخش باز نمی‌شود.</div></div>';
+      continue;
+    }
     var val = Math.round((d.budget[k] || 0) * 100);
     h += '<div style="border-bottom:1px solid var(--line);padding:6px 0">' +
       '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
@@ -6876,6 +7401,8 @@ function renderArmy(d) {
   var cap = d.maxManpower || 0, cur = s.troops, train = d.pendingTrain || 0;
   var gap = Math.max(0, cap - cur - train);
   var unit = d.recruitCost || 1;
+  var Q = d.recruitQuotes || {};
+  /* هزینه واقعی سربازگیری شامل خرید منابعی است که کشور کم دارد */
   var costFor = function (n) { return n * unit; };
   var h = '<div class="grid2">';
   h += '<div class="card"><h4>وضعیت ارتش</h4>' +
@@ -6887,9 +7414,14 @@ function renderArmy(d) {
     kv('روحیه', pc(s.morale)) + bar(s.morale, 100, '#15803d') +
     kv('آمادگی رزمی', pc(s.readiness)) + bar(s.readiness) +
     kv('خستگی جنگ', pc(p ? p.warWeariness : 0)) +
-    kv('قدرت نظامی', fa(s.power)) + '</div>';
+    (d.hasFuelTech ? kv('سوخت و انرژی', fa(d.energy) + ' از ' + fa(d.energyCap),
+      (d.energy / Math.max(d.energyCap, 1)) < 0.15 ? 'bad' : '') +
+      bar(d.energy, Math.max(d.energyCap, 1), '#f59e0b') : '') +
+    kv('قدرت نظامی', fa(s.power)) +
+    kv('ضریب دوره نظامی', '×' + faf((G.meta.eraPower || [1])[d.era.id] || 1, 2)) + '</div>';
   h += '<div class="card"><h4>هزینه‌ها</h4>' +
-    kv('هزینه آموزش هر سرباز', money(unit)) +
+    kv('هزینه آموزش هر سرباز', money(unit) + (d.recruitBase && unit > d.recruitBase * 1.02 ?
+      ' (پایه ' + money(d.recruitBase) + ' + واردات منابع)' : '')) +
     kv('نگهداری هر سرباز در چرخه', money(d.soldierUpkeep)) +
     kv('هزینه کل ارتش در چرخه', money(d.lastCycle ? d.lastCycle.costs.army : 0)) +
     kv('ناو', fa(s.navy) + ' — هزینه ساخت ' + money(d.shipCost)) +
@@ -6900,12 +7432,20 @@ function renderArmy(d) {
   h += '</div>';
 
   h += '<div class="card"><h4>اقدام سریع</h4><div class="actgrid">';
+  function qTxt(q, empty) {
+    if (!q || q.n < 1) return empty;
+    return fa(q.n) + ' سرباز — ' + money(q.cost);
+  }
   h += '<button class="act" data-a="fill" ' + (gap < 1 ? 'disabled' : '') + '><b>جبران کامل کسری</b><small>' +
-    (gap < 1 ? 'ارتش به سقف رسیده است' : fa(gap) + ' سرباز — ' + money(costFor(gap))) + '</small></button>';
+    (gap < 1 ? 'ارتش به سقف رسیده است' : qTxt(Q.gap, fa(gap) + ' سرباز')) + '</small></button>';
   h += '<button class="act" data-a="half" ' + (gap < 2 ? 'disabled' : '') + '><b>نیمی از کسری</b><small>' +
-    (gap < 2 ? '—' : fa(Math.floor(gap / 2)) + ' سرباز — ' + money(costFor(Math.floor(gap / 2)))) + '</small></button>';
+    (gap < 2 ? '—' : qTxt(Q.half, '—')) + '</small></button>';
   h += '<button class="act" data-a="quarter" ' + (gap < 4 ? 'disabled' : '') + '><b>یک‌چهارم کسری</b><small>' +
-    (gap < 4 ? '—' : fa(Math.floor(gap / 4)) + ' سرباز — ' + money(costFor(Math.floor(gap / 4)))) + '</small></button>';
+    (gap < 4 ? '—' : qTxt(Q.quarter, '—')) + '</small></button>';
+  h += '<button class="act" data-a="allMoney" ' + ((Q.allMoney && Q.allMoney.n >= 1) ? '' : 'disabled') + '><b>کسری با تمام خزانه</b><small>' +
+    qTxt(Q.allMoney, gap < 1 ? 'ارتش به سقف رسیده است' : 'خزانه کافی نیست') + '</small></button>';
+  h += '<button class="act" data-a="halfMoney" ' + ((Q.halfMoney && Q.halfMoney.n >= 1) ? '' : 'disabled') + '><b>کسری با نیمی از خزانه</b><small>' +
+    qTxt(Q.halfMoney, gap < 1 ? 'ارتش به سقف رسیده است' : 'خزانه کافی نیست') + '</small></button>';
   h += '<button class="act" data-a="ready"><b>تجهیز و آموزش فوری</b><small>افزایش آمادگی و روحیه — ' + money(Math.max(20, s.treasury * 0.1)) + '</small></button>';
   h += '<button class="act" data-a="navy" ' + (s.tech < 18 ? 'disabled' : '') + '><b>ساخت یک ناو</b><small>' +
     (s.tech < 18 ? 'نیاز به فناوری ۱۸' : money(d.shipCost)) + '</small></button>';
@@ -6994,6 +7534,8 @@ function renderArmy(d) {
       if (a === 'fill') cmd('recruitGap', { share: 1 });
       else if (a === 'half') cmd('recruitGap', { share: 0.5 });
       else if (a === 'quarter') cmd('recruitGap', { share: 0.25 });
+      else if (a === 'allMoney') cmd('recruitTreasury', { share: 1 });
+      else if (a === 'halfMoney') cmd('recruitTreasury', { share: 0.5 });
       else if (a === 'ready') cmd('boostReadiness', {});
       else if (a === 'navy') cmd('buildNavy', { n: 1 });
       else if (a === 'air') cmd('buildAir', { n: 1 });
@@ -7027,6 +7569,8 @@ function renderTech(d) {
     kv('آموزش', faf(d.education, 1)) + bar(d.education) +
     kv('سلامت عمومی', faf(d.healthIdx, 1)) + bar(d.healthIdx) +
     kv('سقف فناوری (بر پایه دانش)', faf(Math.min(100, d.knowledge * 1.25 + 8), 1)) +
+    kv('کارخانه، کمپانی و تأسیسات', pc(d.factory || 0)) + bar(d.factory || 0, 100, '#0891b2') +
+    (d.hasEnergy ? '' : '<div style="font-size:11px;color:var(--dim2)">این بخش تا رسیدن به سوخت و انرژی رشد نمی‌کند.</div>') +
     '<div class="hint">فناوری مستقیماً خریدنی نیست: پول ← آموزش و دانش ← تحقیق ← فناوری. ثبات، اقتصاد، جمعیت و ارتباط با کشورهای پیشرفته نیز اثر دارند.</div></div>';
   var tre = s.treasury;
   h += '<div class="card"><h4>سرمایه‌گذاری مستقیم در تحقیق</h4>' +
@@ -7040,10 +7584,13 @@ function renderTech(d) {
   h += '<div class="card"><h4>اثر فناوری</h4><div class="grid2">' +
     kv('اقتصاد و صنعت', '×' + faf(1 + s.tech / 60, 2)) +
     kv('کشاورزی و غذا', '×' + faf(1 + Math.pow(Math.max(s.tech, 1), 1.45) * 2.6 / 300, 2)) +
-    kv('کیفیت تجهیزات نظامی', '×' + faf(1 + s.tech / 17, 2)) +
+    kv('کیفیت تجهیزات نظامی', '×' + faf((1 + s.tech / 17) * ((G.meta.eraPower || [1])[d.era.id] || 1), 2) +
+      ' (ضریب دوره ×' + faf((G.meta.eraPower || [1])[d.era.id] || 1, 2) + ')') +
     kv('پزشکی و طول عمر', '+' + fa(s.tech * 0.26) + ' سال') +
     kv('لجستیک و پشتیبانی', '×' + faf(0.9 + s.tech / 130, 2)) +
-    kv('اکتشاف منابع', s.tech > 38 ? 'شامل نفت' : (s.tech > 12 ? 'شامل آهن' : 'فقط منابع سطحی')) +
+    kv('اکتشاف منابع', s.tech >= 40 ? 'چوب، غذا، آهن، طلا و نفت' :
+      (s.tech >= 22 ? 'چوب، غذا، آهن و طلا' : (s.tech >= 12 ? 'چوب، غذا و آهن' : 'فقط چوب و غذا'))) +
+    kv('سوخت و انرژی', d.hasFuelTech ? (d.hasEnergy ? 'فعال' : 'در دسترس ولی بدون نفت') : 'نیاز به فناوری ' + fa(d.fuelTech || 40)) +
     '</div></div>';
   h += '<div class="card"><h4>دوره‌های نظامی</h4><table><tr><th>دوره</th><th>فناوری</th><th>سلاح‌ها</th></tr>';
   for (var i = 0; i < G.meta.eras.length; i++) {
@@ -7070,6 +7617,9 @@ function renderTech(d) {
 }
 function renderTrade(d) {
   var mk = G.snap.market, keys = G.meta.resKeys;
+  /* سوخت و انرژی هم کالای قابل داد و ستد است */
+  var tkeys = d.hasFuelTech ? keys.concat(['energy']) : keys;
+  function hold(k) { return k === 'energy' ? d.energy : d.stock[k]; }
   var h = '<div class="card"><h4>واگذاری تجارت به دولت</h4>' +
     '<div class="kv"><span>دولت خودش قرارداد می‌بندد و کمبودها را از بازار جبران می‌کند</span>' +
     '<b><input type="checkbox" id="autoTr"' + (d.autoTrade ? ' checked' : '') + '></b></div>' +
@@ -7083,9 +7633,14 @@ function renderTrade(d) {
       '<td style="color:' + (tr > 0 ? 'var(--bad)' : tr < 0 ? 'var(--good)' : 'var(--dim)') + '">' + (tr > 0 ? '▲' : tr < 0 ? '▼' : '—') + ' ' + faf(Math.abs(tr), 2) + '</td>' +
       '<td>' + fa(d.stock[k]) + '</td></tr>';
   }
-  h += '</table><div class="hint">قیمت‌ها بر پایه تولید و تقاضای جهانی تغییر می‌کنند و در حالت عادی نوسان هر چرخه محدود است.</div></div>';
+  if (d.hasFuelTech) {
+    h += '<tr><td>⚡ سوخت و انرژی</td><td>' + faf(d.energyPrice, 2) + '</td><td style="color:var(--dim)">—</td>' +
+      '<td>' + fa(d.energy) + '</td></tr>';
+  }
+  h += '</table><div class="hint">قیمت‌ها بر پایه تولید و تقاضای جهانی تغییر می‌کنند و در حالت عادی نوسان هر چرخه محدود است. ' +
+    'سهم مازادی که هر چرخه خودبه‌خود فروخته می‌شود در بخش منابع تنظیم می‌گردد.</div></div>';
   h += '<div class="card"><h4>خرید و فروش</h4><div class="row">' +
-    '<select id="tRes">' + keys.map(function (k) { return '<option value="' + k + '">' + G.meta.resNames[k] + '</option>'; }).join('') + '</select>' +
+    '<select id="tRes">' + tkeys.map(function (k) { return '<option value="' + k + '">' + G.meta.resNames[k] + '</option>'; }).join('') + '</select>' +
     '<input type="number" id="tAmt" min="1" value="100">' +
     '</div><div class="row" style="margin-top:8px">' +
     '<button class="btn" id="tBuy">خرید</button><button class="btn" id="tSell">فروش</button></div>' +
@@ -7477,6 +8032,164 @@ function renderHistory(d) {
   setModal('تاریخ جهان', h);
 }
 
+/* ---------- منابع، سوخت و انرژی ---------- */
+function renderRes(d) {
+  var list = d.resources || [];
+  var h = '';
+  /* کارت سوخت و انرژی */
+  var cap = d.energyCap || 1;
+  var pct = clamp(d.energy / Math.max(cap, 1) * 100, 0, 100);
+  h += '<div class="card"><h4>سوخت و انرژی ⚡</h4>';
+  if (!d.hasFuelTech) {
+    h += '<div class="hint">سوخت و انرژی از نفتِ مصرف داخلی ساخته می‌شود و تا نفت کشف نشود وجود ندارد. ' +
+      'برای پالایش نفت به فناوری ' + fa(d.fuelTech || 40) + ' نیاز دارید (فناوری کنونی ' + faf(d.summary.tech, 1) + ').</div>';
+  } else {
+    h += kv('ذخیره سوخت', fa(d.energy) + ' از ' + fa(cap)) + bar(d.energy, cap, pct < 20 ? '#c0392b' : '#f59e0b') +
+      kv('تولید چرخه گذشته', fa(d.energyMade)) +
+      kv('مصرف غیرنظامی', fa(d.energyUse)) +
+      kv('کمبود انرژی', pc((d.energyShort || 0) * 100), d.energyShort > 0.2 ? 'bad' : '') +
+      kv('بهای هر واحد', money(d.energyPrice)) +
+      '<div class="hint">نفتی که برای مصرف داخلی نگه می‌دارید به سوخت و انرژی تبدیل می‌شود. ' +
+      'در دوره سلاح پیشرفته و سلاح هوشمند، حمله و پدافند سوخت می‌خورند؛ مصرف پدافند ۸۰٪ کمتر از آفند است. ' +
+      'با تمام‌شدن سوخت، پدافند انجام می‌شود ولی ضعیف‌تر.</div>';
+    h += '<div class="row" style="margin-top:8px">' +
+      '<button class="btn" data-buyE="100">خرید ۱۰۰ واحد</button>' +
+      '<button class="btn" data-buyE="500">خرید ۵۰۰ واحد</button>' +
+      '<button class="btn primary" data-buyE="fill">پرکردن ذخیره</button></div>' +
+      '<div class="hint">خرید سوخت مصرفی و حجمی است؛ با یک‌بار خرید دائمی نمی‌شود.</div>';
+  }
+  h += '</div>';
+
+  /* جدول منابع */
+  h += '<div class="card"><h4>منابع کشور</h4>' +
+    '<div class="hint">نوار هر منبع تعیین می‌کند چند درصد برای مصرف داخلی بماند و چه مقدار برای فروش گذاشته شود. ' +
+    'فروش در بخش تجارت انجام می‌شود. با زدن تیک، تصمیم آن منبع به دولت واگذار می‌شود.</div>';
+  for (var i = 0; i < list.length; i++) {
+    var r = list[i];
+    var keepPct = Math.round(r.keep * 100);
+    var cover = r.cover == null ? null : r.cover;
+    var state = cover == null ? '—' : (cover < 0.8 ? 'کمبود' : (cover > 1.8 ? 'مازاد زیاد' : 'کافی'));
+    var cls = cover == null ? '' : (cover < 0.8 ? 'bad' : (cover > 1.8 ? 'good' : ''));
+    h += '<div style="border-bottom:1px solid var(--line);padding:7px 0"' + (r.locked ? ' class="dim"' : '') + '>' +
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
+      '<b style="flex:1;font-size:12.5px">' + r.icon + ' ' + esc(r.name) + '</b>' +
+      '<span class="tag ' + cls + '">' + state + '</span>' +
+      '<label style="font-size:11.5px;color:var(--dim);display:flex;align-items:center;gap:4px">' +
+      '<input type="checkbox" data-ares="' + r.k + '"' + (r.auto ? ' checked' : '') + '> واگذاری به دولت</label></div>' +
+      '<div class="grid2" style="margin:3px 0">' +
+      '<div class="kv"><span>ذخیره</span><b>' + fa(r.have) + '</b></div>' +
+      '<div class="kv"><span>تولید چرخه</span><b>' + fa(r.prod) + '</b></div>' +
+      '<div class="kv"><span>نیاز داخلی</span><b>' + fa(r.need) + '</b></div>' +
+      '<div class="kv"><span>بهای بازار</span><b>' + money(r.price) + '</b></div></div>' +
+      (r.locked ? '<div class="hint">هنوز در دسترس نیست؛ نیاز به فناوری ' + fa((G.meta.resTech || {})[r.k] || d.fuelTech || 0) + '.</div>' :
+        '<div class="slider"><label>مصرف داخلی</label>' +
+        '<input type="range" class="resb" data-k="' + r.k + '" min="0" max="100" value="' + keepPct + '"' + (r.auto ? ' disabled' : '') + '>' +
+        '<b id="rv_' + r.k + '">' + (r.auto ? 'دولت' : pc(keepPct)) + '</b></div>' +
+        '<div style="font-size:11px;color:var(--dim2)" id="rs_' + r.k + '">برای فروش: ' + pc(r.salePct) + ' — ' + fa(r.sale) + ' واحد (' + money(r.sale * r.price) + ')</div>') +
+      '</div>';
+  }
+  h += '<div class="row" style="margin-top:8px"><button class="btn primary" id="rApply">اعمال سیاست منابع</button>' +
+    '<button class="btn" id="rAllGov">همه به دولت</button><button class="btn" id="rAllMe">همه با من</button></div></div>';
+
+  h += '<div class="card"><h4>وضعیت تجارت</h4>' +
+    kv('دسترسی تجاری', pc((d.tradeAccess || 1) * 100), (d.tradeAccess || 1) < 0.5 ? 'bad' : 'good') +
+    '<div class="hint">دو کشوری که با هم در جنگ‌اند تجارت نمی‌کنند و کشورهای دشمن رابطه تجاری بسیار کمی دارند. ' +
+    'اگر به منابع کشوری نیاز دارید، دوستی با او به سود شماست.</div></div>';
+
+  setModal('منابع', h);
+
+  function refreshRow(k) {
+    var b = $('.resb[data-k="' + k + '"]');
+    if (!b) return;
+    var item = null;
+    for (var i = 0; i < list.length; i++) if (list[i].k === k) item = list[i];
+    if (!item) return;
+    var keep = (+b.value) / 100;
+    var lab = $('#rv_' + k);
+    if (lab) lab.textContent = b.disabled ? 'دولت' : pc(keep * 100);
+    var sale = Math.max(0, item.have * (1 - keep));
+    var s2 = $('#rs_' + k);
+    if (s2) s2.textContent = 'برای فروش: ' + pc((1 - keep) * 100) + ' — ' + fa(sale) + ' واحد (' + money(sale * item.price) + ')';
+  }
+  $$('#mbody .resb').forEach(function (b) { b.oninput = function () { refreshRow(b.getAttribute('data-k')); }; });
+  $$('#mbody [data-ares]').forEach(function (b) {
+    b.onchange = function () {
+      var k = b.getAttribute('data-ares');
+      cmd('autoRes', { key: k, value: b.checked });
+      var sl = $('.resb[data-k="' + k + '"]');
+      if (sl) sl.disabled = b.checked;
+      refreshRow(k);
+    };
+  });
+  $('#rApply').onclick = function () {
+    var v = {};
+    $$('#mbody .resb').forEach(function (b) { if (!b.disabled) v[b.getAttribute('data-k')] = (+b.value) / 100; });
+    cmd('resPolicy', { value: v });
+    toast('سیاست منابع اعمال شد');
+  };
+  $('#rAllGov').onclick = function () {
+    var o = {};
+    (G.meta.tradeKeys || []).forEach(function (k) { o[k] = true; });
+    cmd('autoRes', { value: o });
+    setTimeout(refreshModal, 120);
+  };
+  $('#rAllMe').onclick = function () {
+    var o = {};
+    (G.meta.tradeKeys || []).forEach(function (k) { o[k] = false; });
+    cmd('autoRes', { value: o });
+    setTimeout(refreshModal, 120);
+  };
+  $$('#mbody [data-buyE]').forEach(function (b) {
+    b.onclick = function () {
+      var v = b.getAttribute('data-buyE');
+      var n = v === 'fill' ? Math.max(1, Math.floor((d.energyCap || 0) - d.energy)) : +v;
+      cmd('buyEnergy', { amount: n });
+    };
+  });
+}
+
+/* ---------- بورس بین‌المللی ---------- */
+function renderStock(d) {
+  var min = d.stockMin || 15;
+  var f = d.factory || 0;
+  var h = '<div class="card"><h4>کارخانه، کمپانی و تأسیسات</h4>' +
+    kv('پیشرفت', pc(f)) + bar(f, 100, '#0891b2') +
+    kv('لازم برای ورود به بورس', pc(min), f >= min ? 'good' : 'bad') +
+    '<div class="hint">این بخش تنها با داشتن سوخت و انرژی رشد می‌کند و بودجه آن در بخش سرمایه‌گذاری تنظیم می‌شود. ' +
+    'هرچه بیشتر باشد، رضایت مردم بالاتر و ارزش سهام کشور در بورس جهانی بیشتر است. رشد این شاخص عمداً کند است.</div></div>';
+
+  if (f < min) {
+    h += '<div class="card"><h4>بورس بین‌المللی</h4><div class="hint">کشور شما هنوز به آستانه ' + pc(min) +
+      ' نرسیده و در بورس جهانی فعال نیست.</div></div>';
+  } else {
+    var p = d.stockParts || {};
+    h += '<div class="card"><h4>بورس بین‌المللی 📈</h4>' +
+      kv('ارزش سهام کشور', fa(d.stockValue)) + bar(d.stockValue, 160, '#0e7490') +
+      kv('درآمد چرخه گذشته از بورس', money(d.stockIncome)) +
+      kv('حال‌وهوای بازار جهانی', pc((d.stockMood || 1) * 100)) +
+      '<div class="hint">ارزش سهام از چهار پایه می‌آید: پیشرفت کارخانه و کمپانی، منابع در اختیار، حجم تجارت و جمعیت. ' +
+      'جنگ‌های بزرگ جهانی حال بازار را بد می‌کند.</div>' +
+      '<div class="grid2" style="margin-top:6px">' +
+      '<div class="kv"><span>پایه کارخانه</span><b>' + pc((p.fac || 0) * 100) + '</b></div>' +
+      '<div class="kv"><span>پایه منابع</span><b>' + pc((p.res || 0) * 100) + '</b></div>' +
+      '<div class="kv"><span>پایه تجارت</span><b>' + pc((p.trade || 0) * 100) + '</b></div>' +
+      '<div class="kv"><span>پایه جمعیت</span><b>' + pc((p.pop || 0) * 100) + '</b></div>' +
+      '<div class="kv"><span>ثبات کشور</span><b>' + pc((p.stab || 0) * 100) + '</b></div>' +
+      '<div class="kv"><span>حجم تجارت</span><b>' + fa(p.tradeVol || 0) + '</b></div>' +
+      '</div></div>';
+  }
+  if (d.stockBoard && d.stockBoard.length) {
+    h += '<div class="card"><h4>تابلوی بورس جهانی</h4><table class="tb"><tr><th>کشور</th><th>کارخانه</th><th>ارزش سهام</th></tr>';
+    for (var i = 0; i < d.stockBoard.length; i++) {
+      var b = d.stockBoard[i];
+      h += '<tr' + (b.me ? ' style="font-weight:700"' : '') + '><td><i class="dot" style="background:' + b.color + '"></i>' + esc(b.name) + '</td>' +
+        '<td>' + pc(b.factory) + '</td><td>' + fa(b.value) + '</td></tr>';
+    }
+    h += '</table></div>';
+  }
+  setModal('بورس', h);
+}
+
 /* ---------- ذخیره‌سازی ---------- */
 var IDB = null, idbTried = false;
 function idb(cb) {
@@ -7642,11 +8355,26 @@ function renderHelp() {
     'هزینه‌های دائمی شامل اداره قلمرو (غیرخطی: هرچه ایالت بیشتر، هزینه هر ایالت بیشتر)، ارتش، زیرساخت، دستگاه حکومت، جنگ و مستعمرات است. ' +
     'مالیات بالا درآمد بیشتر ولی رضایت و رشد کمتر می‌آورد.' +
     '</div></div>';
+  h += '<div class="card"><h4>منابع، سوخت و بورس</h4><div style="font-size:13px;line-height:2">' +
+    'هر ذخیره معدنی یا <b>سرشار</b> است یا <b>معمولی</b>: سرشار دست‌کم ۵۰۰ سال بهره‌برداری می‌دهد و در نقشه منابع پررنگ‌تر دیده می‌شود. ' +
+    'منابع تمام‌شدنی‌اند ولی هرگز به‌کلی از جهان پایان نمی‌گیرند: در ایالت‌های مستعد پیوسته ذخایر تازه کشف می‌شود و هرچه ذخایر جهانی کمتر شود، اکتشاف شتاب می‌گیرد.<br>' +
+    'ترتیب کشف با فناوری است: چوب و غذا از آغاز، آهن از فناوری ۱۲، طلا از ۲۲ و نفت از ۴۰. کشوری که منبعی ندارد باید آن را از دیگران بخرد.<br>' +
+    'در بخش <b>منابع</b> می‌بینید کدام منبع کم است و کدام مازاد دارد، و با نوار تعیین می‌کنید چند درصد برای مصرف داخلی بماند و چه مقدار برای فروش برود. هر منبع تیک واگذاری به دولت دارد.<br>' +
+    '<b>سوخت و انرژی</b> از نفتِ مصرف داخلی ساخته می‌شود؛ هرچه نفت بیشتر، سوخت بیشتر. کشورهایی که به سوخت رسیده‌اند در نمای فناوری نماد ⚡ می‌گیرند. ' +
+    'کشوری که فناوری‌اش کافی است ولی نفت ندارد می‌تواند سوخت بخرد؛ این خرید مصرفی است و دائمی نیست.<br>' +
+    'دو کشور در حال جنگ با هم تجارت نمی‌کنند و کشورهای دشمن رابطه تجاری بسیار کمی دارند؛ پس اگر به منابع کشوری نیاز دارید، دوستی با او به سود شماست.<br>' +
+    'کشورهای دارای سوخت بخش <b>کارخانه، کمپانی و تأسیسات</b> را در سرمایه‌گذاری باز می‌کنند. رشد آن عمداً کند است، رضایت مردم را بالا می‌برد و ' +
+    'با رسیدن به ۱۵٪ کشور وارد <b>بورس بین‌المللی</b> می‌شود. ارزش سهام از پیشرفت کارخانه، منابع در اختیار، حجم تجارت و جمعیت می‌آید.' +
+    '</div></div>';
   h += '<div class="card"><h4>فناوری</h4><div style="font-size:13px;line-height:2">' +
     'فناوری یک شاخص واحد ۰ تا ۱۰۰ است و با سال باز نمی‌شود. مسیر آن: پول ← آموزش و دانش ← تحقیق ← فناوری. ' +
-    'کشوری متوسط و باثبات حدود ۱۰۰۰ سال زمان می‌برد تا از تمدن اولیه به فناوری نزدیک امروز برسد. پنج دوره نظامی بر پایه فناوری فعال می‌شوند.' +
+    'کشوری متوسط و باثبات حدود ۱۰۰۰ سال زمان می‌برد تا از تمدن اولیه به فناوری نزدیک امروز برسد. پنج دوره نظامی بر پایه فناوری فعال می‌شوند و ' +
+    'توان رزمی هر دوره به‌روشنی از دوره پیش بالاتر است: صد سرباز دوره سلاح هوشمند چند برابر صد سرباز دوره سلاح پیشرفته می‌ارزد.' +
     '</div></div>';
   h += '<div class="card"><h4>جنگ</h4><div style="font-size:13px;line-height:2">' +
+    'در دوره سلاح پیشرفته و سلاح هوشمند، حمله و پدافند <b>سوخت و انرژی</b> می‌خورند و درصد سوخت در نوار بالا دیده می‌شود. ' +
+    'مصرف پدافند ۸۰٪ کمتر از آفند است. با تمام‌شدن سوخت، پدافند همچنان انجام می‌شود ولی ضعیف‌تر و حمله بسیار کم‌اثر می‌شود؛ ' +
+    'در جنگ‌های فرسایشی باید حواستان به ذخیره سوخت باشد.<br>' +
     'برای حمله زمینی باید مرز زمینی مستقیم داشته باشید (مرز قطری کافی نیست). ایالت ساحلی را می‌توان با ناو و فناوری کافی از دریا هدف گرفت. ' +
     'هر عملیات زمان‌بر است و خط تدارکات، فاصله، زمین، استحکامات، روحیه و فناوری بر نتیجه اثر می‌گذارند. نسبت قدرت ۱ یعنی نبرد برابر و ۲ یعنی احتمال پیروزی بسیار بالا — اما هیچ برتری‌ای پیروزی تضمین‌شده نیست.' +
     '</div></div>';
