@@ -542,7 +542,11 @@ const COUNTRY_COLORS = [
   '#cf8f5a', '#000075', '#7d8794', '#ff4d4d', '#2e8b57', '#1e90ff', '#ff8c00', '#6a0dad',
   '#00ced1', '#ff69b4', '#7cfc00', '#c71585', '#20b2aa', '#cd853f', '#4682b4', '#daa520',
   '#8b4513', '#5f9ea0', '#d2691e', '#556b2f', '#b03060', '#483d8b', '#008080', '#b8860b',
-  '#708090', '#e9967a', '#66cdaa', '#9932cc', '#ff6347', '#40826d', '#8fbc8f', '#dc143c'
+  '#708090', '#e9967a', '#66cdaa', '#9932cc', '#ff6347', '#40826d', '#8fbc8f', '#dc143c',
+  '#1b7ced', '#a0522d', '#d81b60', '#00838f', '#7b1fa2', '#33691e', '#ef6c00', '#4e342e',
+  '#0d47a1', '#c2185b', '#00695c', '#827717', '#bf360c', '#37474f', '#6d4c41', '#01579b',
+  '#ad1457', '#2e7d32', '#e65100', '#4527a0', '#00838a', '#9e9d24', '#b71c1c', '#1a237e',
+  '#f4511e', '#3949ab', '#00897b', '#7cb342', '#fb8c00', '#5e35b1', '#039be5', '#c0ca33'
 ];
 function hexToRgb(h) {
   return [parseInt(h.substr(1, 2), 16), parseInt(h.substr(3, 2), 16), parseInt(h.substr(5, 2), 16)];
@@ -563,12 +567,13 @@ function pickColor(usedColors, neighborColors) {
   if (best) return best;
   /* اگر پالت تمام شد، رنگ تازه با فاصله زیاد بساز */
   let bc = null, bs = -1;
-  for (let t = 0; t < 60; t++) {
+  for (let t = 0; t < 400; t++) {
     const h = Math.floor(RNGX ? RNGX.f() * 360 : Math.random() * 360);
     const col = hslToHex(h, 55 + Math.floor((RNGX ? RNGX.f() : Math.random()) * 25), 38 + Math.floor((RNGX ? RNGX.f() : Math.random()) * 22));
     let sc = 1e9;
     for (const n of usedColors) sc = Math.min(sc, colorDist(col, n));
     if (sc > bs) { bs = sc; bc = col; }
+    if (bs > 95) break;   /* فاصله رنگی کافی پیدا شد */
   }
   return bc || '#888888';
 }
@@ -621,6 +626,16 @@ const RES_ICON = { food: '🌾', wood: '🪵', iron: '⛓️', oil: '🛢️', g
 const RES_TECH = { food: 0, wood: 0, iron: 12, gold: 22, oil: 40 };
 /* توان رزمی هر دوره نظامی — سرباز دوره بالاتر به‌روشنی قوی‌تر است */
 const ERA_POWER = [1.00, 1.22, 1.58, 2.15, 3.00];
+/* دستور ساخت سلاح در هر دوره: هر واحد سلاح چه منابعی می‌خواهد.
+   هر سرباز برای مسلح شدن یک واحد سلاح لازم دارد. */
+const ARMS_RECIPE = [
+  { wood: 0.40 },                                                   /* سلاح اولیه */
+  { wood: 0.32, iron: 0.24 },                                       /* سلاح سرد */
+  { wood: 0.20, iron: 0.36, oil: 0.14 },                            /* سلاح گرم */
+  { wood: 0.16, iron: 0.44, oil: 0.28, gold: 0.024 },               /* سلاح پیشرفته */
+  { wood: 0.12, iron: 0.48, oil: 0.36, gold: 0.036, energy: 0.24 }  /* سلاح هوشمند */
+];
+const ARMS_RES_NAMES = ['چوب', 'چوب و آهن', 'چوب، آهن و نفت', 'چوب، آهن، نفت و طلا', 'چوب، آهن، نفت، طلا و سوخت'];
 
 const ERAS = [
   { id: 0, name: 'سلاح اولیه', min: 0, max: 15, items: ['سنگ', 'چوب', 'چماق', 'نیزه ساده', 'کمان ابتدایی'] },
@@ -661,7 +676,7 @@ const BUDGET_DESC = {
 
 /* ---------- ۴) ثابت‌های تعادل (قابل تنظیم) ---------- */
 const BAL = {
-  ECON_REF: 300,          // مرجع تولید ایالت در هر چرخه
+  ECON_REF: 560,          // مرجع تولید ایالت در هر چرخه
   POP_REF: 170,           // جمعیت مرجع
   POP_EXP: 0.55,          // نمای جمعیت در تولید
   ADMIN_BASE: 7.0,        // هزینه پایه اداره هر ایالت
@@ -671,25 +686,26 @@ const BAL = {
   NAVY_UPKEEP: 2.6,       // هزینه هر ناو در چرخه
   AIR_UPKEEP: 3.4,        // هزینه هر یگان هوایی در چرخه
   RECRUIT_COST: 0.9,      // هزینه آموزش و تجهیز هر سرباز
-  TECH_K: 30000,          // ضریب سرعت پیشرفت فناوری
+  TECH_K: 20000,          // ضریب سرعت پیشرفت فناوری
   KNOW_K: 18,             // ضریب رشد دانش
   EDU_K: 26,              // ضریب رشد آموزش
   HEALTH_K: 30,           // ضریب رشد سلامت
   STATE_K: 30,            // ضریب رشد شاخص‌های ایالتی
   TECH_DIV: 10,           // مقیاس منحنی گرانی فناوری
   TECH_BASE: 10,          // کف گرانی فناوری (پیشرفت اولیه هم آسان نیست)
-  TECH_POW: 2.2,          // نمای گرانی فناوری در سطوح بالا
+  TECH_POW: 2.40,          // نمای گرانی فناوری در سطوح بالا
   INDEX_COST: 26,         // پایه گرانی شاخص‌های داخلی
   COLONY_TAKE: 0.5,       // حداکثر سهم استعمارگر
   TICKS_PER_YEAR: 4,
   CYCLE_YEARS: 5,
-  MAX_STATES: 350,
-  NEW_WORLD: 50,          // ایالت‌های دو قاره تازه در دل اقیانوس
-  COUNTRIES: 25,          // تعداد کشورهای آغازین
+  MAX_STATES: 400,
+  NEW_WORLD: 75,          // ایالت‌های سه قاره تازه در دل اقیانوس
+  COUNTRIES: 40,          // تعداد کشورهای آغازین
+  START_TOL: 0.10,        // تلرانس ±۱۰٪ در وسعت، قدرت و خزانه آغازین
 
   /* ---- منابع ---- */
   RICH_CHANCE: 0.28,      // سهم ذخایر سرشار از کل ذخایر
-  MINE_RATE: { iron: 18, oil: 24, gold: 3.4 },      // برداشت پایه هر چرخه از یک معدن معمولی
+  MINE_RATE: { iron: 17, oil: 21, gold: 3.1 },      // برداشت پایه هر چرخه از یک معدن معمولی
   RICH_YIELD: 1.75,       // برداشت معدن سرشار نسبت به معمولی
   RICH_LIFE: 108,         // چرخه‌های عمر معدن سرشار (۱۰۸ × ۵ = ۵۴۰ سال)
   NORM_LIFE: 34,          // چرخه‌های عمر معدن معمولی (حدود ۱۷۰ سال)
@@ -703,6 +719,20 @@ const BAL = {
   ENERGY_ATTACK: 0.012,   // انرژی لازم برای هر سرباز مهاجم در هر تیک نبرد
   ENERGY_DEFEND: 0.20,    // نسبت مصرف پدافند به آفند (۸۰٪ کمتر)
   ENERGY_TECH: 40,        // فناوری لازم برای تبدیل نفت به سوخت
+
+  /* ---- غذا ---- */
+  FOOD_HEAD: 0.82,        // مصرف غذای سرانه در هر چرخه
+  FOOD_YIELD: 1.50,       // ضریب بازده کشاورزی (هماهنگ با سرانه مصرف)
+
+  /* ---- پول ---- */
+  HOARD_KEEP: 4,          // خزانه معقول = این تعداد چرخه درآمد
+  HOARD_LEAK: 0.16,       // نشت سالانه مازاد خزانه به فساد و اسراف
+
+  /* ---- سلاح ---- */
+  ARMS_MONEY: 0.20,       // هزینه پول ساخت هر واحد سلاح (میلیون) پیش از ضریب فناوری
+  ARMS_SHARE: 0.42,       // سهم پیش‌فرض بودجه ارتش که صرف ساخت سلاح می‌شود
+  ARMS_RETURN: 0.55,      // سهم سلاحی که با مرخص‌کردن سرباز به زرادخانه برمی‌گردد
+  ARMS_LOSS: 0.75,        // سهم سلاح از دست رفته با کشته‌شدن سرباز
 
   /* ---- کارخانه، کمپانی و بورس ---- */
   FACTORY_K: 14,         // سرعت رشد شاخص کارخانه (عمداً کند)
@@ -877,7 +907,7 @@ function buildGeo(seedStr) {
   function freeForNew(c, r, otherMark) {
     if (c < 2 || r < 2 || c > COLS - 3 || r > ROWS - 3) return false;
     if (land[idx(c, r)]) return false;
-    if (innerD(c, r) > 0.46) return false;
+    if (innerD(c, r) > 0.52) return false;
     for (let dc = -1; dc <= 1; dc++) for (let dr = -1; dr <= 1; dr++) {
       const nc = c + dc, nr = r + dr;
       if (!inGrid(nc, nr)) continue;
@@ -887,11 +917,12 @@ function buildGeo(seedStr) {
   }
   const newMarks = [];
   if (NEWW > 0) {
-    const per = Math.round(NEWW / 2);
     const spots = [
-      { ax: 0.5 - 0.17, ay: 0.5 - 0.11 },
-      { ax: 0.5 + 0.17, ay: 0.5 + 0.11 }
+      { ax: 0.5 - 0.19, ay: 0.5 - 0.12 },
+      { ax: 0.5 + 0.19, ay: 0.5 + 0.12 },
+      { ax: 0.5 + 0.02, ay: 0.5 - 0.17 }
     ];
+    const per = Math.round(NEWW / spots.length);
     let placedTotal = 0;
     for (let ci = 0; ci < spots.length; ci++) {
       const want = ci === spots.length - 1 ? (NEWW - placedTotal) : per;
@@ -1054,12 +1085,14 @@ function newAgent(opts) {
     const f = W.agents[opts.father], m = W.agents[opts.mother];
     for (let i = 0; i < TRAITS.length; i++) {
       if (GENETIC.indexOf(i) >= 0 && f && m) {
-        const base = 0.45 * f.tr[i] + 0.45 * m.tr[i] + 0.10 * RNGX.f();
-        traits.push(clamp(base + RNGX.gauss() * 0.09, 0.02, 0.99));
+        /* ویژگی‌های ژنتیکی به‌روشنی از پدر و مادر به ارث می‌رسند */
+        const base = 0.56 * f.tr[i] + 0.56 * m.tr[i] - 0.12 * 0.5 + 0.06 * RNGX.f();
+        traits.push(clamp(base + RNGX.gauss() * 0.07, 0.02, 0.99));
       } else {
         /* اکتسابی: تأثیر خانواده کم، جامعه و شرایط زیاد */
+        /* اکتسابی: تربیت خانواده هم سهم روشنی دارد */
         const fam = f && m ? (f.tr[i] + m.tr[i]) / 2 : 0.5;
-        traits.push(clamp(0.30 * fam + 0.70 * RNGX.f(), 0.02, 0.99));
+        traits.push(clamp(0.45 * fam + 0.55 * RNGX.f(), 0.02, 0.99));
       }
     }
   } else {
@@ -1131,8 +1164,10 @@ function baseCountry(id, name, color, capital) {
     warmonger: 0, unRep: 50, diploPower: 0, counterBribes: {},
     autoBudget: {}, royalName: '', regnal: 1,
     energy: 0, lastEnergyMade: 0, lastEnergyUse: 0, energyShort: 0,
+    weapons: 0, lastArms: 0, armsBlocked: null,
     factory: 0, stockValue: 0, stockIncome: 0, stockActive: false,
     resPolicy: defaultResPolicy(), autoRes: defaultAutoRes(), lastProd: {}, tradeAccess: 1,
+    priceMark: defaultPriceMark(), autoPrice: defaultAutoRes(),
     owned: [], ctrl: [], vassalOf: 0, vassals: [],
     lastCycle: null, aiOffset: id % 3, isPlayer: false,
     intel: {}, factions: [], deficitYears: 0, dynasty: ''
@@ -1229,6 +1264,13 @@ function rebalanceResources(rng) {
   }
 }
 
+/* نام دلخواه بازیکن نباید با نام کشور دیگری یکی شود */
+function reserveName(nm) {
+  if (!nm) return;
+  const n = String(nm).trim();
+  if (!n) return;
+  if (W.namesUsed.indexOf(n) < 0) W.namesUsed.push(n);
+}
 function generateWorld(opts) {
   const seed = String(opts.seed || 'kavosh');
   GEO = buildGeo(seed);
@@ -1298,8 +1340,12 @@ function generateWorld(opts) {
   }
 
   /* ساخت کشورها */
+  /* نام دلخواه بازیکن را پیشاپیش رزرو می‌کنیم تا کشور دیگری همان نام را نگیرد */
+  reserveName(opts && opts.countryName ? String(opts.countryName).slice(0, 24).trim() : '');
   const totalStart = rng.int(Math.round(BAL.MAX_STATES * 0.40), Math.round(BAL.MAX_STATES * 0.60));
   const per = Math.max(3, Math.floor(totalStart / seeds.length));
+  /* تلرانس ±۱۰٪: هر کشور سهم کمی بیشتر یا کمتر از میانگین می‌گیرد */
+  const TOL = BAL.START_TOL || 0.10;
   for (let k = 0; k < seeds.length; k++) {
     const id = W.nextCountry++;
     /* رنگ متمایز نسبت به همسایگان نزدیک */
@@ -1322,7 +1368,11 @@ function generateWorld(opts) {
     c.stability = rng.range(48, 66);
     c.legitimacy = rng.range(55, 78);
     c.corruption = clamp(GOVS[c.gov].corrupt * 100 + rng.range(-8, 8), 5, 80);
-    c.treasury = rng.range(900, 1500);
+    /* ضریب بخت هر کشور در آغاز: وسعت، خزانه و ارتش را با هم کم یا زیاد می‌کند */
+    c.startTol = 1 + rng.range(-TOL, TOL);
+    c.treasury = rng.range(1120, 1280) * c.startTol;
+    c.tech *= (0.94 + 0.12 * c.startTol);
+    c.stability *= (0.97 + 0.06 * c.startTol);
     c.taxRate = Math.min(rng.range(0.14, 0.26), GOVS[c.gov].taxMax);
     c.bias = {
       militarism: clamp(0.5 + rng.gauss() * 0.2, 0.05, 0.95), trade: clamp(0.5 + rng.gauss() * 0.2, 0.05, 0.95),
@@ -1349,7 +1399,8 @@ function generateWorld(opts) {
     let any = false;
     for (const cid in W.countries) {
       const c = W.countries[cid];
-      if (c.owned.length >= per + (rng.chance(0.4) ? 2 : 0)) continue;
+      const quota = Math.max(2, Math.round(per * (c.startTol || 1)));
+      if (c.owned.length >= quota + (rng.chance(0.4) ? 1 : 0)) continue;
       if (assigned >= totalStart) break;
       const fr = fronts[cid];
       let placed = false;
@@ -1384,7 +1435,8 @@ function generateWorld(opts) {
   /* ارتش اولیه هر کشور متناسب با جمعیت */
   for (const cid in W.countries) {
     const c = W.countries[cid];
-    c.army.troops = Math.max(6, Math.round(countryPop(c) * rng.range(0.018, 0.032)));
+    c.army.troops = Math.max(6, Math.round(countryPop(c) * rng.range(0.018, 0.032) * (c.startTol || 1)));
+    c.weapons = Math.round(c.army.troops * rng.range(0.10, 0.30));
     c.army.morale = rng.range(62, 80);
     c.army.readiness = rng.range(60, 80);
     c.conscript = rng.range(0.02, 0.05);
@@ -1441,11 +1493,15 @@ function generateWorld(opts) {
   W.player = playerId;
   pc.isPlayer = true;
   if (opts.countryName) {
-    const nm = String(opts.countryName).slice(0, 24);
+    const nm = String(opts.countryName).slice(0, 24).trim();
     const old = pc.name;
-    pc.name = nm;
-    const i = W.namesUsed.indexOf(old);
-    if (i >= 0) W.namesUsed[i] = nm;
+    if (nm) {
+      pc.name = nm;
+      /* نام قبلی آزاد می‌شود و نام تازه رزرو می‌ماند تا هیچ کشور دیگری آن را نگیرد */
+      const i = W.namesUsed.indexOf(old);
+      if (i >= 0) W.namesUsed.splice(i, 1);
+      reserveName(nm);
+    }
   }
   if (opts.kingName) {
     const lead = W.agents[pc.leader];
@@ -1614,7 +1670,7 @@ function countryRevenue(c) {
 function countryCosts(c, rev) {
   const n = c.owned.length + c.ctrl.length;
   const avg = Math.max(6, rev.revenue / Math.max(1, n));
-  const adminUnit = Math.max(2.2, 0.105 * avg);
+  const adminUnit = Math.max(2.2, 0.088 * avg);
   let admin = adminUnit * Math.pow(Math.max(n, 1), BAL.ADMIN_EXP) * (1 + c.corruption / 190);
   admin *= (1 - 0.20 * GOVS[c.gov].effic);
   if (c.isPlayer) admin *= DIFF().playerCost;
@@ -1638,6 +1694,18 @@ function countryCosts(c, rev) {
   }
   const gov = rev.revenue * (0.06 + 0.05 * GOVS[c.gov].central);
   return { admin, army: army + strat, strat, infra, colony, war, gov, total: admin + army + strat + infra + colony + war + gov };
+}
+/* خزانه راکد: اندوخته بسیار بیشتر از نیاز، به فساد، اسراف و ریخت‌وپاش درباری نشت می‌کند.
+   این کار مانع انباشت بی‌پایان پول می‌شود و برنامه‌ریزی مالی را معنادار نگه می‌دارد. */
+function treasuryLeak(c, revenue) {
+  const keep = Math.max(150, revenue * BAL.HOARD_KEEP);
+  const excess = c.treasury - keep;
+  if (excess <= 0) { c.lastLeak = 0; return 0; }
+  const rate = clamp((BAL.HOARD_LEAK + c.corruption / 300 - GOVS[c.gov].effic * 0.05) * leaderFx(c).leak, 0.03, 0.40);
+  const leak = excess * rate;
+  c.treasury -= leak;
+  c.lastLeak = leak;
+  return leak;
 }
 function indexCost(level) { return Math.exp(clamp(level, 0, 100) / BAL.INDEX_COST); }
 
@@ -1675,7 +1743,7 @@ function investBudget(c, pool) {
   const spend = {};
   BUDGET_KEYS.forEach(k => { spend[k] = pool * (b[k] || 0); });
   c.lastBudget = b;
-  const eff = (0.55 + 0.45 * GOVS[c.gov].effic) * (1 - c.corruption / 200);
+  const eff = (0.55 + 0.45 * GOVS[c.gov].effic) * (1 - c.corruption / 200) * leaderFx(c).spend;
   const rel = k => (spend[k] / scale) * eff;
 
   /* دانش، آموزش و فناوری از یک بودجه مشترک */
@@ -1768,11 +1836,12 @@ function foodProduction(st, techOverride) {
   const c = st.controller ? W.countries[st.controller] : null;
   const tech = techOverride != null ? techOverride : (c ? c.tech : 1.5);
   const damp = (1 - st.devast / 150) * (st.siege > 0 ? 0.55 : 1) * (st.droughtYears > 0 ? 0.7 : 1);
-  return st.foodBase * (80 + st.agri * 2.6 + Math.pow(Math.max(tech, 1), 1.45) * 2.6) * damp;
+  return st.foodBase * (80 + st.agri * 2.6 + Math.pow(Math.max(tech, 1), 1.45) * 2.6) * BAL.FOOD_YIELD * damp;
 }
 function popCapacity(st) {
-  /* ظرفیت جمعیت از توان تولید غذا می‌آید */
-  return Math.max(30, foodProduction(st) / 0.5);
+  /* ظرفیت جمعیت دقیقاً از توان تولید غذا و سرانه مصرف می‌آید:
+     جمعیت کمی زیر سقف غذایی می‌ایستد، پس کمبود از شوک می‌آید نه از ساختار */
+  return Math.max(30, foodProduction(st) / BAL.FOOD_HEAD * 0.98);
 }
 function popYear(st) {
   const c = st.controller ? W.countries[st.controller] : null;
@@ -1780,7 +1849,10 @@ function popYear(st) {
   st.popCap = K;
   const health = st.health / 100, sat = st.sat / 100;
   let r = 0.004 + 0.011 * health + 0.004 * sat;
-  if (c && c.foodShort) r -= 0.012 * c.foodShort;
+  /* کمبود غذا رشد جمعیت را محکم ترمز می‌کند: جمعیت روی سقف غذایی می‌ایستد
+     و کمبود به‌جای قحطی مزمن، به تعادل می‌رسد */
+  const fs = c ? (c.foodShort || 0) : 0;
+  if (fs > 0) r -= 0.055 * fs + 0.09 * Math.max(0, fs - 0.18);
   if (st.devast > 30) r -= 0.006 * (st.devast / 100);
   if (st.siege > 0) r -= 0.010;
   /* نرخ منفی نباید با جمله لجستیک علامت عوض کند */
@@ -1807,7 +1879,7 @@ function resourceCycle(c) {
     prod.food += foodProduction(st, c.tech) * share;
     const cut = Math.min(st.forest * 0.055 * (0.6 + c.tech / 90), st.forest);
     st.forest = clamp(st.forest - cut + (st.forestCap - st.forest) * 0.09, 0, st.forestCap);
-    prod.wood += cut * 5.5 * (st.rich && st.rich.wood ? 1.25 : 1) * damp * share;
+    prod.wood += cut * 4.4 * (st.rich && st.rich.wood ? 1.25 : 1) * damp * share;
     for (const k of MINE_KEYS) {
       if (!st.known[k] || st[k] <= 0) continue;
       if (c.tech < RES_TECH[k]) continue;
@@ -1910,21 +1982,67 @@ function marketCycle(worldProd, worldDemand) {
 /* ---------- ۲۵) منابع، سوخت و انرژی، کارخانه و بورس جهانی ---------- */
 
 /* نیاز داخلی هر کشور در یک چرخه، به تفکیک منبع */
-function resDemand(c) {
+/* مصرف واقعی مردم و اقتصاد در هر چرخه — این مقدار هر چرخه از انبار کم می‌شود */
+function civDemand(c) {
   const pop = countryPop(c);
   const t = 0.75 + clamp(c.tech, 0, 100) / 160;    /* جامعه پیشرفته‌تر بیشتر مصرف می‌کند */
   const n = Math.max(1, c.owned.length + c.ctrl.length * 0.5) * t;
   return {
-    food: pop * 0.7,
-    wood: n * 7 + c.army.troops * 0.05,
-    iron: n * 8 + c.army.troops * 0.08,
-    oil: c.tech >= RES_TECH.oil ? (n * 4 + c.army.air * 12) : 0,
-    gold: 0,
-    /* ذخیره هدف سوخت = مصرف غیرنظامی + اندوخته جنگی (انگیزه خرید برای کشورهای نظامی) */
-    energy: hasFuelTech(c) ? energyCivUse(c) + c.army.troops * 0.35 : 0
+    food: pop * foodHead(c),
+    wood: n * 6,
+    iron: n * 5,
+    oil: c.tech >= RES_TECH.oil ? (n * 3.5 + c.army.air * 12) : 0,
+    gold: n * 0.45,                                  /* زیور، ضرب سکه و اندوخته دولتی */
+    energy: hasFuelTech(c) ? energyCivUse(c) : 0
   };
 }
+/* هدف نگهداری هر کالا: مصرف غیرنظامی + نیاز صنایع نظامی + اندوخته راهبردی */
+function resDemand(c) {
+  const civ = civDemand(c);
+  const arms = armsDemand(c);
+  return {
+    food: civ.food * 1.12,
+    wood: civ.wood + (arms.wood || 0),
+    iron: civ.iron + (arms.iron || 0),
+    oil: civ.oil + (arms.oil || 0),
+    gold: civ.gold + (arms.gold || 0),
+    energy: civ.energy + (arms.energy || 0) + (hasFuelTech(c) ? c.army.troops * 0.35 : 0)
+  };
+}
+/* سرانه مصرف غذا با پیشرفت جامعه بالا می‌رود؛ ظرفیت کشاورزی با نرخ پایه سنجیده می‌شود،
+   پس کشورهای پیشرفته ناچار به واردات غذا از کشورهای کشاورزی‌اند */
+function foodHead(c) {
+  return BAL.FOOD_HEAD * (0.88 + 0.55 * clamp(c ? c.tech : 0, 0, 100) / 100);
+}
 function hasFuelTech(c) { return c.tech >= BAL.ENERGY_TECH; }
+
+/* ---- قیمت‌گذاری فروش: بازیکن یا دولت حاشیه سود را تعیین می‌کند ---- */
+function defaultPriceMark() {
+  const o = {};
+  for (const k of TRADE_KEYS) o[k] = 1.0;
+  return o;
+}
+/* حاشیه قیمت مؤثر هر کالا (۰٫۷ تا ۱٫۶ برابر بهای بازار) */
+function priceMarkOf(c, k) {
+  const auto = (!c.isPlayer) || !c.autoPrice || c.autoPrice[k];
+  if (auto) {
+    /* دولت بر پایه کمیابی جهانی قیمت می‌گذارد: کالای کمیاب گران‌تر */
+    const m = W.market[k];
+    const tight = m ? clamp(m.demand / Math.max(m.supply, 1), 0.5, 2.2) : 1;
+    return clamp(0.93 + (tight - 1) * 0.35, 0.80, 1.35);
+  }
+  const p = c.priceMark || defaultPriceMark();
+  return clamp(p[k] == null ? 1 : p[k], 0.7, 1.6);
+}
+function salePrice(c, k) {
+  const base = k === 'energy' ? energyPrice() : (W.market[k] ? W.market[k].price : 1);
+  return base * priceMarkOf(c, k);
+}
+/* گران‌فروشی حجم فروش را کم و ارزان‌فروشی آن را زیاد می‌کند */
+function priceVolume(c, k) {
+  const m = priceMarkOf(c, k);
+  return clamp(Math.pow(1 / Math.max(m, 0.4), 1.7), 0.25, 1.75);
+}
 /* مصرف غیرنظامی سوخت در هر چرخه — جدا از اندوخته جنگی */
 function energyCivUse(c) {
   const n = Math.max(1, c.owned.length + c.ctrl.length * 0.5);
@@ -1981,12 +2099,9 @@ function energyCycle(c) {
     c.energy = (c.energy || 0) + made;
     c.lastEnergyMade = made;
   }
-  /* مصرف غیرنظامی */
-  const civ = energyCivUse(c);
-  const use = Math.min(c.energy || 0, civ);
-  c.energy = Math.max(0, (c.energy || 0) - use);
-  c.lastEnergyUse = use;
-  c.energyShort = civ > 0 ? clamp(1 - use / civ, 0, 1) : 0;
+  /* مصرف غیرنظامی سوخت در گام مصرف عمومی (tradeCycle) برداشت می‌شود */
+  c.lastEnergyUse = energyCivUse(c);
+  c.energyShort = c.shortage ? (c.shortage.energy || 0) : 0;
   c.energy = Math.min(c.energy, energyCap(c));
 }
 
@@ -2086,6 +2201,8 @@ function resReport(c) {
       cover: want > 0 ? r3(clamp(have / want, 0, 9)) : null,
       price: W.market[k] ? r3(W.market[k].price) : r3(energyPrice()),
       auto: !c.autoRes || !!c.autoRes[k],
+      mark: r3(priceMarkOf(c, k)), autoPrice: !c.autoPrice || !!c.autoPrice[k],
+      askPrice: r3(salePrice(c, k)), volFactor: r3(priceVolume(c, k)),
       locked: k === 'energy' ? !hasFuelTech(c) : (c.tech < (RES_TECH[k] || 0))
     });
   }
@@ -2095,6 +2212,63 @@ function energyPrice() {
   /* بهای سوخت از بهای نفت می‌آید با حاشیه پالایش */
   const oil = W.market.oil ? W.market.oil.price : 2.2;
   return clamp(oil * 1.55 + 0.6, 0.9, 90);
+}
+
+/* ---------- ۲۶) صنایع نظامی: ساخت سلاح ---------- */
+function armsRecipe(c) { return ARMS_RECIPE[eraOf(c.tech).id] || ARMS_RECIPE[0]; }
+function armsMoneyCost(c) { return BAL.ARMS_MONEY * (1 + c.tech / 26); }
+/* بیشترین تعداد سلاحی که با منابع موجود ساخته می‌شود (بدون مصرف) */
+function armsResourceLimit(c) {
+  const rec = armsRecipe(c);
+  let lim = Infinity;
+  for (const k in rec) {
+    const have = k === 'energy' ? (c.energy || 0) : (c.stock[k] || 0);
+    lim = Math.min(lim, have / rec[k]);
+  }
+  return Math.max(0, Math.floor(lim));
+}
+/* کدام منبع جلوی ساخت سلاح را گرفته است */
+function armsBottleneck(c) {
+  const rec = armsRecipe(c);
+  let worst = null, worstV = Infinity;
+  for (const k in rec) {
+    const have = k === 'energy' ? (c.energy || 0) : (c.stock[k] || 0);
+    const v = have / rec[k];
+    if (v < worstV) { worstV = v; worst = k; }
+  }
+  return worst;
+}
+/* ساخت n واحد سلاح و برداشت منابع؛ خروجی: تعداد ساخته‌شده */
+function buildArms(c, n) {
+  /* زرادخانه بی‌نهایت انبار نمی‌شود: سقف آن به اندازه نیروی انسانی کشور است */
+  const room = Math.max(0, maxManpower(c) * 1.15 - (c.weapons || 0));
+  n = Math.floor(Math.min(n, armsResourceLimit(c), room));
+  if (n <= 0) return 0;
+  const rec = armsRecipe(c);
+  for (const k in rec) {
+    const use = rec[k] * n;
+    if (k === 'energy') c.energy = Math.max(0, (c.energy || 0) - use);
+    else c.stock[k] = Math.max(0, (c.stock[k] || 0) - use);
+  }
+  c.weapons = (c.weapons || 0) + n;
+  return n;
+}
+/* نیاز منابع صنایع نظامی در یک چرخه، برای محاسبه تقاضای جهانی و سیاست منابع */
+function armsDemand(c) {
+  const rec = armsRecipe(c);
+  const want = armsTargetPerCycle(c);
+  const out = {};
+  for (const k in rec) out[k] = rec[k] * want;
+  return out;
+}
+/* کشور در هر چرخه چند سلاح می‌خواهد بسازد */
+function armsTargetPerCycle(c) {
+  const mm = maxManpower(c);
+  const cur = c.army.troops + pendingTrain(c) + (c.weapons || 0);
+  const share = c.isPlayer ? (c.armyTarget != null ? c.armyTarget : 0.9) : (0.40 + 0.55 * c.bias.militarism);
+  const gap = Math.max(0, mm * share - cur);
+  /* جایگزینی فرسودگی + بخشی از کسری */
+  return Math.max(0, c.army.troops * 0.03 + gap * 0.28);
 }
 
 /* ---------- ۱۱) ارتش ---------- */
@@ -2145,8 +2319,14 @@ function resourceNeedFor(c, kind, amount, dryRun) {
 function recruitQuote(c, n) {
   if (n <= 0) return 0;
   const base = BAL.RECRUIT_COST * (1 + c.tech / 12);
-  return n * base + resourceNeedFor(c, 'troops', n, true);
+  let cost = n * base + resourceNeedFor(c, 'troops', n, true);
+  /* سلاح کم‌داشته باید ساخته شود؛ هزینه ساخت هم روی قیمت می‌آید */
+  const missing = Math.max(0, n - (c.weapons || 0));
+  if (missing > 0) cost += missing * armsMoneyCost(c);
+  return cost;
 }
+/* بیشترین تعداد سربازی که همین حالا می‌توان مسلح کرد (زرادخانه + توان ساخت از منابع) */
+function armableNow(c) { return Math.floor((c.weapons || 0) + armsResourceLimit(c)); }
 /* بیشترین تعداد سربازی که با مبلغ داده‌شده می‌توان گرفت */
 function recruitAffordable(c, money) {
   if (money <= 0) return 0;
@@ -2167,6 +2347,16 @@ function spendArmyFund(c) {
   /* بخشی برای آمادگی و روحیه، بخشی برای نیروی جدید */
   const targetShare = c.isPlayer ? (c.armyTarget != null ? c.armyTarget : 0.9) : (0.35 + 0.6 * c.bias.militarism);
   const wantGrow = cur < maxMan * targetShare;
+  /* بخشی از بودجه ارتش صرف صنایع نظامی می‌شود: بی‌سلاح سربازگیری ممکن نیست */
+  const armsShare = wantGrow ? BAL.ARMS_SHARE : BAL.ARMS_SHARE * 0.45;
+  const armsMoney = fund * armsShare;
+  fund -= armsMoney;
+  const unitArms = armsMoneyCost(c);
+  const wantArms = armsTargetPerCycle(c);
+  const madeArms = buildArms(c, Math.min(wantArms, Math.floor(armsMoney / Math.max(unitArms, 0.05))));
+  c.lastArms = madeArms;
+  c.armsBlocked = madeArms < wantArms * 0.6 ? armsBottleneck(c) : null;
+  fund += Math.max(0, armsMoney - madeArms * unitArms);   /* پول خرج‌نشده به بودجه برمی‌گردد */
   const readyShare = wantGrow ? 0.35 : 0.7;
   const readyMoney = fund * readyShare;
   const growMoney = fund - readyMoney;
@@ -2177,11 +2367,13 @@ function spendArmyFund(c) {
     const base = BAL.RECRUIT_COST * (1 + c.tech / 12);
     let n = Math.floor(growMoney / Math.max(0.2, base));
     n = Math.min(n, Math.max(0, Math.floor(maxMan - cur)));
+    n = Math.min(n, Math.floor(c.weapons || 0));   /* هر سرباز یک واحد سلاح می‌خواهد */
     if (n > 0) {
       const extra = resourceNeedFor(c, 'troops', n);
       const total = n * base + extra;
       if (total > growMoney) n = Math.floor(n * growMoney / Math.max(total, 0.01));
       if (n > 0) {
+        c.weapons = Math.max(0, (c.weapons || 0) - n);
         c.army.training.push({ n, remain: 1 + (c.tech > 35 ? 0 : 1) });
       }
     }
@@ -2546,9 +2738,12 @@ function opTick(op) {
   st.defense = Math.max(0, st.defense - dLoss);
   op.defLoss += dLoss;
   c.army.troops = Math.max(0, c.army.troops - aLoss);
+  /* سلاح سربازان کشته‌شده هم از بین می‌رود؛ بخشی از میدان جمع می‌شود */
+  c.weapons = Math.max(0, (c.weapons || 0) + aLoss * (1 - BAL.ARMS_LOSS) * 0.4);
   const dc = W.countries[st.controller];
   if (dc) {
     dc.army.troops = Math.max(0, dc.army.troops - dLoss);
+    dc.weapons = Math.max(0, (dc.weapons || 0) + dLoss * (1 - BAL.ARMS_LOSS) * 0.25);
     dc.warWeariness = clamp(dc.warWeariness + 0.10, 0, 100);
   }
   c.warWeariness = clamp(c.warWeariness + 0.08, 0, 100);
@@ -3044,8 +3239,10 @@ function revolutionYear(c) {
   const warLoss = clamp(c.warWeariness / 100, 0, 1);
   const org = clamp(0.12 + c.education / 240 + (1 - g.repress) * 0.26 + g.party * 0.12 + (c.factions.length ? 0.06 + c.factions.length * 0.015 : 0), 0, 1.0);
   const opposition = oppositionStrength(c);
+  const hunger = clamp((c.foodShort || 0) - 0.06, 0, 0.5);
   let p = (100 - sat) * 0.028 + unrest * 0.030 + c.corruption * 0.016 + poverty * 2.2 +
-    inequality * 1.6 + warLoss * 2.4 + (100 - c.legitimacy) * 0.026 + opposition * 1.4;
+    inequality * 1.6 + warLoss * 2.4 + (100 - c.legitimacy) * 0.026 + opposition * 1.4 +
+    hunger * 12;   /* نان، عامل کلاسیک سرنگونی حکومت‌ها */
   p *= (0.55 + org);
   p -= g.repress * 2.4 + c.stability * 0.05;
   c.revPressure = clamp(c.revPressure * 0.96 + Math.max(0, p) * 0.30, 0, 100);
@@ -3168,13 +3365,15 @@ function unrestYear(st) {
   const sub = c.foodSubsidy || 0;
   let target = 8;
   target += (55 - st.sat) * 0.50;
-  target += colony * 20 + ethDiff * 7;
+  target += colony * 26 + ethDiff * 8;
   target += (1 - clamp(st.integ, 0, 1)) * 28;
   target += Math.max(0, c.taxRate - 0.30) * 85;
   target += c.corruption * 0.14;
   target += st.devast * 0.10;
   target += (st.rebel || 0) * 0.32;
   target += clamp(c.warWeariness, 0, 100) * 0.10;
+  /* گرسنگی: مهم‌ترین عامل ناآرامی، ولی با سقف تا بازی در آن غرق نشود */
+  target += clamp((c.foodShort || 0) - 0.06, 0, 0.5) * 70;
   target -= st.security * 0.28;
   target -= g.repress * 14;
   target -= sub * 22;
@@ -3194,7 +3393,9 @@ function unrestYear(st) {
   st.sat = clamp(st.sat + (satT - st.sat) * 0.09, 0, 100);
   /* قیام ایالتی */
   if (st.unrest > 72) {
-    const p = 0.0035 + (st.unrest - 72) / 2600 + (st.rebel || 0) / 3200;
+    /* گرسنگی طولانی، شورش و جدایی‌طلبی را محتمل‌تر می‌کند */
+    const hunger = clamp((c.foodShort || 0) - 0.12, 0, 0.5);
+    const p = 0.0035 + (st.unrest - 72) / 2600 + (st.rebel || 0) / 3200 + hunger * 0.012;
     if (RNGX.chance(p)) stateRevolt(st, c);
   }
 }
@@ -3842,45 +4043,104 @@ function tradeAccess(c) {
   /* دسترسی مؤثر: میانگین وزنی شرکا، با کف کوچک برای بازار خاکستری */
   return clamp(0.12 + 0.88 * (open / Math.max(total, 1)), 0.10, 1.25);
 }
-function tradeCycle(c) {
-  const need = {}, sur = {};
+/* ---- گام یکم: هر کشور پیشنهاد فروش و نیاز خرید خود را اعلام می‌کند ---- */
+function tradePlan(c) {
   const want = resDemand(c);
   const pol = effectiveResPolicy(c);
   const access = tradeAccess(c);
   c.tradeAccess = r3(access);
-  let bought = 0, sold = 0;
+  const offer = {}, need = {};
+  const prod = c.lastProd || {};
   for (const k of TRADE_KEYS) {
     const have = k === 'energy' ? (c.energy || 0) : (c.stock[k] || 0);
     const w = want[k] || 0;
-    if (have < w) need[k] = w - have; else sur[k] = have - w;
+    if (have > w) {
+      /* کشور تنها مازاد تولید همین چرخه را می‌فروشد، نه همه انبارش */
+      const flow = Math.max(0, (prod[k] || 0) - w);
+      const sur = Math.min(have - w, flow + Math.max(0, have - w * 1.8) * 0.25);
+      offer[k] = Math.max(0, sur) * (1 - clamp(pol[k], 0, 1)) * access;
+    } else {
+      need[k] = (w - have) * access;
+    }
   }
-  /* فروش مازاد — فقط سهمی که سیاست منابع برای فروش گذاشته است */
-  for (const k in sur) {
-    if (sur[k] <= 0) continue;
-    const have = k === 'energy' ? (c.energy || 0) : (c.stock[k] || 0);
-    const offer = Math.min(sur[k], have * (1 - clamp(pol[k], 0, 1)));
-    const amt = offer * access;
+  c.tradeOffer = offer;
+  c.tradeNeed = need;
+  return { offer, need };
+}
+/* ---- گام دوم: تسویه بازار جهانی — فروش هیچ‌کس بیش از خرید دیگران نیست ---- */
+/* قبایل، ایالت‌های آزاد و بازرگانان مستقل هم در بازار جهانی خریدارند */
+function outsideDemand() {
+  let pop = 0, n = 0;
+  for (const st of W.states) if (!st.controller) { pop += st.pop; n++; }
+  return {
+    food: pop * 0.42, wood: n * 6 + pop * 0.006, iron: n * 4.5,
+    oil: n * 1.6, gold: n * 2.4, energy: n * 0.6
+  };
+}
+function marketClear(alive) {
+  const totOffer = {}, totNeed = {};
+  const out = outsideDemand();
+  for (const k of TRADE_KEYS) { totOffer[k] = 0; totNeed[k] = out[k] || 0; }
+  for (const c of alive) {
+    tradePlan(c);
+    for (const k of TRADE_KEYS) {
+      totOffer[k] += c.tradeOffer[k] || 0;
+      totNeed[k] += c.tradeNeed[k] || 0;
+    }
+  }
+  const fill = {};
+  for (const k of TRADE_KEYS) {
+    /* کالای بی‌خریدار فروش نمی‌رود و کالای کمیاب به همه نمی‌رسد */
+    fill[k] = {
+      sell: totOffer[k] > 0 ? clamp(totNeed[k] / totOffer[k], 0, 1) : 0,
+      buy: totNeed[k] > 0 ? clamp(totOffer[k] / totNeed[k], 0, 1) : 0
+    };
+  }
+  W.clearing = fill;
+  W.tradeTotals = { offer: totOffer, need: totNeed };
+  return fill;
+}
+function tradeCycle(c) {
+  const want = resDemand(c);
+  const fill = W.clearing || {};
+  const offer = c.tradeOffer || {}, need = c.tradeNeed || {};
+  let bought = 0, sold = 0;
+  /* فروش: تنها به اندازه‌ای که در جهان خریدار دارد */
+  for (const k in offer) {
+    const f = fill[k] ? fill[k].sell : 0;
+    const amt = (offer[k] || 0) * f * priceVolume(c, k);
     if (amt <= 0) continue;
-    const price = k === 'energy' ? energyPrice() : W.market[k].price;
+    const price = salePrice(c, k);
     const income = amt * price * 0.92;
-    if (k === 'energy') c.energy = Math.max(0, c.energy - amt); else c.stock[k] -= amt;
+    if (k === 'energy') c.energy = Math.max(0, c.energy - amt); else c.stock[k] = Math.max(0, c.stock[k] - amt);
     c.treasury += income; sold += income;
   }
-  /* خرید کمبود در حد توان و در حد دسترسی تجاری */
+  /* خرید: در حد کالای عرضه‌شده در جهان و توان خزانه */
   for (const k in need) {
     if (need[k] <= 0) continue;
     const price = k === 'energy' ? energyPrice() : W.market[k].price;
-    const budget = Math.max(0, c.treasury * 0.25) / Math.max(price * 1.08, 0.05);
-    const canBuy = Math.min(need[k] * access, budget);
+    const budget = Math.max(0, c.treasury * 0.3) / Math.max(price * 1.08, 0.05);
+    const f = fill[k] ? fill[k].buy : 0;
+    const canBuy = Math.min(need[k] * f, budget);
     if (canBuy > 0) {
       const cost = canBuy * price * 1.08;
       if (k === 'energy') c.energy = Math.min(energyCap(c), (c.energy || 0) + canBuy); else c.stock[k] += canBuy;
       c.treasury -= cost; bought += cost;
     }
   }
-  c.foodShort = clamp((want.food - c.stock.food) / Math.max(want.food, 1), 0, 1);
-  c.stock.food = Math.max(0, c.stock.food - want.food * 0.85);
-  for (const k of ['wood', 'iron', 'oil']) c.stock[k] = Math.max(0, c.stock[k] - (want[k] || 0) * 0.35);
+  /* مصرف واقعی: هر کالا به اندازه نیاز مردم و اقتصاد از انبار کم می‌شود.
+     نیاز صنایع نظامی جداگانه هنگام ساخت سلاح برداشت می‌شود. */
+  const civ = civDemand(c);
+  c.shortage = {};
+  for (const k of TRADE_KEYS) {
+    const w = civ[k] || 0;
+    if (w <= 0) { c.shortage[k] = 0; continue; }
+    const have = k === 'energy' ? (c.energy || 0) : (c.stock[k] || 0);
+    const use = Math.min(have, w);
+    if (k === 'energy') c.energy = Math.max(0, have - use); else c.stock[k] = Math.max(0, have - use);
+    c.shortage[k] = clamp(1 - use / w, 0, 1);
+  }
+  c.foodShort = c.shortage.food || 0;
   /* حجم تجارت با شرکا */
   const partners = Object.keys(c.rel).map(Number).filter(o => {
     const r = c.rel[o], oc = W.countries[o];
@@ -3936,14 +4196,21 @@ function aiBudget(c) {
   else if (sat < 45 || c.unrestAvg > 55) t -= 0.025;
   if (margin < 0.12) t += 0.02 + (threat > 0 ? 0.01 : 0);
   if (c.treasury < 0) t += 0.03;
-  c.taxRate = clamp(t, 0.08, GOVS[c.gov].taxMax);
-  /* سهم درآمدی که خودکار خرج می‌شود */
-  let sr = clamp(margin * 0.92, 0.04, 0.88);
+  /* خزانه پر: مالیات پایین می‌آید و مردم راضی‌تر می‌شوند */
+  if (lc && c.treasury > lc.revenue * 7) t -= 0.03;
+  else if (lc && c.treasury > lc.revenue * 4) t -= 0.015;
+  c.taxRate = clamp(t * leaderFx(c).tax, 0.08, GOVS[c.gov].taxMax);
+  /* سهم درآمدی که خودکار خرج می‌شود: دولت معمولاً بیشتر درآمد را خرج می‌کند
+     و تنها در تنگنای مالی دست نگه می‌دارد */
   const rev = lc ? lc.revenue : 100;
-  if (c.treasury > rev * 2.2) sr = clamp(sr + 0.12, 0.04, 0.92);
-  if (c.treasury > rev * 4) sr = clamp(Math.max(sr, 0.55), 0.04, 0.92);
-  if (c.treasury < rev * 0.4) sr = clamp(sr - 0.1, 0.02, 0.9);
-  c.spendRatio = sr;
+  let sr = 0.42 + clamp(margin, -0.4, 0.5) * 0.45;
+  if (c.treasury > rev * 5) sr += 0.18;
+  else if (c.treasury > rev * 2.5) sr += 0.08;
+  /* دولت تا حدود ۲٫۵ چرخه ذخیره می‌سازد و پس از آن آزادانه خرج می‌کند */
+  const reserve = rev * 2.5;
+  if (c.treasury < reserve) sr *= clamp(0.40 + 0.60 * (c.treasury / Math.max(reserve, 1)), 0.4, 1);
+  if (c.treasury < 0) sr -= 0.28;
+  c.spendRatio = clamp(sr, 0.15, 0.92);
   c.conscript = clamp(0.012 + c.bias.militarism * 0.05 + threat * 0.012 + GOVS[c.gov].army * 0.02, 0.008, 0.09);
 }
 
@@ -4672,11 +4939,29 @@ function leaderStyle(c) {
 }
 function leaderSatBonus(c) {
   const L = leaderStyle(c);
-  return (L.kind - 0.5) * 22 - (L.iron - 0.5) * 8;
+  return (L.kind - 0.5) * 34 - (L.iron - 0.5) * 12;
 }
 function leaderUnrestBonus(c) {
   const L = leaderStyle(c);
-  return -(L.kind - 0.5) * 14 + (L.iron - 0.5) * 6;
+  return -(L.kind - 0.5) * 22 + (L.iron - 0.5) * 9;
+}
+/* اثر شخصیت فرمانروا بر ادارهٔ کشور — فرمانروا واقعاً فرق می‌کند */
+function leaderFx(c) {
+  const L = leaderStyle(c);
+  const a = W.agents[c.leader];
+  const greed = a ? a.tr[TI.greed] : 0.5;
+  return {
+    /* کارایی خرج دولت: فرمانروای کوشا و منظم اسراف کمتری دارد */
+    spend: clamp(0.80 + (L.drive - 0.5) * 0.55 + (L.mind - 0.5) * 0.25, 0.65, 1.35),
+    /* فساد: طمع و اقتدار بی‌مهار فساد می‌آورد، عدالت آن را کم می‌کند */
+    corrupt: clamp(1 + (greed - 0.5) * 0.85 + (L.iron - 0.5) * 0.30 - (L.kind - 0.5) * 0.45, 0.55, 1.75),
+    /* اشتهای مالیاتی */
+    tax: clamp(1 + (L.iron - 0.5) * 0.30 + (greed - 0.5) * 0.22 - (L.kind - 0.5) * 0.20, 0.7, 1.35),
+    /* ثبات: فرمانروای باتدبیر کشور را جمع نگه می‌دارد */
+    stab: clamp((L.drive - 0.5) * 6 + (L.mind - 0.5) * 4 + (L.kind - 0.5) * 3, -5, 6),
+    /* نشت خزانه: درباری ولخرج بیشتر می‌خورد */
+    leak: clamp(1 + (greed - 0.5) * 0.9 - (L.drive - 0.5) * 0.5, 0.5, 1.9)
+  };
 }
 
 /* ---------- ۳۸) دوستی و اثر دیپلماسی بر درآمد ---------- */
@@ -5032,6 +5317,8 @@ function cycleStep() {
   marketCycle(wp, wd);
   contractsCycle();
   unSession();
+  /* تسویه بازار: مجموع فروش جهان از مجموع خرید جهان بیشتر نمی‌شود */
+  marketClear(alive);
   for (const c of alive) {
     tradeCycle(c);
     const rev = countryRevenue(c);
@@ -5060,6 +5347,8 @@ function cycleStep() {
       c.deficitYears = 0;
       c.army.pay = clamp(c.army.pay + 12, 0, 100);
     }
+    /* اندوخته راکد آب می‌رود */
+    treasuryLeak(c, rev.revenue);
     if (!c.isPlayer) aiBudget(c); else playerAutoTrade(c);
     /* سهم تعیین‌شده از درآمد به‌طور خودکار خرج می‌شود؛ باقی در خزانه می‌ماند */
     let pool = c.spendRatio * rev.revenue;
@@ -5083,9 +5372,11 @@ function cycleStep() {
     c.warWeariness = clamp(c.warWeariness - (Object.values(c.rel).some(r => r.status === 'war') ? 0 : 6), 0, 100);
     c.stability = clamp(c.stability + (avgSat(c) - 50) * 0.06 + GOVS[c.gov].stab * 3 - c.unrestAvg * 0.05 - 1.2 + (c.owned.indexOf(c.capital) >= 0 ? 0.6 : 0), 0, 100);
     c.legitimacy = clamp(c.legitimacy * 0.985 + GOVS[c.gov].legitBase * 1.5 + (avgSat(c) - 50) * 0.03, 0, 100);
-    c.corruption = clamp(c.corruption * 0.97 + GOVS[c.gov].corrupt * 3.2 - (c.education / 900) - ((c.lastBudget || c.budget).security || 0) * 4, 2, 92);
+    c.stability = clamp(c.stability + leaderFx(c).stab * 0.35, 0, 100);
+    c.corruption = clamp(c.corruption * 0.97 + GOVS[c.gov].corrupt * 3.2 * leaderFx(c).corrupt - (c.education / 900) - ((c.lastBudget || c.budget).security || 0) * 4, 2, 92);
     c.lastCycle = {
       y0, y1, revenue: rev.revenue, gross: rev.gross, trade: rev.trade, tribute: rev.tribute, stock: rev.stock || 0,
+      leak: c.lastLeak || 0, arms: c.lastArms || 0,
       costs, net, treasury: c.treasury, pool, spend, tax: c.taxRate
     };
     if (c.isPlayer) {
@@ -5307,6 +5598,8 @@ function snapshot() {
     unrest: pc.unrestAvg, revPressure: pc.revPressure, coupRisk: pc.coupRisk,
     lastCycle: pc.lastCycle, capital: pc.capital, wars: Object.keys(pc.rel).filter(o => pc.rel[o].status === 'war').map(Number),
     manpower: maxManpower(pc), warWeariness: pc.warWeariness, foodShort: pc.foodShort || 0,
+    weapons: Math.floor(pc.weapons || 0), armsBlocked: pc.armsBlocked ? (RES_NAMES[pc.armsBlocked] || '') : '',
+    shortage: pc.shortage || {},
     energy: r3(pc.energy || 0), energyCap: Math.round(energyCap(pc)),
     fuelPct: r3(clamp((pc.energy || 0) / Math.max(energyCap(pc), 1) * 100, 0, 100)),
     hasFuelTech: hasFuelTech(pc), hasEnergy: hasEnergy(pc),
@@ -5471,14 +5764,20 @@ function inspectCountry(id) {
     recruitQuotes: (function () {
       const mm = maxManpower(c), cur = c.army.troops + pendingTrain(c);
       const gap = Math.max(0, Math.floor(mm - cur));
-      const q = n => ({ n: Math.floor(n), cost: r3(recruitQuote(c, Math.floor(n))) });
-      const byMoney = m => { const n = Math.min(gap, recruitAffordable(c, m)); return { n, cost: r3(recruitQuote(c, n)) }; };
+      const q = n => { const v = Math.floor(Math.min(n, armableNow(c))); return { n: v, cost: r3(recruitQuote(c, v)) }; };
+      const arm = armableNow(c);
+      const byMoney = m => { const n = Math.min(gap, arm, recruitAffordable(c, m)); return { n, cost: r3(recruitQuote(c, n)) }; };
       return {
         gap: q(gap), half: q(Math.floor(gap / 2)), quarter: q(Math.floor(gap / 4)),
         allMoney: byMoney(Math.max(0, c.treasury)), halfMoney: byMoney(Math.max(0, c.treasury) * 0.5)
       };
     })(),
     shipCost: Math.round(500 * (0.35 + c.tech / 60)), airCost: Math.round(700 * (0.4 + c.tech / 70)),
+    weapons: Math.floor(c.weapons || 0), armsMade: r3(c.lastArms || 0),
+    armsLimit: armsResourceLimit(c), armsUnitCost: r3(armsMoneyCost(c)),
+    armsRecipe: armsRecipe(c), armsNeedText: ARMS_RES_NAMES[eraOf(c.tech).id] || '',
+    armsBlocked: c.armsBlocked ? (RES_NAMES[c.armsBlocked] || '') : '',
+    armsTarget: Math.round(armsTargetPerCycle(c)),
     strike: c.strike || 0, shield: c.shield || 0, stratMax: stratMaxLevel(c),
     stratTech: STRAT_TECH, stratCap: STRAT_MAX,
     strikeCost: stratMaxLevel(c) > (c.strike || 0) ? stratLevelCost(c, c.strike || 0) : 0,
@@ -5491,6 +5790,9 @@ function inspectCountry(id) {
     /* منابع، سوخت و انرژی، کارخانه و بورس */
     resources: resReport(c),
     resPolicy: c.resPolicy || defaultResPolicy(), autoRes: c.autoRes || defaultAutoRes(),
+    priceMark: c.priceMark || defaultPriceMark(), autoPrice: c.autoPrice || defaultAutoRes(),
+    lastTrade: c.lastTrade || { bought: 0, sold: 0 },
+    clearing: W.clearing || {},
     energy: r3(c.energy || 0), energyCap: Math.round(energyCap(c)),
     energyMade: r3(c.lastEnergyMade || 0), energyUse: r3(c.lastEnergyUse || 0),
     energyShort: r3(c.energyShort || 0), energyPrice: r3(energyPrice()),
@@ -5565,13 +5867,38 @@ function command(cmd, a) {
       const mm = maxManpower(pc);
       const cur = pc.army.troops + pendingTrain(pc);
       if (cur + n > mm) return { ok: false, why: 'سقف نیروی انسانی ' + faNum(Math.floor(mm)) + ' سرباز است.' };
+      /* هر سرباز یک واحد سلاح می‌خواهد: از زرادخانه یا ساخت فوری از منابع */
+      const can = armableNow(pc);
+      if (can < n) {
+        const bk = armsBottleneck(pc);
+        return {
+          ok: false, why: 'سلاح کافی ندارید: زرادخانه ' + faNum(Math.floor(pc.weapons || 0)) +
+            ' و منابع شما تنها برای ' + faNum(can) + ' سرباز سلاح می‌دهد. کمبود ' + (RES_NAMES[bk] || '') + '.'
+        };
+      }
       const base = BAL.RECRUIT_COST * (1 + pc.tech / 12);
-      const extra = resourceNeedFor(pc, 'troops', n);
-      const cost = n * base + extra;
+      const missing = Math.max(0, n - Math.floor(pc.weapons || 0));
+      const armsCost = missing * armsMoneyCost(pc);
+      const extra = resourceNeedFor(pc, 'troops', n, true);
+      const cost = n * base + extra + armsCost;
       if (pc.treasury < cost) return { ok: false, why: 'هزینه ' + faNum(cost) + ' میلیون است؛ خزانه کافی نیست.' };
+      if (missing > 0 && buildArms(pc, missing) < missing) return { ok: false, why: 'منابع ساخت سلاح کافی نیست.' };
+      resourceNeedFor(pc, 'troops', n);
       pc.treasury -= cost;
+      pc.weapons = Math.max(0, (pc.weapons || 0) - n);
       pc.army.training.push({ n, remain: pc.tech > 35 ? 1 : 2 });
-      return { ok: true, cost, msg: faNum(n) + ' سرباز به آموزش رفتند.' };
+      return { ok: true, cost, msg: faNum(n) + ' سرباز مسلح و به آموزش فرستاده شدند.' };
+    }
+    case 'buildArms': {
+      const n = Math.max(1, Math.floor(+a.n || 0));
+      const lim = armsResourceLimit(pc);
+      if (lim < 1) return { ok: false, why: 'منابع لازم برای ساخت سلاح ندارید (کمبود ' + (RES_NAMES[armsBottleneck(pc)] || '') + ').' };
+      const want = Math.min(n, lim);
+      const cost = want * armsMoneyCost(pc);
+      if (pc.treasury < cost) return { ok: false, why: 'هزینه ' + faNum(cost) + ' میلیون است؛ خزانه کافی نیست.' };
+      const made = buildArms(pc, want);
+      pc.treasury -= made * armsMoneyCost(pc);
+      return { ok: true, cost: made * armsMoneyCost(pc), msg: faNum(made) + ' واحد سلاح ساخته شد.' };
     }
     case 'buildNavy': {
       if (pc.tech < 18) return { ok: false, why: 'نیاز به فناوری ۱۸.' };
@@ -5598,8 +5925,10 @@ function command(cmd, a) {
       const n = Math.min(Math.floor(+a.n), Math.floor(pc.army.troops - committedOf(pc)));
       if (n < 1) return { ok: false, why: 'نیروی آزاد کافی ندارید.' };
       pc.army.troops -= n;
+      const back = Math.floor(n * BAL.ARMS_RETURN);
+      pc.weapons = (pc.weapons || 0) + back;
       pc.treasury += n * 0.25 * (1 + pc.tech / 12);
-      return { ok: true, msg: faNum(n) + ' سرباز مرخص شدند.' };
+      return { ok: true, msg: faNum(n) + ' سرباز مرخص شدند و ' + faNum(back) + ' واحد سلاح به زرادخانه بازگشت.' };
     }
     case 'op': {
       if (!st) return { ok: false, why: 'ایالت نامعتبر.' };
@@ -5811,6 +6140,20 @@ function command(cmd, a) {
         for (const k of TRADE_KEYS) if (a.value[k] != null) pc.resPolicy[k] = clamp(+a.value[k], 0, 1);
       }
       return { ok: true, resPolicy: pc.resPolicy };
+    }
+    case 'priceMark': {
+      pc.priceMark = pc.priceMark || defaultPriceMark();
+      if (a.key && TRADE_KEYS.indexOf(a.key) >= 0) pc.priceMark[a.key] = clamp(+a.value, 0.7, 1.6);
+      else if (a.value && typeof a.value === 'object') {
+        for (const k of TRADE_KEYS) if (a.value[k] != null) pc.priceMark[k] = clamp(+a.value[k], 0.7, 1.6);
+      }
+      return { ok: true, priceMark: pc.priceMark };
+    }
+    case 'autoPrice': {
+      pc.autoPrice = pc.autoPrice || defaultAutoRes();
+      if (a.key && TRADE_KEYS.indexOf(a.key) >= 0) pc.autoPrice[a.key] = !!a.value;
+      else if (a.value && typeof a.value === 'object') pc.autoPrice = Object.assign({}, a.value);
+      return { ok: true, autoPrice: pc.autoPrice };
     }
     case 'autoRes': {
       pc.autoRes = pc.autoRes || defaultAutoRes();
@@ -6728,6 +7071,13 @@ function buildTopbar() {
   h += '<div class="stat"><b>' + faf(p.tech, 1) + '</b><span>فناوری</span></div>';
   h += '<div class="stat"><b>' + fa(p.troops) + '</b><span>سرباز</span></div>';
   h += '<div class="stat"><b>' + fa(p.power) + '</b><span>قدرت نظامی</span></div>';
+  if (p.weapons != null) {
+    h += '<div class="stat ' + (p.armsBlocked ? 'bad' : '') + '"><b>' + fa(p.weapons) + '</b><span>' +
+      (p.armsBlocked ? 'سلاح — کمبود ' + esc(p.armsBlocked) : 'سلاح در زرادخانه') + '</span></div>';
+  }
+  if (p.foodShort > 0.04) {
+    h += '<div class="stat bad"><b>' + pc(p.foodShort * 100) + '</b><span>کمبود غذا</span></div>';
+  }
   if (p.hasFuelTech) {
     var fp = p.fuelPct || 0;
     h += '<div class="stat ' + (fp < 15 ? 'bad' : (fp > 55 ? 'good' : '')) + '"><b>⚡' + pc(fp) + '</b><span>سوخت و انرژی</span></div>';
@@ -6824,6 +7174,7 @@ function renderOverview() {
     kv('فشار انقلاب', pc(p.revPressure)) + bar(p.revPressure, 100, '#e0553f') +
     kv('خطر کودتا', pc(p.coupRisk)) + bar(p.coupRisk, 100, '#fbbf24') +
     (p.foodShort > 0.05 ? kv('کمبود غذا', pc(p.foodShort * 100), 'bad') : '') +
+    kv('سلاح در زرادخانه', fa(p.weapons || 0) + (p.armsBlocked ? ' — کمبود ' + esc(p.armsBlocked) : '')) +
     '</div>';
   if (lc) {
     h += '<div class="card"><h4>گزارش مالی ' + fa(lc.y0) + '–' + fa(lc.y1) + '</h4>' +
@@ -7431,6 +7782,21 @@ function renderArmy(d) {
     'برای ارتش بزرگ‌تر باید جمعیت یا نرخ سربازگیری را بالا ببرید (بخش اقتصاد).</div></div>';
   h += '</div>';
 
+  h += '<div class="card"><h4>زرادخانه و صنایع نظامی</h4>' +
+    kv('سلاح آماده در زرادخانه', fa(d.weapons || 0)) +
+    kv('ساخت چرخه گذشته', fa(d.armsMade || 0) + ' از هدف ' + fa(d.armsTarget || 0)) +
+    kv('توان ساخت با منابع کنونی', fa(d.armsLimit || 0) + ' واحد', (d.armsLimit || 0) < 1 ? 'bad' : '') +
+    kv('هزینه پول هر واحد', money(d.armsUnitCost || 0)) +
+    kv('مواد لازم هر واحد', esc(d.armsNeedText || '')) +
+    (d.armsBlocked ? '<div class="kv"><span>گلوگاه کنونی</span><b class="bad">کمبود ' + esc(d.armsBlocked) + '</b></div>' : '') +
+    '<div class="hint">هر سرباز برای مسلح‌شدن یک واحد سلاح می‌خواهد و ساخت سلاح در هر دوره نظامی مواد متفاوتی لازم دارد. ' +
+    'بدون این مواد، هر اندازه هم پول داشته باشید ارتش بزرگ نمی‌شود.</div>' +
+    '<div class="actgrid" style="margin-top:6px">' +
+    '<button class="act" data-arms="50" ' + ((d.armsLimit || 0) < 50 ? 'disabled' : '') + '><b>ساخت ۵۰ سلاح</b><small>' + money(50 * (d.armsUnitCost || 0)) + '</small></button>' +
+    '<button class="act" data-arms="200" ' + ((d.armsLimit || 0) < 200 ? 'disabled' : '') + '><b>ساخت ۲۰۰ سلاح</b><small>' + money(200 * (d.armsUnitCost || 0)) + '</small></button>' +
+    '<button class="act" data-arms="max" ' + ((d.armsLimit || 0) < 1 ? 'disabled' : '') + '><b>ساخت با همه منابع</b><small>' +
+    ((d.armsLimit || 0) < 1 ? 'منابع ندارید' : fa(d.armsLimit) + ' واحد — ' + money((d.armsLimit || 0) * (d.armsUnitCost || 0))) + '</small></button>' +
+    '</div></div>';
   h += '<div class="card"><h4>اقدام سریع</h4><div class="actgrid">';
   function qTxt(q, empty) {
     if (!q || q.n < 1) return empty;
@@ -7528,6 +7894,12 @@ function renderArmy(d) {
   var tg = $('#aTgt');
   tg.oninput = function () { $('#aTgtV').textContent = pc(+tg.value); };
   tg.onchange = function () { cmd('armyTarget', { value: +tg.value / 100 }); };
+  $$('#mbody [data-arms]').forEach(function (b) {
+    b.onclick = function () {
+      var v = b.getAttribute('data-arms');
+      cmd('buildArms', { n: v === 'max' ? (d.armsLimit || 0) : +v });
+    };
+  });
   $$('#mbody .act[data-a]').forEach(function (b) {
     b.onclick = function () {
       var a = b.getAttribute('data-a');
@@ -8085,7 +8457,13 @@ function renderRes(d) {
         '<div class="slider"><label>مصرف داخلی</label>' +
         '<input type="range" class="resb" data-k="' + r.k + '" min="0" max="100" value="' + keepPct + '"' + (r.auto ? ' disabled' : '') + '>' +
         '<b id="rv_' + r.k + '">' + (r.auto ? 'دولت' : pc(keepPct)) + '</b></div>' +
-        '<div style="font-size:11px;color:var(--dim2)" id="rs_' + r.k + '">برای فروش: ' + pc(r.salePct) + ' — ' + fa(r.sale) + ' واحد (' + money(r.sale * r.price) + ')</div>') +
+        '<div style="font-size:11px;color:var(--dim2)" id="rs_' + r.k + '">برای فروش: ' + pc(r.salePct) + ' — ' + fa(r.sale) + ' واحد (' + money(r.sale * r.askPrice) + ')</div>' +
+        '<div class="slider"><label>قیمت فروش</label>' +
+        '<input type="range" class="pmk" data-k="' + r.k + '" min="70" max="160" value="' + Math.round((r.mark || 1) * 100) + '"' + (r.autoPrice ? ' disabled' : '') + '>' +
+        '<b id="pm_' + r.k + '">' + (r.autoPrice ? 'دولت' : pc((r.mark || 1) * 100)) + '</b></div>' +
+        '<div style="font-size:11px;color:var(--dim2)" id="pp_' + r.k + '">بهای هر واحد ' + money(r.askPrice) + ' — حجم فروش ×' + faf(r.volFactor, 2) + '</div>' +
+        '<label style="font-size:11.5px;color:var(--dim);display:flex;align-items:center;gap:4px;margin-top:2px">' +
+        '<input type="checkbox" data-aprice="' + r.k + '"' + (r.autoPrice ? ' checked' : '') + '> قیمت‌گذاری با دولت</label>') +
       '</div>';
   }
   h += '<div class="row" style="margin-top:8px"><button class="btn primary" id="rApply">اعمال سیاست منابع</button>' +
@@ -8093,8 +8471,12 @@ function renderRes(d) {
 
   h += '<div class="card"><h4>وضعیت تجارت</h4>' +
     kv('دسترسی تجاری', pc((d.tradeAccess || 1) * 100), (d.tradeAccess || 1) < 0.5 ? 'bad' : 'good') +
+    kv('فروش چرخه گذشته', money((d.lastTrade || {}).sold || 0)) +
+    kv('خرید چرخه گذشته', money((d.lastTrade || {}).bought || 0)) +
     '<div class="hint">دو کشوری که با هم در جنگ‌اند تجارت نمی‌کنند و کشورهای دشمن رابطه تجاری بسیار کمی دارند. ' +
-    'اگر به منابع کشوری نیاز دارید، دوستی با او به سود شماست.</div></div>';
+    'اگر به منابع کشوری نیاز دارید، دوستی با او به سود شماست.<br>' +
+    'قیمت بالاتر سود هر واحد را زیاد ولی حجم فروش را کم می‌کند؛ قیمت پایین‌تر برعکس. ' +
+    'فروش هر کشور از مجموع خرید جهان بیشتر نمی‌شود، پس کالای بی‌خریدار در انبار می‌ماند.</div></div>';
 
   setModal('منابع', h);
 
@@ -8111,6 +8493,30 @@ function renderRes(d) {
     var s2 = $('#rs_' + k);
     if (s2) s2.textContent = 'برای فروش: ' + pc((1 - keep) * 100) + ' — ' + fa(sale) + ' واحد (' + money(sale * item.price) + ')';
   }
+  function refreshPrice(k) {
+    var b = $('.pmk[data-k="' + k + '"]');
+    if (!b) return;
+    var item = null;
+    for (var i = 0; i < list.length; i++) if (list[i].k === k) item = list[i];
+    if (!item) return;
+    var mk = (+b.value) / 100;
+    var lab = $('#pm_' + k);
+    if (lab) lab.textContent = b.disabled ? 'دولت' : pc(mk * 100);
+    var vol = Math.pow(1 / Math.max(mk, 0.4), 1.7);
+    vol = vol < 0.25 ? 0.25 : (vol > 1.75 ? 1.75 : vol);
+    var pp = $('#pp_' + k);
+    if (pp) pp.textContent = 'بهای هر واحد ' + money(item.price * mk) + ' — حجم فروش ×' + faf(vol, 2);
+  }
+  $$('#mbody .pmk').forEach(function (b) { b.oninput = function () { refreshPrice(b.getAttribute('data-k')); }; });
+  $$('#mbody [data-aprice]').forEach(function (b) {
+    b.onchange = function () {
+      var k = b.getAttribute('data-aprice');
+      cmd('autoPrice', { key: k, value: b.checked });
+      var sl = $('.pmk[data-k="' + k + '"]');
+      if (sl) sl.disabled = b.checked;
+      refreshPrice(k);
+    };
+  });
   $$('#mbody .resb').forEach(function (b) { b.oninput = function () { refreshRow(b.getAttribute('data-k')); }; });
   $$('#mbody [data-ares]').forEach(function (b) {
     b.onchange = function () {
@@ -8122,22 +8528,26 @@ function renderRes(d) {
     };
   });
   $('#rApply').onclick = function () {
-    var v = {};
+    var v = {}, p = {};
     $$('#mbody .resb').forEach(function (b) { if (!b.disabled) v[b.getAttribute('data-k')] = (+b.value) / 100; });
+    $$('#mbody .pmk').forEach(function (b) { if (!b.disabled) p[b.getAttribute('data-k')] = (+b.value) / 100; });
     cmd('resPolicy', { value: v });
-    toast('سیاست منابع اعمال شد');
+    cmd('priceMark', { value: p });
+    toast('سیاست منابع و قیمت‌گذاری اعمال شد');
   };
   $('#rAllGov').onclick = function () {
     var o = {};
     (G.meta.tradeKeys || []).forEach(function (k) { o[k] = true; });
     cmd('autoRes', { value: o });
-    setTimeout(refreshModal, 120);
+    cmd('autoPrice', { value: o });
+    setTimeout(refreshModal, 140);
   };
   $('#rAllMe').onclick = function () {
     var o = {};
     (G.meta.tradeKeys || []).forEach(function (k) { o[k] = false; });
     cmd('autoRes', { value: o });
-    setTimeout(refreshModal, 120);
+    cmd('autoPrice', { value: o });
+    setTimeout(refreshModal, 140);
   };
   $$('#mbody [data-buyE]').forEach(function (b) {
     b.onclick = function () {
@@ -8355,6 +8765,13 @@ function renderHelp() {
     'هزینه‌های دائمی شامل اداره قلمرو (غیرخطی: هرچه ایالت بیشتر، هزینه هر ایالت بیشتر)، ارتش، زیرساخت، دستگاه حکومت، جنگ و مستعمرات است. ' +
     'مالیات بالا درآمد بیشتر ولی رضایت و رشد کمتر می‌آورد.' +
     '</div></div>';
+  h += '<div class="card"><h4>سلاح و صنایع نظامی</h4><div style="font-size:13px;line-height:2">' +
+    'هر سرباز برای مسلح‌شدن یک <b>واحد سلاح</b> می‌خواهد و ساخت سلاح در هر دوره نظامی مواد متفاوتی لازم دارد:<br>' +
+    'سلاح اولیه: چوب · سلاح سرد: چوب و آهن · سلاح گرم: چوب، آهن و نفت · ' +
+    'سلاح پیشرفته: چوب، آهن، نفت و طلا · سلاح هوشمند: چوب، آهن، نفت، طلا و سوخت و انرژی.<br>' +
+    'بدون این مواد، هر اندازه هم پول داشته باشید ارتش بزرگ نمی‌شود. بخشی از بودجه ارتش خودبه‌خود صرف ساخت سلاح می‌شود ' +
+    'و در بخش ارتش می‌توانید دستی هم سلاح بسازید. مرخص‌کردن سرباز بخشی از سلاح را به زرادخانه برمی‌گرداند و کشته‌شدن او سلاحش را هم از بین می‌برد.' +
+    '</div></div>';
   h += '<div class="card"><h4>منابع، سوخت و بورس</h4><div style="font-size:13px;line-height:2">' +
     'هر ذخیره معدنی یا <b>سرشار</b> است یا <b>معمولی</b>: سرشار دست‌کم ۵۰۰ سال بهره‌برداری می‌دهد و در نقشه منابع پررنگ‌تر دیده می‌شود. ' +
     'منابع تمام‌شدنی‌اند ولی هرگز به‌کلی از جهان پایان نمی‌گیرند: در ایالت‌های مستعد پیوسته ذخایر تازه کشف می‌شود و هرچه ذخایر جهانی کمتر شود، اکتشاف شتاب می‌گیرد.<br>' +
@@ -8363,6 +8780,11 @@ function renderHelp() {
     '<b>سوخت و انرژی</b> از نفتِ مصرف داخلی ساخته می‌شود؛ هرچه نفت بیشتر، سوخت بیشتر. کشورهایی که به سوخت رسیده‌اند در نمای فناوری نماد ⚡ می‌گیرند. ' +
     'کشوری که فناوری‌اش کافی است ولی نفت ندارد می‌تواند سوخت بخرد؛ این خرید مصرفی است و دائمی نیست.<br>' +
     'دو کشور در حال جنگ با هم تجارت نمی‌کنند و کشورهای دشمن رابطه تجاری بسیار کمی دارند؛ پس اگر به منابع کشوری نیاز دارید، دوستی با او به سود شماست.<br>' +
+    'منابع کل کشور یک‌کاسه است: ذخایر هر ایالت به همه کشور می‌رسد و ایالت‌ها جدا از هم درگیر کمبود نمی‌شوند.<br>' +
+    'غذا با جمعیت بالا می‌رود و جامعه پیشرفته‌تر سرانه بیشتری مصرف می‌کند؛ کمبود غذا رضایت را پایین می‌آورد، ناآرامی و فشار سرنگونی حکومت را بالا می‌برد ' +
+    'و در کمبود شدید، جدایی‌طلبی ایالت‌ها را محتمل‌تر می‌کند.<br>' +
+    'بهای هر کالا از عرضه و تقاضای جهانی می‌آید و شما (یا دولت) حاشیه قیمت فروش خود را تعیین می‌کنید: ' +
+    'گران‌فروشی سود هر واحد را بالا و حجم فروش را پایین می‌آورد. فروش هیچ کشوری از مجموع خرید جهان بیشتر نمی‌شود.<br>' +
     'کشورهای دارای سوخت بخش <b>کارخانه، کمپانی و تأسیسات</b> را در سرمایه‌گذاری باز می‌کنند. رشد آن عمداً کند است، رضایت مردم را بالا می‌برد و ' +
     'با رسیدن به ۱۵٪ کشور وارد <b>بورس بین‌المللی</b> می‌شود. ارزش سهام از پیشرفت کارخانه، منابع در اختیار، حجم تجارت و جمعیت می‌آید.' +
     '</div></div>';
