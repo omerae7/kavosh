@@ -131,7 +131,9 @@ button{cursor:pointer;border:0;background:none}
 #bottombar{grid-area:bot;display:flex;align-items:center;gap:4px;padding:0 6px;background:linear-gradient(180deg,#f7fafd,#e9eef6);
   border-top:1px solid var(--line);overflow-x:auto;white-space:nowrap;scrollbar-width:none}
 #bottombar::-webkit-scrollbar{display:none}
-.spd{display:flex;gap:3px;align-items:center;padding-left:6px;border-left:1px solid var(--line);margin-left:4px}
+/* کنترل سرعت مهم‌ترین دکمه بازی است؛ با پیمایش نوار پایین نباید از دسترس برود */
+.spd{display:flex;gap:3px;align-items:center;padding-left:6px;border-left:1px solid var(--line);margin-left:4px;
+  position:sticky;right:0;z-index:2;background:linear-gradient(180deg,#f7fafd,#e9eef6)}
 .sbtn{min-width:34px;height:32px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);
   font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
 .sbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -1269,12 +1271,13 @@ function distributeResources(rng) {
     /* جنگل و کشتزار سرشار: نادر ولی بسیار پربازده */
     if (rng.chance(0.055) && st.forestCap > 40) { st.rich.wood = 1; st.forestCap = clamp(st.forestCap * 1.7, 0, 150); st.forest = st.forestCap; }
     if (rng.chance(0.05) && st.foodBase > 1.0) { st.rich.food = 1; st.foodBase = clamp(st.foodBase * 1.6, 0.15, 3.2); }
-    /* رگه‌های سطحی آهن و طلا از همان آغاز پیدا هستند؛ بقیه باید کشف شوند */
-    st.known = {
-      food: true, wood: true,
+    /* تنها چوب و غذا از آغاز پیدا هستند؛ هیچ معدنی پیش از کشف دیده نمی‌شود.
+       رگه سطحی زودتر پیدا می‌شود، ولی باز هم باید کشف شود. */
+    st.known = { food: true, wood: true, iron: false, gold: false, oil: false };
+    st.shallow = {
       iron: st.iron > 0 && rng.chance(0.38),
       gold: st.gold > 0 && rng.chance(0.32),
-      oil: false
+      oil: rng.chance(0.30)
     };
   }
 }
@@ -1388,6 +1391,7 @@ function reserveName(nm) {
   if (W.namesUsed.indexOf(n) < 0) W.namesUsed.push(n);
 }
 function generateWorld(opts) {
+  resetResSeen();   /* دیدِ منابع از جهان پیشین نماند */
   const seed = String(opts.seed || 'kavosh');
   GEO = buildGeo(seed);
   RNGX = new RNG(seed + '|sim');
@@ -1421,7 +1425,7 @@ function generateWorld(opts) {
       infra: 0, industry: 0, agri: 0, health: 0, security: 0, trade: 0,
       sat: 55, unrest: 0, devast: 0, integ: 1, defense: 0, fort: 0,
       foodBase: 1, forest: 30, forestCap: 30, iron: 0, oil: 0, gold: 0,
-      ironMax: 0, oilMax: 0, goldMax: 0, known: null,
+      ironMax: 0, oilMax: 0, goldMax: 0, known: null, shallow: null,
       hist: [], lastInc: 0, lastOut: 0, rebel: 0, siege: 0, capital: false
     };
     st.pop = Math.round(clamp(TERRAINS[t].food * rng.range(45, 150), 15, 260));
@@ -2115,8 +2119,10 @@ function discoverCheck(st) {
     if (tech < RES_TECH[k]) continue;
     const over = tech - RES_TECH[k];
     if (!st.known[k] && st[k] > 0) {
-      /* ذخیره موجود ولی ناشناخته */
-      if (RNGX.chance(0.012 + over / 1300)) {
+      /* ذخیره موجود ولی ناشناخته: رگه سطحی خیلی زود پیدا می‌شود، ذخیره عمیق دیرتر */
+      const shallow = st.shallow && st.shallow[k];
+      const p = shallow ? 0.30 + over / 240 : 0.012 + over / 1300;
+      if (RNGX.chance(clamp(p, 0, 0.6))) {
         st.known[k] = true;
         stateHist(st, (st.rich[k] ? 'ذخایر سرشار ' : 'ذخایر ') + MINE_LABEL[k] + ' کشف شد.');
         if (c) news(MINE_FOUND[k][0], MINE_FOUND[k][1] + faNum(st.id) + ' شناسایی شد' + (st.rich[k] ? ' و سرشار است' : '') + '.', 'discovery', { c: c.id, s: st.id });
@@ -2129,6 +2135,7 @@ function discoverCheck(st) {
       if (RNGX.chance(clamp(p, 0, 0.3))) {
         seedDeposit(st, k, RNGX, st.pot[k]);
         st.known[k] = true;
+        if (st.shallow) st.shallow[k] = 1;   /* همان‌جا که کاویدیم پیدا شد */
         stateHist(st, 'ذخیره تازه‌ای از ' + MINE_LABEL[k] + ' یافت شد.');
         if (c) news('ذخیره تازه', 'اکتشاف در ایالت ' + faNum(st.id) + ' به ذخیره تازه‌ای از ' + MINE_LABEL[k] + ' رسید.', 'discovery', { c: c.id, s: st.id });
       }
@@ -6419,12 +6426,14 @@ function loadGame(json) {
   rebuildLists();
   /* Cacheهای مشتق‌شده پس از بارگذاری بازسازی می‌شوند */
   W._supY = null; W._supB = null; W._wapY = null; W._wap = null;
+  resetResSeen();
   return validate();
 }
 function linkGeo() {
   for (const st of W.states) {
     st.coastalB = !!GEO.coastal[st.id - 1];
-    if (!st.known) st.known = { food: true, wood: true, gold: true, iron: st.iron > 0, oil: false };
+    if (!st.known) st.known = { food: true, wood: true, iron: false, gold: false, oil: false };
+    if (!st.shallow) st.shallow = { iron: 0, gold: 0, oil: 0 };
   }
 }
 
@@ -6462,10 +6471,44 @@ function countrySummary(c) {
     stockValue: r3(c.stockValue || 0)
   };
 }
+/* از معدنِ کشف‌شده در خاک دیگران تنها وقتی باخبریم که آنجا را در دست داشته باشیم،
+   با آن هم‌مرز باشیم، یا از آن کشور اطلاعات کافی داشته باشیم.
+   این دید تنها برای نمایش است و در شبیه‌سازی اثری ندارد، پس سالی یک‌بار بس است. */
+let _seenY = -1, _seenP = -1, _seenC = null, _seenB = null;
+function resetResSeen() { _seenY = -1; _seenP = -1; _seenC = null; _seenB = null; }
+function buildResSeen(pc) {
+  const y = Math.floor(W.year);
+  if (_seenY === y && _seenP === pc.id && _seenC) return;
+  const s = {};
+  for (const cid in W.countries) {
+    const o = W.countries[cid];
+    if (!o.alive) continue;
+    if (o.id === pc.id || intelQuality(pc, o) >= 0.42) s[o.id] = 1;
+  }
+  /* ایالت‌های قلمرو ما و همه همسایگانشان، یک‌بار و نه چهارصدبار */
+  const b = new Uint8Array(GEO.N);
+  for (const sid of controlledStates(pc)) {
+    b[sid - 1] = 1;
+    for (const nb of GEO.neighbors[sid - 1]) b[nb] = 1;
+  }
+  _seenY = y; _seenP = pc.id; _seenC = s; _seenB = b;
+}
+function resSeenCountries(pc) {
+  if (!pc || !pc.alive) return null;      /* تماشاگر: همه‌چیز پیداست */
+  buildResSeen(pc);
+  return _seenC;
+}
+function resVisible(pc, st, i, seen) {
+  if (!seen) return true;
+  if (st.controller && seen[st.controller]) return true;
+  return _seenB ? !!_seenB[i] : false;
+}
 function snapshot() {
   const owners = new Array(GEO.N), ctrls = new Array(GEO.N), pops = new Array(GEO.N),
     incs = new Array(GEO.N), sats = new Array(GEO.N), unr = new Array(GEO.N),
     devs = new Array(GEO.N), stt = new Array(GEO.N), res = new Array(GEO.N);
+  const viewer = W.countries[W.player];
+  const seen = resSeenCountries(viewer);
   for (let i = 0; i < GEO.N; i++) {
     const st = W.states[i];
     owners[i] = st.owner; ctrls[i] = st.controller;
@@ -6474,9 +6517,10 @@ function snapshot() {
     devs[i] = Math.round(st.devast);
     stt[i] = st.status === 'owned' ? 2 : (st.status === 'tribal' ? 1 : 0);
     let rk = 0, rich = 0;
-    if (st.known.oil && st.oil > 0) { rk = 4; rich = st.rich.oil; }
-    else if (st.known.gold && st.gold > 0) { rk = 5; rich = st.rich.gold; }
-    else if (st.known.iron && st.iron > 0) { rk = 3; rich = st.rich.iron; }
+    const mine = resVisible(viewer, st, i, seen);
+    if (mine && st.known.oil && st.oil > 0) { rk = 4; rich = st.rich.oil; }
+    else if (mine && st.known.gold && st.gold > 0) { rk = 5; rich = st.rich.gold; }
+    else if (mine && st.known.iron && st.iron > 0) { rk = 3; rich = st.rich.iron; }
     /* تنها جنگل و کشتزار به‌راستی شاخص روی نقشه منبع نشان داده می‌شود */
     else if (st.rich.wood || st.forest > 74) { rk = 2; rich = st.rich.wood; }
     else if (st.rich.food || st.foodBase > 1.65) { rk = 1; rich = st.rich.food; }
@@ -6579,6 +6623,7 @@ function inspectState(id) {
       }
     }
   }
+  const resView = resVisible(pc, st, i, resSeenCountries(pc));
   let sup = null;
   if (pc && pc.alive && st.controller !== pc.id) {
     const sv = supplyFor(pc, i);
@@ -6600,18 +6645,21 @@ function inspectState(id) {
     sat: st.sat, unrest: st.unrest, infra: st.infra, industry: st.industry, agri: st.agri,
     health: st.health, security: st.security, trade: st.trade, devast: st.devast, integ: st.integ,
     defense: st.defense, fort: st.fort, tech: ctrl ? ctrl.tech : 0,
+    /* ذخیره معدنی تنها برای کسی دیده می‌شود که آنجا را در دست دارد،
+       با آن هم‌مرز است یا از نگه‌دارنده‌اش اطلاعات کافی دارد */
+    resSeen: resView,
     res: {
       food: r3(st.foodBase), wood: Math.round(st.forest),
-      iron: st.known.iron ? Math.round(st.iron) : -1,
-      oil: st.known.oil ? Math.round(st.oil) : -1,
-      gold: st.known.gold ? Math.round(st.gold) : -1
+      iron: resView && st.known.iron ? Math.round(st.iron) : -1,
+      oil: resView && st.known.oil ? Math.round(st.oil) : -1,
+      gold: resView && st.known.gold ? Math.round(st.gold) : -1
     },
     rate: {
       food: Math.round(foodProduction(st)),
       wood: Math.round(st.forest * 0.055 * (0.6 + (ctrl ? ctrl.tech : 1) / 90) * 2.2),
-      iron: st.known.iron && st.iron > 0 ? Math.round(st.iron * 0.016 * (0.4 + (ctrl ? ctrl.tech : 1) / 70) + 2) : 0,
-      oil: st.known.oil && st.oil > 0 && ctrl && ctrl.tech >= 40 ? Math.round(st.oil * 0.020 * (0.3 + ctrl.tech / 60) + 3) : 0,
-      gold: st.known.gold && st.gold > 0 ? Math.round(st.gold * 0.013 * (0.5 + (ctrl ? ctrl.tech : 1) / 80) + 0.8) : 0,
+      iron: resView && st.known.iron && st.iron > 0 ? Math.round(st.iron * 0.016 * (0.4 + (ctrl ? ctrl.tech : 1) / 70) + 2) : 0,
+      oil: resView && st.known.oil && st.oil > 0 && ctrl && ctrl.tech >= 40 ? Math.round(st.oil * 0.020 * (0.3 + ctrl.tech / 60) + 3) : 0,
+      gold: resView && st.known.gold && st.gold > 0 ? Math.round(st.gold * 0.013 * (0.5 + (ctrl ? ctrl.tech : 1) / 80) + 0.8) : 0,
       damage: Math.round(st.extractDamage || 0)
     },
     neighbors: GEO.neighbors[i].map(x => x + 1), nbCountries, hist: st.hist.slice(-8), ops, actions,
@@ -8235,9 +8283,13 @@ function renderState(d) {
   h += '<div class="card"><h4>منابع</h4>';
   h += kv('غذا (کیفیت زمین)', faf(d.res.food, 2) + ' — تولید ' + fa(d.rate.food));
   h += kv('جنگل', fa(d.res.wood) + '٪ — برداشت ' + fa(d.rate.wood));
-  h += kv('آهن', d.res.iron < 0 ? '<span style="color:var(--dim2)">ناشناخته</span>' : (fa(d.res.iron) + ' ذخیره — استخراج ' + fa(d.rate.iron)));
-  h += kv('نفت', d.res.oil < 0 ? '<span style="color:var(--dim2)">ناشناخته</span>' : (fa(d.res.oil) + ' ذخیره — استخراج ' + fa(d.rate.oil)));
-  h += kv('طلا', d.res.gold < 0 ? '<span style="color:var(--dim2)">ناشناخته</span>' : (fa(d.res.gold) + ' ذخیره — استخراج ' + fa(d.rate.gold)));
+  var unk = d.resSeen === false
+    ? '<span style="color:var(--dim2)">بی‌خبر</span>'
+    : '<span style="color:var(--dim2)">ناشناخته</span>';
+  h += kv('آهن', d.res.iron < 0 ? unk : (fa(d.res.iron) + ' ذخیره — استخراج ' + fa(d.rate.iron)));
+  h += kv('نفت', d.res.oil < 0 ? unk : (fa(d.res.oil) + ' ذخیره — استخراج ' + fa(d.rate.oil)));
+  h += kv('طلا', d.res.gold < 0 ? unk : (fa(d.res.gold) + ' ذخیره — استخراج ' + fa(d.rate.gold)));
+  if (d.resSeen === false) h += '<div class="hint">از معادن این ایالت بی‌خبرید. با هم‌مرزی، تجارت یا جاسوسی می‌توانید از آن باخبر شوید.</div>';
   if (d.rate.damage > 0) h += kv('آسیب تأسیسات استخراج', pc(d.rate.damage), 'bad');
   h += '</div>';
 
