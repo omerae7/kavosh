@@ -655,6 +655,50 @@ function eraOf(tech) {
   return ERAS[0];
 }
 
+/* ---------- مسیرهای رسیدن به قدرت ----------
+   همه کشورها جاه‌طلبی برترشدن دارند، ولی راه رسیدن به آن یکسان نیست. */
+const DOCTRINES = [
+  {
+    k: 'conquest', n: 'فتح و گسترش', icon: '⚔',
+    desc: 'قدرت از راه شمشیر: قلمرو بیشتر، ارتش بزرگ‌تر و ترساندن همسایگان.',
+    budget: { army: 1.85, science: 0.85, economy: 0.85, security: 1.15, diplomacy: 0.6, factory: 0.7, welfare: 0.85 },
+    war: 1.55, expand: 1.7, trade: 0.75, diplo: 0.65, tax: 1.06
+  },
+  {
+    k: 'wealth', n: 'ثروت و بازرگانی', icon: '⚖',
+    desc: 'قدرت از راه کیسه پول: تجارت گسترده، قرارداد و نفوذ اقتصادی.',
+    budget: { army: 0.75, science: 1.1, economy: 1.65, factory: 1.35, diplomacy: 1.2, welfare: 1.05, culture: 1.05 },
+    war: 0.55, expand: 0.8, trade: 1.7, diplo: 1.25, tax: 0.9
+  },
+  {
+    k: 'science', n: 'دانش و فناوری', icon: '🔬',
+    desc: 'قدرت از راه برتری فناوری: دانش، آموزش و سلاح‌های یک نسل جلوتر.',
+    budget: { army: 0.85, science: 1.95, economy: 1.0, welfare: 1.15, factory: 1.2, culture: 1.1, security: 0.85 },
+    war: 0.7, expand: 0.8, trade: 1.1, diplo: 1.05, tax: 0.98
+  },
+  {
+    k: 'influence', n: 'نفوذ و اتحاد', icon: '🕊',
+    desc: 'قدرت از راه دیگران: اتحاد، دست‌نشانده، و در دست گرفتن سازمان ملل.',
+    budget: { army: 0.8, diplomacy: 2.3, culture: 1.35, economy: 1.05, science: 1.0, security: 0.9 },
+    war: 0.5, expand: 0.75, trade: 1.25, diplo: 1.9, tax: 0.94
+  },
+  {
+    k: 'colonial', n: 'دریا و مستعمره', icon: '⛵',
+    desc: 'قدرت از راه دریا: مستعمره در سرزمین‌های دور و ناوگان بزرگ.',
+    budget: { army: 1.35, economy: 1.25, science: 1.05, diplomacy: 0.9, factory: 1.1, security: 1.05 },
+    war: 1.1, expand: 1.45, trade: 1.35, diplo: 0.9, tax: 1.02
+  },
+  {
+    k: 'industry', n: 'صنعت و منابع', icon: '🏭',
+    desc: 'قدرت از راه کارخانه و معدن: زنجیره منابع، صنایع سنگین و بورس.',
+    budget: { factory: 2.0, economy: 1.45, science: 1.15, army: 0.95, welfare: 0.95, diplomacy: 0.85 },
+    war: 0.85, expand: 1.0, trade: 1.4, diplo: 0.95, tax: 1.0
+  }
+];
+function doctrineOf(c) {
+  for (const d of DOCTRINES) if (d.k === c.doctrine) return d;
+  return DOCTRINES[0];
+}
 const BUDGET_KEYS = ['army', 'science', 'welfare', 'economy', 'factory', 'housing', 'culture', 'diplomacy', 'security'];
 const BUDGET_NAMES = {
   army: 'ارتش و ناوگان',
@@ -1172,6 +1216,7 @@ function baseCountry(id, name, color, capital) {
     revPressure: 0, coupRisk: 0, unrestAvg: 0,
     warmonger: 0, unRep: 50, diploPower: 0, counterBribes: {},
     autoBudget: {}, royalName: '', regnal: 1,
+    doctrine: '', doctrineYears: 0, ambition: 0.5, drive: 0.7, supRank: 0, supGap: 0.5,
     energy: 0, lastEnergyMade: 0, lastEnergyUse: 0, energyShort: 0,
     weapons: 0, lastArms: 0, armsBlocked: null,
     factory: 0, stockValue: 0, stockIncome: 0, stockActive: false,
@@ -1498,6 +1543,12 @@ function generateWorld(opts) {
     }
   }
   guaranteeResources(rng);
+  /* چگالی میانگین معادن در جهان — پایه سنجش «کشور معدنی» بودن */
+  (function () {
+    let n = 0;
+    for (const st of W.states) if (st.iron > 0 || st.oil > 0 || st.gold > 0) n++;
+    W.resDensity = r3(n / Math.max(W.states.length, 1));
+  })();
   rebalanceResources(rng);
   /* ارتش اولیه هر کشور متناسب با جمعیت */
   for (const cid in W.countries) {
@@ -1578,6 +1629,14 @@ function generateWorld(opts) {
     lead.sur = ordinalFa(1);
   }
   initUN();
+  /* هر کشور راه خودش را برای بزرگ‌شدن برمی‌گزیند */
+  for (const cid in W.countries) {
+    const c = W.countries[cid];
+    if (!c.alive) continue;
+    c.ambition = ambitionOf(c);
+    c.doctrine = pickDoctrine(c, rng);
+    c.doctrineYears = 0;
+  }
   assignGoals();
   logHistory(W.year, 'جهان با ' + faNum(ids.length) + ' کشور و ' + faNum(GEO.N) + ' ایالت آغاز شد.');
   news('آغاز', 'تمدن‌های نخستین در کرانه اقیانوس بزرگ شکل گرفتند.', 'world');
@@ -2147,8 +2206,9 @@ function effectiveResPolicy(c) {
     const want = need[k] || 0;
     if (want <= 0) { out[k] = k === 'gold' ? 0.15 : 0.25; continue; }
     const cover = have / Math.max(want, 1);
-    /* هرچه پوشش نیاز بیشتر، سهم فروش بیشتر */
-    out[k] = clamp(1.05 - 0.32 * cover, 0.22, 0.96);
+    /* هرچه پوشش نیاز بیشتر، سهم فروش بیشتر؛ اهل بازرگانی جسورانه‌تر می‌فروشند */
+    const tr = c.isPlayer ? 1 : ambitionFx(c).trade;
+    out[k] = clamp(1.05 - 0.32 * cover * tr, 0.18, 0.96);
   }
   return out;
 }
@@ -2340,6 +2400,173 @@ function armsTargetPerCycle(c) {
   const gap = Math.max(0, mm * share - cur);
   /* جایگزینی فرسودگی + بخشی از کسری */
   return Math.max(0, c.army.troops * 0.03 + gap * 0.28);
+}
+
+/* ---------- ۲۷) جاه‌طلبی: همه در پی برترشدن، هر یک از راهی دیگر ---------- */
+
+/* توان کلی یک کشور برای سنجش رتبه جهانی — همه پایه‌های قدرت با هم */
+function supremacyScore(c) {
+  if (!c || !c.alive) return 0;
+  const land = c.owned.length + c.ctrl.length * 0.45;
+  const pop = Math.pow(Math.max(countryPop(c), 1), 0.42) / 9;
+  const mil = Math.pow(Math.max(militaryPower(c), 1), 0.5) / 5;
+  const tech = c.tech / 4.5;
+  let vassals = 0;
+  for (const v of c.vassals) if (W.countries[v] && W.countries[v].alive) vassals += 1.2;
+  let allies = 0, tradeVol = 0;
+  for (const oid in c.rel) {
+    const r = c.rel[oid], o = W.countries[oid];
+    if (!o || !o.alive) continue;
+    if (r.ally) allies += 0.5; else if (r.friend) allies += 0.25;
+    if (r.status !== 'war' && !r.embargo) tradeVol += r.trade;
+  }
+  const wealth = Math.pow(Math.max(c.lastCycle ? c.lastCycle.revenue : 1, 1), 0.45) / 3.5;
+  const trade = Math.pow(Math.max(tradeVol, 1), 0.42) / 5;
+  const ind = (c.factory || 0) / 9 + (c.stockValue || 0) / 26;
+  const un = (c.unRep == null ? 50 : c.unRep) / 55 + (W.un ? unInfluence(c) * 2.2 : 0);
+  return Math.max(0.5, land + pop + mil + tech + vassals + allies + wealth + trade + ind + un);
+}
+/* رتبه و فاصله تا برترین کشور جهان */
+function supremacyBoard() {
+  if (W._supY === Math.floor(W.year) && W._supB) return W._supB;
+  const list = [];
+  for (const cid in W.countries) {
+    const c = W.countries[cid];
+    if (!c.alive) continue;
+    list.push({ id: c.id, name: c.name, color: c.color, score: r3(supremacyScore(c)), doctrine: c.doctrine, ambition: r3(c.ambition || 0.5) });
+  }
+  list.sort((a, b) => b.score - a.score);
+  for (let i = 0; i < list.length; i++) list[i].rank = i + 1;
+  W._supY = Math.floor(W.year);
+  W._supB = list;
+  return list;
+}
+function supremacyRank(c) {
+  const b = supremacyBoard();
+  for (const r of b) if (r.id === c.id) return r.rank;
+  return b.length;
+}
+/* چقدر از برترین کشور عقب‌تر است: ۰ یعنی خودش برتر است، ۱ یعنی بسیار عقب */
+function supremacyGap(c) {
+  const b = supremacyBoard();
+  if (!b.length) return 0.5;
+  const top = b[0].score;
+  const mine = supremacyScore(c);
+  return clamp(1 - mine / Math.max(top, 0.5), 0, 1);
+}
+
+/* جاه‌طلبی هر کشور: از شخصیت فرمانروا، گرایش‌های ملی و نوع حکومت می‌آید */
+function ambitionOf(c) {
+  const a = W.agents[c.leader];
+  const L = leaderStyle(c);
+  const amb = a ? a.tr[TI.ambition] : 0.5;
+  const g = GOVS[c.gov];
+  const base = 0.30 + amb * 0.38 + L.drive * 0.16 + c.bias.expansion * 0.10 +
+    g.central * 0.08 + (c.legitimacy > 70 ? 0.04 : 0);
+  return clamp(base, 0.10, 0.99);
+}
+
+/* برازندگی هر مسیر قدرت برای این کشور: شخصیت، جغرافیا و داشته‌ها */
+function doctrineFit(c, d) {
+  const a = W.agents[c.leader];
+  const t = a ? a.tr : null;
+  const L = leaderStyle(c);
+  const coast = hasCoast(c) ? 1 : 0;
+  let coastShare = 0;
+  for (const sid of c.owned) if (GEO.coastal[sid - 1]) coastShare++;
+  coastShare = c.owned.length ? coastShare / c.owned.length : 0;
+  let mineral = 0;
+  for (const sid of c.owned) {
+    const st = W.states[sid - 1];
+    if (st.iron > 0 || st.oil > 0 || st.gold > 0) mineral++;
+  }
+  mineral = c.owned.length ? mineral / c.owned.length : 0;
+  const g = GOVS[c.gov];
+  /* هر مسیر با معیارهای خودش سنجیده می‌شود؛ خروجی همه در یک بازه است تا جهان یکنواخت نشود */
+  const T = i => (t ? t[i] : 0.5);
+  switch (d.k) {
+    case 'conquest':
+      return 0.42 + c.bias.militarism * 0.68 + L.iron * 0.34 + T(TI.aggression) * 0.34 +
+        g.army * 0.28 + c.bias.expansion * 0.28 - g.polFree * 0.15;
+    case 'wealth':
+      return 0.30 + c.bias.trade * 0.70 + T(TI.enterprise) * 0.40 + T(TI.negotiation) * 0.25 +
+        g.ecoFree * 0.40 + coastShare * 0.30;
+    case 'science':
+      return 0.30 + c.bias.science * 0.70 + L.mind * 0.45 + T(TI.curiosity) * 0.30 +
+        T(TI.learning) * 0.20 + g.polFree * 0.20;
+    case 'influence':
+      return 0.30 + c.bias.diplomacy * 0.70 + T(TI.charisma) * 0.35 + T(TI.negotiation) * 0.35 +
+        L.kind * 0.25 + (W.un ? W.un.power * 0.35 : 0.1) - c.bias.militarism * 0.15;
+    case 'colonial':
+      return 0.18 + coast * (0.24 + coastShare * 0.48) + c.bias.expansion * 0.38 + c.bias.trade * 0.22 +
+        T(TI.courage) * 0.24 + T(TI.risk) * 0.18;
+    case 'industry':
+      /* سهم معادن نسبت به میانگین جهان، نه مقدار مطلق */
+      const world = W.resDensity == null ? 0.22 : W.resDensity;
+      const relMin = clamp(mineral / Math.max(world, 0.05), 0, 2.4);
+      return 0.30 + relMin * 0.42 + c.bias.trade * 0.25 + c.bias.science * 0.30 +
+        T(TI.diligence) * 0.35 + T(TI.organize) * 0.20 + (c.factory || 0) / 130;
+  }
+  return 0.3;
+}
+/* انتخاب مسیر قدرت — با کمی تصادف تا جهان یکنواخت نشود */
+function pickDoctrine(c, rng) {
+  const R = rng || RNGX;
+  let best = null, bv = -1e9;
+  for (const d of DOCTRINES) {
+    const v = doctrineFit(c, d) * (0.72 + R.f() * 0.56);
+    if (v > bv) { bv = v; best = d; }
+  }
+  return (best || DOCTRINES[0]).k;
+}
+/* بازنگری راهبرد: با تغییر فرمانروا یا وقتی مسیر کنونی به جایی نمی‌رسد */
+function doctrineReview(c) {
+  const rank = supremacyRank(c);
+  const n = supremacyBoard().length;
+  const rel = n > 1 ? (rank - 1) / (n - 1) : 0;      /* ۰ برترین، ۱ ضعیف‌ترین */
+  c.doctrineYears = (c.doctrineYears || 0) + 1;
+  /* پیشرفت راهبرد را می‌سنجیم: اگر رتبه بدتر شده، مسیر زیر سؤال می‌رود */
+  const prev = c.lastRankRel == null ? rel : c.lastRankRel;
+  c.lastRankRel = prev * 0.75 + rel * 0.25;
+  if (c.doctrineYears < 40) return;
+  const failing = rel > 0.55 && c.lastRankRel >= prev - 0.002;
+  const chance = (failing ? 0.05 : 0.012) * (0.5 + (c.ambition || 0.5));
+  if (!RNGX.chance(chance)) return;
+  const old = c.doctrine;
+  const nd = pickDoctrine(c);
+  if (nd === old) { c.doctrineYears = 0; return; }
+  c.doctrine = nd;
+  c.doctrineYears = 0;
+  const D = doctrineOf(c);
+  logHistory(W.year, esc0(c.name) + ' راه تازه‌ای برای بزرگ‌شدن برگزید: ' + D.n + '.', 'gov');
+  if (c.isPlayer) return;
+  news('راهبرد تازه', esc0(c.name) + ' مسیر قدرت خود را به «' + D.n + '» تغییر داد.', 'gov', { c: c.id });
+}
+function esc0(s) { return String(s == null ? '' : s); }
+
+/* هر سال: جاه‌طلبی به‌روز می‌شود و کشور در پی جبران عقب‌ماندگی است */
+function ambitionYear(c) {
+  const target = ambitionOf(c);
+  c.ambition = c.ambition == null ? target : c.ambition * 0.9 + target * 0.1;
+  if (!c.doctrine) c.doctrine = pickDoctrine(c);
+  /* فشار رقابت: هرچه از برترین کشور عقب‌تر، تلاش بیشتر */
+  const gap = supremacyGap(c);
+  c.supGap = r3(gap);
+  c.supRank = supremacyRank(c);
+  c.drive = r3(clamp((c.ambition || 0.5) * (0.65 + gap * 0.7), 0.1, 1.5));
+  doctrineReview(c);
+}
+/* ضریب‌های رفتاری که از راهبرد و جاه‌طلبی می‌آیند */
+function ambitionFx(c) {
+  const d = doctrineOf(c);
+  const drive = c.drive == null ? 0.7 : c.drive;
+  return {
+    war: clamp(d.war * (0.72 + drive * 0.5), 0.3, 2.2),
+    expand: clamp(d.expand * (0.72 + drive * 0.5), 0.3, 2.4),
+    trade: clamp(d.trade * (0.8 + drive * 0.3), 0.5, 2.0),
+    diplo: clamp(d.diplo * (0.8 + drive * 0.3), 0.4, 2.2),
+    tax: clamp(d.tax * (0.96 + drive * 0.06), 0.85, 1.2)
+  };
 }
 
 /* ---------- ۱۱) ارتش ---------- */
@@ -3699,13 +3926,21 @@ function assignGoals() { for (const cid in W.countries) if (W.countries[cid].ali
 function assignGoalsFor(c) {
   const pool = [];
   if (!hasCoast(c)) pool.push({ t: 'sea', w: 1.2 });
-  pool.push({ t: 'military', w: c.bias.militarism });
-  pool.push({ t: 'economy', w: c.bias.trade });
-  pool.push({ t: 'tech', w: c.bias.science });
-  pool.push({ t: 'stability', w: 1 - c.bias.risk });
-  pool.push({ t: 'expand', w: c.bias.expansion });
-  pool.push({ t: 'oil', w: c.tech > 35 ? 1.1 : 0.2 });
-  pool.push({ t: 'iron', w: 0.6 });
+  const D = doctrineOf(c);
+  const dr = c.drive == null ? 0.7 : c.drive;
+  const B = k => (D.budget[k] != null ? D.budget[k] : 1);
+  pool.push({ t: 'military', w: c.bias.militarism * B('army') });
+  pool.push({ t: 'economy', w: c.bias.trade * B('economy') });
+  pool.push({ t: 'tech', w: c.bias.science * B('science') });
+  pool.push({ t: 'stability', w: (1 - c.bias.risk) * 0.9 });
+  pool.push({ t: 'expand', w: c.bias.expansion * D.expand });
+  pool.push({ t: 'oil', w: (c.tech > 35 ? 1.1 : 0.2) * (D.k === 'industry' ? 1.6 : 1) });
+  pool.push({ t: 'iron', w: 0.6 * (D.k === 'industry' ? 1.8 : 1) });
+  /* هدف همیشگی هر کشور: برترشدن — هرچه عقب‌تر، پررنگ‌تر */
+  pool.push({ t: 'supremacy', w: 0.5 + dr * 1.1 });
+  if (D.k === 'influence') pool.push({ t: 'alliances', w: 0.9 + dr * 0.8 });
+  if (D.k === 'colonial') pool.push({ t: 'sea', w: 0.9 + dr * 0.7 });
+  if (D.k === 'wealth') pool.push({ t: 'trade', w: 1.0 + dr * 0.7 });
   const enemies = Object.keys(c.rel).filter(o => c.rel[o].status === 'hostile' || c.rel[o].status === 'war');
   if (enemies.length) pool.push({ t: 'defeat', target: +RNGX.pick(enemies), w: 1.0 });
   pool.sort((a, b) => (b.w * (0.6 + RNGX.f() * 0.8)) - (a.w * (0.6 + RNGX.f() * 0.8)));
@@ -3730,7 +3965,14 @@ function strategicValue(c, st) {
     if (g.t === 'sea' && GEO.coastal[st.id - 1]) v += 1.2;
     if (g.t === 'defeat' && st.controller === g.target) v += 1.0;
     if (g.t === 'expand') v += 0.35;
+    if (g.t === 'supremacy') v += 0.30;
+    if (g.t === 'trade' && GEO.coastal[st.id - 1]) v += 0.5;
   }
+  const D = doctrineOf(c);
+  if (D.k === 'industry' && ((st.known.iron && st.iron > 0) || (st.known.oil && st.oil > 0))) v += 0.9;
+  if (D.k === 'wealth' && st.trade > 40) v += 0.6;
+  if (D.k === 'colonial' && GEO.coastal[st.id - 1]) v += 0.7;
+  if (D.k === 'conquest') v += 0.35;
   return v;
 }
 function aiError(c) {
@@ -3795,7 +4037,9 @@ function aiDecide(c) {
       if (v > bv) { bv = v; best = { st, need }; }
     }
     if (best && bv > 0.55) {
-      const useColony = c.tech > 20 && best.need * 0.62 < freeTroops && RNGX.chance(clamp(0.25 + c.bias.trade * 0.3 - c.bias.militarism * 0.2, 0.05, 0.6));
+      const colBias = doctrineOf(c).k === 'colonial' ? 0.35 : (doctrineOf(c).k === 'conquest' ? -0.15 : 0);
+      const useColony = c.tech > 20 && best.need * 0.62 < freeTroops &&
+        RNGX.chance(clamp(0.25 + c.bias.trade * 0.3 - c.bias.militarism * 0.2 + colBias, 0.05, 0.75));
       if (useColony) {
         const chk2 = canOperate(c, best.st, 'colonize');
         if (chk2.ok) startOp(c, best.st, 'colonize', Math.min(freeTroops, Math.ceil(chk2.need * 1.15)));
@@ -3840,7 +4084,13 @@ function aiDecide(c) {
       let u = 0;
       u += clamp(ratio - 1, -1.8, 2.4) * 1.8;
       u += targetsValue * 1.1;
+      const AF = ambitionFx(c);
       u += c.bias.militarism * 1.3 + c.bias.expansion * 1.2;
+      /* راهبرد قدرت: اهل شمشیر زودتر می‌جنگند، اهل بازرگانی و نفوذ دیرتر */
+      u += (AF.war - 1) * 2.2;
+      /* رقابت بر سر برتری: به کشوری که از ما جلوتر است سخت‌تر نگاه می‌کنیم */
+      const rank = supremacyRank(c), orank = supremacyRank(o);
+      if (orank < rank) u += clamp((rank - orank) / 9, 0, 1.0) * (0.4 + (c.drive || 0.7) * 0.8);
       u += r.grudge / 30 + r.tension / 45;
       u += landHunger * 0.9;
       u -= r.trust / 34;
@@ -3875,7 +4125,7 @@ function aiDecide(c) {
     if (best && bv > 3.0 && RNGX.chance(0.32)) { c.lastWarDec = W.year; declareWar(c, best, 'اهداف راهبردی'); }
   }
   /* ۴) گسترش در مناطق آزاد */
-  if (RNGX.chance(0.65)) {
+  if (RNGX.chance(clamp(0.45 * ambitionFx(c).expand, 0.2, 0.95))) {
     let best = null, bv = 0;
     for (const st of W.states) {
       if (st.owner) continue;
@@ -3887,16 +4137,18 @@ function aiDecide(c) {
     }
     if (best && bv > 0.5 && c.treasury > best.cost * 2.2) startOp(c, best.st, 'expand');
   }
-  /* ۵) دیپلماسی */
-  if (RNGX.chance(0.22)) {
+  /* ۵) دیپلماسی — اهل نفوذ بسیار پرکارترند */
+  if (RNGX.chance(clamp(0.22 * ambitionFx(c).diplo, 0.08, 0.6))) {
     const cands = Object.keys(c.rel).map(Number).filter(oid => W.countries[oid] && W.countries[oid].alive && c.rel[oid].status !== 'war');
     if (cands.length) {
       const oid = RNGX.pick(cands);
       const o = W.countries[oid], r = c.rel[oid];
       const threat = biggestThreat(c);
+      const AF = ambitionFx(c);
       let uAlly = r.trust / 45 + c.bias.diplomacy * 1.1 + (threat && threat !== o.id && relOf(o, threat).tension > 40 ? 1.1 : 0) - r.grudge / 40;
+      uAlly += (AF.diplo - 1) * 1.3;
       if (!r.ally && noisy(uAlly, err) > 2.3) diploOffer(c, o, 'alliance');
-      else if (!r.friend && !r.ally && noisy(r.trust / 52 + c.bias.diplomacy * 0.8 + c.bias.trade * 0.35 - r.grudge / 45, err) > 1.45) diploOffer(c, o, 'friendship');
+      else if (!r.friend && !r.ally && noisy(r.trust / 52 + c.bias.diplomacy * 0.8 + c.bias.trade * 0.35 - r.grudge / 45 + (AF.diplo - 1) * 0.55, err) > 1.45) diploOffer(c, o, 'friendship');
       else if (!r.nonAgg && noisy(r.trust / 60 + c.bias.diplomacy * 0.6, err) > 1.1) diploOffer(c, o, 'nonAgg');
       else if (!r.embargo && r.status !== 'hostile' && RNGX.chance(0.5)) diploOffer(c, o, 'trade');
       /* کمک به متحد ضعیف */
@@ -4259,6 +4511,13 @@ function aiBudgetWeights(c) {
     diplomacy: 0.03 + c.bias.diplomacy * 0.09 + (W.un ? W.un.power * 0.05 : 0),
     security: 0.05 + clamp(c.unrestAvg / 130, 0, 0.16) + g.repress * 0.06
   };
+  /* راهبرد قدرت، اولویت‌های بودجه را جابه‌جا می‌کند */
+  const D = doctrineOf(c);
+  const drive = c.drive == null ? 0.7 : c.drive;
+  for (const k in w) {
+    const m = D.budget[k];
+    if (m != null) w[k] *= 1 + (m - 1) * clamp(0.55 + drive * 0.5, 0.4, 1.25);
+  }
   let tot = 0;
   for (const k in w) tot += w[k];
   const out = {};
@@ -4281,7 +4540,7 @@ function aiBudget(c) {
   /* خزانه پر: مالیات پایین می‌آید و مردم راضی‌تر می‌شوند */
   if (lc && c.treasury > lc.revenue * 7) t -= 0.03;
   else if (lc && c.treasury > lc.revenue * 4) t -= 0.015;
-  c.taxRate = clamp(t * leaderFx(c).tax, 0.08, GOVS[c.gov].taxMax);
+  c.taxRate = clamp(t * leaderFx(c).tax * ambitionFx(c).tax, 0.08, GOVS[c.gov].taxMax);
   /* سهم درآمدی که خودکار خرج می‌شود: دولت معمولاً بیشتر درآمد را خرج می‌کند
      و تنها در تنگنای مالی دست نگه می‌دارد */
   const rev = lc ? lc.revenue : 100;
@@ -5476,6 +5735,10 @@ function cycleStep() {
 /* ---------- ۲۲) گام سالانه ---------- */
 function yearStep() {
   const y = Math.floor(W.year);
+  for (const cid in W.countries) {
+    const c = W.countries[cid];
+    if (c.alive) ambitionYear(c);
+  }
   for (const st of W.states) {
     popYear(st);
     unrestYear(st);
@@ -5639,6 +5902,8 @@ function countrySummary(c) {
     pop: countryPop(c), sat: avgSat(c), stability: c.stability, legitimacy: c.legitimacy, corruption: c.corruption,
     capital: c.capital, leader: c.leader, isPlayer: !!c.isPlayer, vassalOf: c.vassalOf,
     power: militaryPower(c), unrest: c.unrestAvg, tax: c.taxRate, era: eraOf(c.tech).name,
+    doctrine: c.doctrine || '', doctrineName: doctrineOf(c).n, doctrineIcon: doctrineOf(c).icon,
+    ambition: r3(c.ambition || 0), supRank: c.supRank || 0,
     energy: r3(c.energy || 0), hasEnergy: hasEnergy(c), factory: r3(c.factory || 0),
     stockValue: r3(c.stockValue || 0)
   };
@@ -5688,7 +5953,10 @@ function snapshot() {
     energy: r3(pc.energy || 0), energyCap: Math.round(energyCap(pc)),
     fuelPct: r3(clamp((pc.energy || 0) / Math.max(energyCap(pc), 1) * 100, 0, 100)),
     hasFuelTech: hasFuelTech(pc), hasEnergy: hasEnergy(pc),
-    factory: r3(pc.factory || 0), stockValue: r3(pc.stockValue || 0), stockIncome: r3(pc.stockIncome || 0)
+    factory: r3(pc.factory || 0), stockValue: r3(pc.stockValue || 0), stockIncome: r3(pc.stockIncome || 0),
+    doctrine: pc.doctrine || '', doctrineName: doctrineOf(pc).n, doctrineIcon: doctrineOf(pc).icon,
+    ambition: r3(pc.ambition || 0), supRank: pc.supRank || 0, supGap: r3(pc.supGap || 0),
+    nRivals: Object.values(W.countries).filter(x => x.alive).length
   } : null;
   const ops = W.ops.map(o => ({ id: o.id, att: o.att, target: o.target, type: o.type, progress: Math.round(o.progress), force: Math.round(o.force), supply: r3(o.supply) }));
   const out = {
@@ -5901,6 +6169,16 @@ function inspectCountry(id) {
     resTech: RES_TECH,
     revPressure: c.revPressure, coupRisk: c.coupRisk, credibility: c.credibility,
     vassals: c.vassals.map(v => W.countries[v] ? W.countries[v].name : '').filter(Boolean),
+    ambition: r3(c.ambition || 0), drive: r3(c.drive || 0),
+    doctrine: (function () { const d = doctrineOf(c); return { k: d.k, n: d.n, icon: d.icon, desc: d.desc }; })(),
+    doctrines: DOCTRINES.map(d => ({ k: d.k, n: d.n, icon: d.icon, desc: d.desc })),
+    supRank: c.supRank || supremacyRank(c), supGap: r3(c.supGap == null ? supremacyGap(c) : c.supGap),
+    supScore: r3(supremacyScore(c)),
+    supBoard: supremacyBoard().slice(0, 12).map(x => Object.assign({}, x, {
+      dn: (DOCTRINES.find(d => d.k === x.doctrine) || DOCTRINES[0]).n,
+      di: (DOCTRINES.find(d => d.k === x.doctrine) || DOCTRINES[0]).icon,
+      me: x.id === c.id
+    })),
     era: eraOf(c.tech), mem: c.mem.slice(-12).map(m => ({ y: Math.floor(m.y), x: memText({ t: m.t, y: m.y, other: m.other }) })),
     ownedList: c.owned.slice(), ctrlList: c.ctrl.slice(),
     factions: c.factions.map(f => ({
@@ -7173,6 +7451,9 @@ function buildTopbar() {
   h += '<div class="stat"><b>' + fa(p.owned) + (p.ctrl ? '+' + fa(p.ctrl) : '') + '</b><span>ایالت</span></div>';
   h += '<div class="stat"><b>' + pc(p.tax * 100) + '</b><span>مالیات</span></div>';
   h += '<div class="stat"><b>' + fa(p.leaderAge) + '</b><span>سن فرمانروا</span></div>';
+  if (p.doctrineName) {
+    h += '<div class="stat"><b>' + fa(p.supRank || 0) + '</b><span>رتبه · ' + esc(p.doctrineIcon || '') + ' ' + esc(p.doctrineName) + '</span></div>';
+  }
   if (s.un) {
     h += '<div class="stat ' + (s.un.sanctioned ? 'bad' : (s.un.condemned ? 'bad' : '')) + '"><b>' +
       (s.un.sanctioned ? 'تحریم' : (s.un.condemned ? 'محکوم' : pc(s.un.power * 100))) + '</b><span>' + esc(s.un.stage) + '</span></div>';
@@ -7251,6 +7532,8 @@ function renderOverview() {
     (p.royalTitle ? kv('دودمان', esc(p.royalTitle) + ' — دوره ' + ordFa(p.regnal)) : '') +
     kv('فرمانروا', esc(p.leaderName) + ' (' + fa(p.leaderAge) + ' ساله)') +
     kv('حکومت', esc(p.gov)) +
+    (p.doctrineName ? kv('راه قدرت', esc(p.doctrineIcon || '') + ' ' + esc(p.doctrineName)) +
+      kv('رتبه جهانی', fa(p.supRank || 0) + (p.nRivals ? ' از ' + fa(p.nRivals) : '')) : '') +
     kv('ایالت‌ها', fa(p.owned) + (p.ctrl ? ' + ' + fa(p.ctrl) + ' مستعمره' : '') + ' از ' + fa(G.meta.maxStates || 350)) +
     bar(p.owned, G.meta.maxStates || 350, '#e8b339') +
     kv('خزانه', money(p.treasury), p.treasury < 0 ? 'bad' : '') +
@@ -7670,6 +7953,30 @@ function agentCard(a, title) {
   }
   return h + '</div>';
 }
+function ambitionCard(d) {
+  if (!d.doctrine) return '';
+  var n = d.supBoard ? d.supBoard.length : 0;
+  var h = '<div class="card"><h4>جاه‌طلبی و راه قدرت</h4>' +
+    kv('راهبرد کشور', (d.doctrine.icon || '') + ' ' + esc(d.doctrine.n)) +
+    '<div class="hint">' + esc(d.doctrine.desc) + '</div>' +
+    kv('جاه‌طلبی', pc((d.ambition || 0) * 100)) + bar((d.ambition || 0) * 100, 100, '#b45309') +
+    kv('تلاش کنونی برای جبران عقب‌ماندگی', pc(clamp((d.drive || 0) / 1.5, 0, 1) * 100)) +
+    kv('رتبه در جهان', fa(d.supRank || 0) + (d.nRivals ? ' از ' + fa(d.nRivals) : '')) +
+    kv('فاصله تا برترین کشور', pc((d.supGap || 0) * 100), (d.supGap || 0) > 0.6 ? 'bad' : 'good') +
+    '<div class="hint">همه کشورها می‌خواهند برترین قدرت جهان شوند، ولی راهشان یکی نیست. ' +
+    'هرچه کشوری از صدر جدول عقب‌تر باشد سخت‌تر تلاش می‌کند، و اگر راهش به جایی نرسد آن را عوض می‌کند.</div>';
+  if (d.supBoard && d.supBoard.length) {
+    h += '<table class="tb" style="margin-top:8px"><tr><th>رتبه</th><th>کشور</th><th>راه قدرت</th><th>امتیاز</th></tr>';
+    for (var i = 0; i < d.supBoard.length; i++) {
+      var b = d.supBoard[i];
+      h += '<tr' + (b.me ? ' style="font-weight:700;background:var(--panel3)"' : '') + '><td>' + fa(b.rank) + '</td>' +
+        '<td><i class="dot" style="background:' + b.color + '"></i>' + esc(b.name) + '</td>' +
+        '<td>' + (b.di || '') + ' ' + esc(b.dn || '') + '</td><td>' + fa(b.score) + '</td></tr>';
+    }
+    h += '</table>';
+  }
+  return h + '</div>';
+}
 function renderCountry(d) {
   var s = d.summary;
   var h = '<div class="grid2">';
@@ -7691,12 +7998,13 @@ function renderCountry(d) {
   h += '<div>' + agentCard(d.leader, 'فرمانروا') + agentCard(d.heir, 'وارث / جانشین') + '</div>';
   h += '</div>';
   h += '<div class="card"><h4>اهداف راهبردی</h4>';
-  var GN = { sea: 'دسترسی به دریا', military: 'افزایش قدرت نظامی', economy: 'رشد اقتصادی', tech: 'پیشرفت فناوری', stability: 'ثبات داخلی', expand: 'توسعه سرزمینی', oil: 'کنترل نفت', iron: 'کنترل آهن', defeat: 'شکست دشمن' };
+  var GN = { sea: 'دسترسی به دریا', military: 'افزایش قدرت نظامی', economy: 'رشد اقتصادی', tech: 'پیشرفت فناوری', stability: 'ثبات داخلی', expand: 'توسعه سرزمینی', oil: 'کنترل نفت', iron: 'کنترل آهن', defeat: 'شکست دشمن', supremacy: 'برترین قدرت جهان', alliances: 'شبکه اتحادها', trade: 'سلطه بازرگانی' };
   for (var i = 0; i < d.goals.length; i++) {
     var g = d.goals[i];
     h += '<span class="tag">' + esc(GN[g.t] || g.t) + (g.target && G.snap.countries[g.target] ? ' (' + esc(G.snap.countries[g.target].name) + ')' : '') + '</span> ';
   }
   h += '</div>';
+  h += ambitionCard(d);
   h += '<div class="card"><h4>حافظه تاریخی کشور</h4>';
   if (!d.mem.length) h += '<div style="color:var(--dim)">هنوز رویداد مهمی ثبت نشده است.</div>';
   for (var m = d.mem.length - 1; m >= 0; m--) h += '<div style="font-size:12px;color:var(--dim)">سال ' + fa(d.mem[m].y) + ' — ' + esc(d.mem[m].x) + '</div>';
@@ -8160,7 +8468,20 @@ function statusTag(s) {
 }
 function renderDiplo(d, ranking) {
   var dp = d.diplo || { bonus: 0, malus: 0, list: [], factor: 1 };
-  var h = '<div class="card"><h4>اثر دیپلماسی بر درآمد</h4>' +
+  var h = '';
+  if (d.supBoard && d.supBoard.length) {
+    h += '<div class="card"><h4>رقابت بر سر برتری جهان</h4>' +
+      '<div class="hint">هر کشور راه خودش را برای بزرگ‌شدن دارد. دانستن راه رقیب یعنی دانستن اینکه از کجا ضربه می‌زند.</div>' +
+      '<table class="tb" style="margin-top:6px"><tr><th>رتبه</th><th>کشور</th><th>راه قدرت</th><th>امتیاز</th></tr>';
+    for (var q = 0; q < d.supBoard.length; q++) {
+      var bq = d.supBoard[q];
+      h += '<tr' + (bq.me ? ' style="font-weight:700;background:var(--panel3)"' : '') + '><td>' + fa(bq.rank) + '</td>' +
+        '<td><i class="dot" style="background:' + bq.color + '"></i>' + esc(bq.name) + '</td>' +
+        '<td>' + (bq.di || '') + ' ' + esc(bq.dn || '') + '</td><td>' + fa(bq.score) + '</td></tr>';
+    }
+    h += '</table></div>';
+  }
+  h += '<div class="card"><h4>اثر دیپلماسی بر درآمد</h4>' +
     kv('افزایش از دوستان و متحدان', '+' + pc(dp.bonus * 100), 'good') +
     kv('کاهش از دشمنی، تحریم و جنگ', '−' + pc(dp.malus * 100), 'bad') +
     kv('ضریب نهایی درآمد', '×' + faf(dp.factor, 3)) +
@@ -8854,6 +9175,18 @@ function renderHelp() {
     'هر ایالت بر پایه جمعیت، فناوری، زیرساخت، صنعت، تجارت، ثبات، سلامت، امنیت و منابع خود تولید می‌کند. درآمد دولت = مالیات بر این تولید. ' +
     'هزینه‌های دائمی شامل اداره قلمرو (غیرخطی: هرچه ایالت بیشتر، هزینه هر ایالت بیشتر)، ارتش، زیرساخت، دستگاه حکومت، جنگ و مستعمرات است. ' +
     'مالیات بالا درآمد بیشتر ولی رضایت و رشد کمتر می‌آورد.' +
+    '</div></div>';
+  h += '<div class="card"><h4>جاه‌طلبی و راه‌های قدرت</h4><div style="font-size:13px;line-height:2">' +
+    'هر کشور در جهان می‌خواهد برترین قدرت شود، ولی راهش را خودش برمی‌گزیند: ' +
+    '⚔ <b>فتح و گسترش</b> · ⚖ <b>ثروت و بازرگانی</b> · 🔬 <b>دانش و فناوری</b> · ' +
+    '🕊 <b>نفوذ و اتحاد</b> · ⛵ <b>دریا و مستعمره</b> · 🏭 <b>صنعت و منابع</b>.<br>' +
+    'راه هر کشور از شخصیت فرمانروا، گرایش‌های ملی و جغرافیای آن می‌آید و اولویت بودجه، اشتهای جنگ، ' +
+    'رفتار دیپلماتیک و سیاست تجاری‌اش را تعیین می‌کند: کشور بازرگان دیرتر می‌جنگد و بیشتر می‌فروشد، ' +
+    'کشور جنگاور زودتر شمشیر می‌کشد، و کشور اهل نفوذ متحد جمع می‌کند.<br>' +
+    'هرچه کشوری از صدر جدول عقب‌تر بیفتد سخت‌تر تلاش می‌کند و به کشورهای بالاتر از خود سخت‌تر نگاه می‌کند. ' +
+    'اگر راهی سال‌ها به جایی نرسد، حکومت راه تازه‌ای برمی‌گزیند — و با مرگ فرمانروا هم ممکن است مسیر عوض شود.<br>' +
+    'جدول رتبه‌بندی در بخش کشور و دیپلماسی دیده می‌شود؛ امتیاز برتری از قلمرو، جمعیت، ارتش، فناوری، ثروت، ' +
+    'تجارت، صنعت، متحدان، دست‌نشاندگان و نفوذ در سازمان ملل ساخته می‌شود.' +
     '</div></div>';
   h += '<div class="card"><h4>سلاح و صنایع نظامی</h4><div style="font-size:13px;line-height:2">' +
     'هر سرباز برای مسلح‌شدن یک <b>واحد سلاح</b> می‌خواهد و ساخت سلاح در هر دوره نظامی مواد متفاوتی لازم دارد:<br>' +
