@@ -623,14 +623,14 @@ const MINE_KEYS = ['iron', 'oil', 'gold'];
 const RES_NAMES = { food: 'غذا', wood: 'چوب', iron: 'آهن', oil: 'نفت', gold: 'طلا', energy: 'سوخت و انرژی' };
 const RES_ICON = { food: '🌾', wood: '🪵', iron: '⛓️', oil: '🛢️', gold: '🪙', energy: '⚡' };
 /* ترتیب کشف: چوب و غذا از آغاز، سپس آهن، سپس طلا، سپس نفت */
-const RES_TECH = { food: 0, wood: 0, iron: 12, gold: 22, oil: 40 };
+const RES_TECH = { food: 0, wood: 0, iron: 7, gold: 15, oil: 40 };
 /* توان رزمی هر دوره نظامی — سرباز دوره بالاتر به‌روشنی قوی‌تر است */
 const ERA_POWER = [1.00, 1.22, 1.58, 2.15, 3.00];
 /* دستور ساخت سلاح در هر دوره: هر واحد سلاح چه منابعی می‌خواهد.
    هر سرباز برای مسلح شدن یک واحد سلاح لازم دارد. */
 const ARMS_RECIPE = [
-  { wood: 0.40 },                                                   /* سلاح اولیه */
-  { wood: 0.32, iron: 0.24 },                                       /* سلاح سرد */
+  { wood: 0.26 },                                                   /* سلاح اولیه */
+  { wood: 0.22, iron: 0.20 },                                       /* سلاح سرد */
   { wood: 0.20, iron: 0.36, oil: 0.14 },                            /* سلاح گرم */
   { wood: 0.16, iron: 0.44, oil: 0.28, gold: 0.024 },               /* سلاح پیشرفته */
   { wood: 0.12, iron: 0.48, oil: 0.36, gold: 0.036, energy: 0.24 }  /* سلاح هوشمند */
@@ -714,7 +714,7 @@ const BAL = {
 
   /* ---- منابع ---- */
   RICH_CHANCE: 0.09,      // سهم ذخایر سرشار از کل ذخایر — نادر و ارزشمند
-  MINE_RATE: { iron: 56, oil: 66, gold: 8 },      // برداشت پایه هر چرخه از یک معدن معمولی
+  MINE_RATE: { iron: 56, oil: 66, gold: 12 },      // برداشت پایه هر چرخه از یک معدن معمولی
   RICH_YIELD: 2.60,       // برداشت معدن سرشار نسبت به معمولی
   RICH_LIFE: 108,         // چرخه‌های عمر معدن سرشار (۱۰۸ × ۵ = ۵۴۰ سال)
   NORM_LIFE: 34,          // چرخه‌های عمر معدن معمولی (حدود ۱۷۰ سال)
@@ -734,8 +734,8 @@ const BAL = {
   FOOD_YIELD: 1.50,       // ضریب بازده کشاورزی (هماهنگ با سرانه مصرف)
 
   /* ---- پول ---- */
-  HOARD_KEEP: 4,          // خزانه معقول = این تعداد چرخه درآمد
-  HOARD_LEAK: 0.16,       // نشت سالانه مازاد خزانه به فساد و اسراف
+  HOARD_KEEP: 6,          // خزانه معقول = این تعداد چرخه درآمد
+  HOARD_LEAK: 0.13,       // نشت مازاد خزانه به فساد و اسراف
 
   /* ---- سلاح ---- */
   ARMS_MONEY: 0.20,       // هزینه پول ساخت هر واحد سلاح (میلیون) پیش از ضریب فناوری
@@ -1211,14 +1211,20 @@ function distributeResources(rng) {
     st.rich = { iron: 0, oil: 0, gold: 0, wood: 0, food: 0 };
     st.iron = st.oil = st.gold = 0;
     st.ironMax = st.oilMax = st.goldMax = 0;
-    /* معادن کمیاب‌اند: تنها بخش کوچکی از ایالت‌ها ذخیره دارند */
-    if (rng.chance(clamp(ironP * 0.20, 0.01, 0.30))) seedDeposit(st, 'iron', rng, ironP);
-    if (rng.chance(clamp(oilP * 0.14, 0.01, 0.22))) seedDeposit(st, 'oil', rng, oilP);
-    if (rng.chance(clamp(goldP * 0.10, 0.005, 0.15))) seedDeposit(st, 'gold', rng, goldP);
+    /* معادن کمیاب‌اند ولی نه نایاب: حد وسط میان فراوانی و قحطی */
+    if (rng.chance(clamp(ironP * 0.28, 0.02, 0.42))) seedDeposit(st, 'iron', rng, ironP);
+    if (rng.chance(clamp(oilP * 0.20, 0.015, 0.32))) seedDeposit(st, 'oil', rng, oilP);
+    if (rng.chance(clamp(goldP * 0.15, 0.01, 0.24))) seedDeposit(st, 'gold', rng, goldP);
     /* جنگل و کشتزار سرشار: نادر ولی بسیار پربازده */
     if (rng.chance(0.055) && st.forestCap > 40) { st.rich.wood = 1; st.forestCap = clamp(st.forestCap * 1.7, 0, 150); st.forest = st.forestCap; }
     if (rng.chance(0.05) && st.foodBase > 1.0) { st.rich.food = 1; st.foodBase = clamp(st.foodBase * 1.6, 0.15, 3.2); }
-    st.known = { food: true, wood: true, gold: false, iron: false, oil: false };
+    /* رگه‌های سطحی آهن و طلا از همان آغاز پیدا هستند؛ بقیه باید کشف شوند */
+    st.known = {
+      food: true, wood: true,
+      iron: st.iron > 0 && rng.chance(0.38),
+      gold: st.gold > 0 && rng.chance(0.32),
+      oil: false
+    };
   }
 }
 
@@ -1234,6 +1240,55 @@ function seedDeposit(st, k, rng, potential) {
   if (!st.rich) st.rich = { iron: 0, oil: 0, gold: 0, wood: 0, food: 0 };
   st.rich[k] = isRich ? 1 : 0;
   return st[k];
+}
+
+/* هیچ تکه‌ای از خشکی نباید کاملاً بی‌منبع بماند.
+   قاره‌ها می‌توانند نامتوازن باشند، ولی هر توده خشکی سهم حداقلی خود را می‌گیرد،
+   و ذخایر درون هر توده پخش می‌شوند تا گوشه‌ای از نقشه یکسره خالی نماند. */
+const RES_SHARE = { iron: 0.15, oil: 0.085, gold: 0.075 };
+function guaranteeResources(rng) {
+  const groups = {};
+  for (let i = 0; i < GEO.N; i++) {
+    const g = GEO.comp[i];
+    (groups[g] = groups[g] || []).push(i);
+  }
+  for (const g in groups) {
+    const idx = groups[g];
+    const size = idx.length;
+    if (size < 3) continue;
+    for (const k of MINE_KEYS) {
+      /* سهم حداقلی این توده از هر منبع */
+      let want = Math.round(size * RES_SHARE[k]);
+      if (size >= 6) want = Math.max(want, 1);
+      if (size >= 20) want = Math.max(want, 2);
+      let have = idx.filter(i => W.states[i][k] > 0).length;
+      let guard = 0;
+      while (have < want && guard++ < 400) {
+        /* ایالتی با بیشترین استعداد که از نزدیک‌ترین معدن موجود دورتر است */
+        let best = -1, bestV = -1e9;
+        for (const i of idx) {
+          const st = W.states[i];
+          if (st[k] > 0) continue;
+          let dmin = 1e9;
+          for (const j of idx) {
+            if (W.states[j][k] <= 0) continue;
+            const dx = GEO.centers[i][0] - GEO.centers[j][0], dy = GEO.centers[i][1] - GEO.centers[j][1];
+            dmin = Math.min(dmin, dx * dx + dy * dy);
+          }
+          if (dmin > 1e8) dmin = 400 * 400;   /* هنوز معدنی نیست */
+          const pot = (st.pot && st.pot[k] != null) ? st.pot[k] : 0.5;
+          const v = Math.sqrt(dmin) * 0.55 + pot * 260 + rng.f() * 60;
+          if (v > bestV) { bestV = v; best = i; }
+        }
+        if (best < 0) break;
+        const st = W.states[best];
+        if (!st.pot) st.pot = { iron: 0.5, oil: 0.5, gold: 0.5 };
+        if (st.pot[k] < 0.3) st.pot[k] = rng.range(0.35, 0.8);   /* زمین‌شناسی این نقطه بازنگری شد */
+        seedDeposit(st, k, rng, st.pot[k]);
+        have++;
+      }
+    }
+  }
 }
 
 function rebalanceResources(rng) {
@@ -1380,7 +1435,8 @@ function generateWorld(opts) {
     c.corruption = clamp(GOVS[c.gov].corrupt * 100 + rng.range(-8, 8), 5, 80);
     /* ضریب بخت هر کشور در آغاز: وسعت، خزانه و ارتش را با هم کم یا زیاد می‌کند */
     c.startTol = 1 + rng.range(-TOL, TOL);
-    c.treasury = rng.range(1120, 1280) * c.startTol;
+    /* خزانه آغازین در مقیاس اقتصاد آغاز بازی: حدود ده تا دوازده چرخه درآمد */
+    c.treasury = rng.range(400, 460) * c.startTol;
     c.tech *= (0.94 + 0.12 * c.startTol);
     c.stability *= (0.97 + 0.06 * c.startTol);
     c.taxRate = Math.min(rng.range(0.14, 0.26), GOVS[c.gov].taxMax);
@@ -1441,6 +1497,7 @@ function generateWorld(opts) {
       st.defense = Math.round(st.pop * rng.range(0.005, 0.02));
     }
   }
+  guaranteeResources(rng);
   rebalanceResources(rng);
   /* ارتش اولیه هر کشور متناسب با جمعیت */
   for (const cid in W.countries) {
@@ -1679,8 +1736,8 @@ function countryRevenue(c) {
 }
 function countryCosts(c, rev) {
   const n = c.owned.length + c.ctrl.length;
-  const avg = Math.max(6, rev.revenue / Math.max(1, n));
-  const adminUnit = Math.max(2.2, 0.088 * avg);
+  const avg = Math.max(6 * cycK(), rev.revenue / Math.max(1, n));
+  const adminUnit = Math.max(2.2 * cycK(), 0.088 * avg);
   let admin = adminUnit * Math.pow(Math.max(n, 1), BAL.ADMIN_EXP) * (1 + c.corruption / 190);
   admin *= (1 - 0.20 * GOVS[c.gov].effic);
   if (c.isPlayer) admin *= DIFF().playerCost;
@@ -1708,7 +1765,7 @@ function countryCosts(c, rev) {
 /* خزانه راکد: اندوخته بسیار بیشتر از نیاز، به فساد، اسراف و ریخت‌وپاش درباری نشت می‌کند.
    این کار مانع انباشت بی‌پایان پول می‌شود و برنامه‌ریزی مالی را معنادار نگه می‌دارد. */
 function treasuryLeak(c, revenue) {
-  const keep = Math.max(150, revenue * BAL.HOARD_KEEP);
+  const keep = Math.max(150 * cycK(), revenue * BAL.HOARD_KEEP);
   const excess = c.treasury - keep;
   if (excess <= 0) { c.lastLeak = 0; return 0; }
   const rate = clamp((BAL.HOARD_LEAK + c.corruption / 300 - GOVS[c.gov].effic * 0.05) * leaderFx(c).leak, 0.03, 0.40) * cycK();
@@ -1748,7 +1805,7 @@ function effectiveBudget(c) {
 }
 function investBudget(c, pool) {
   const n = Math.max(1, c.owned.length);
-  const scale = Math.max(6, avgStateRevenue(c)) * n;
+  const scale = Math.max(6 * cycK(), avgStateRevenue(c)) * n;
   const b = effectiveBudget(c);
   const spend = {};
   BUDGET_KEYS.forEach(k => { spend[k] = pool * (b[k] || 0); });
@@ -1891,7 +1948,7 @@ function resourceCycle(c) {
     prod.food += foodProduction(st, c.tech) * share;
     const cut = Math.min(st.forest * 0.055 * cycK() * (0.6 + c.tech / 90), st.forest);
     st.forest = clamp(st.forest - cut + (st.forestCap - st.forest) * 0.09 * cycK(), 0, st.forestCap);
-    prod.wood += cut * 4.4 * (st.rich && st.rich.wood ? 1.25 : 1) * damp * share;
+    prod.wood += cut * 6.2 * (st.rich && st.rich.wood ? 1.25 : 1) * damp * share;
     for (const k of MINE_KEYS) {
       if (!st.known[k] || st[k] <= 0) continue;
       if (c.tech < RES_TECH[k]) continue;
@@ -2002,10 +2059,10 @@ function civDemand(c) {
   const K = cycK();
   return {
     food: pop * foodHead(c) * K,
-    wood: n * 6 * K,
+    wood: n * 4.5 * K,
     iron: n * 5 * K,
     oil: c.tech >= RES_TECH.oil ? (n * 3.5 + c.army.air * 12) * K : 0,
-    gold: n * 0.30 * K,                              /* زیور، ضرب سکه و اندوخته دولتی */
+    gold: n * 0.22 * K,                              /* زیور، ضرب سکه و اندوخته دولتی */
     energy: hasFuelTech(c) ? energyCivUse(c) : 0
   };
 }
@@ -2177,7 +2234,7 @@ function stockCycle(c) {
   c.stockValue = s * 100;
   c.stockActive = s > 0;
   if (s <= 0) { c.stockIncome = 0; return 0; }
-  const scale = Math.max(6, avgStateRevenue(c)) * Math.max(1, c.owned.length);
+  const scale = Math.max(6 * cycK(), avgStateRevenue(c)) * Math.max(1, c.owned.length);
   const inc = scale * BAL.STOCK_K * s;   /* مقیاس خودش با چرخه کوچک شده است */
   c.stockIncome = inc;
   return inc;
@@ -2377,12 +2434,15 @@ function spendArmyFund(c) {
   const wantArms = armsTargetPerCycle(c);
   const madeArms = buildArms(c, Math.min(wantArms, Math.floor(armsMoney / Math.max(unitArms, 0.05))));
   c.lastArms = madeArms;
-  c.armsBlocked = madeArms < wantArms * 0.6 ? armsBottleneck(c) : null;
+  /* گلوگاه تنها وقتی «کمبود منبع» است که واقعاً ساخت خواسته شده و منابع کم آمده باشد */
+  const resLim = armsResourceLimit(c);
+  c.armsBlocked = (wantArms >= 1 && madeArms < wantArms * 0.6 && resLim < wantArms * 0.6) ? armsBottleneck(c) : null;
+  c.armsMoneyShort = (wantArms >= 1 && madeArms < wantArms * 0.6 && resLim >= wantArms * 0.6);
   fund += Math.max(0, armsMoney - madeArms * unitArms);   /* پول خرج‌نشده به بودجه برمی‌گردد */
   const readyShare = wantGrow ? 0.35 : 0.7;
   const readyMoney = fund * readyShare;
   const growMoney = fund - readyMoney;
-  const scale = Math.max(6, avgStateRevenue(c)) * Math.max(1, c.owned.length);
+  const scale = Math.max(6 * cycK(), avgStateRevenue(c)) * Math.max(1, c.owned.length);
   c.army.readiness = clamp(c.army.readiness + (readyMoney / scale) * 55 - 2, 5, 100);
   c.army.morale = clamp(c.army.morale + (readyMoney / scale) * 22 - 1, 5, 100);
   if (growMoney > 0 && cur < maxMan * (c.isPlayer ? targetShare : 1)) {
@@ -5193,7 +5253,7 @@ function buildStrat(c, kind, levels) {
   return { ok: true, cost: cost, msg: (kind === 'strike' ? 'توان آفندی' : 'توان پدافندی') + ' به ' + faNum(cur + want) + ' رسید.' };
 }
 function strategicCost(c) {
-  return Math.round(Math.max(120, avgStateRevenue(c) * 3.2) * (0.5 + (c.strike || 0) / 26));
+  return Math.round(Math.max(120 * cycK(), avgStateRevenue(c) * 3.2) * (0.5 + (c.strike || 0) / 26));
 }
 function canStrategic(c, o) {
   if (c.tech < STRAT_TECH) return { ok: false, why: 'نیاز به فناوری ' + faNum(STRAT_TECH) + '.' };
@@ -5353,21 +5413,23 @@ function cycleStep() {
     c.treasury += net;
     /* کسری بودجه */
     if (c.treasury < 0) {
+      /* جریمه کسری «در هر چرخه» است، پس با طول چرخه سنجیده می‌شود */
+      const K = cycK();
       c.deficitYears++;
       c.army.pay = clamp(100 + (c.treasury / Math.max(costs.army, 1)) * 60, 0, 100);
-      c.army.morale = clamp(c.army.morale - 7, 5, 100);
-      c.army.readiness = clamp(c.army.readiness - 6, 5, 100);
-      c.stability = clamp(c.stability - 3, 0, 100);
-      for (const sid of c.owned) W.states[sid - 1].unrest = clamp(W.states[sid - 1].unrest + 2.2, 0, 100);
-      if (c.deficitYears > 2) {
-        const cut = Math.floor(c.army.troops * 0.12);
+      c.army.morale = clamp(c.army.morale - 7 * K, 5, 100);
+      c.army.readiness = clamp(c.army.readiness - 6 * K, 5, 100);
+      c.stability = clamp(c.stability - 3 * K, 0, 100);
+      for (const sid of c.owned) W.states[sid - 1].unrest = clamp(W.states[sid - 1].unrest + 2.2 * K, 0, 100);
+      if (c.deficitYears > BAL.CYCLE_REF / BAL.CYCLE_YEARS * 2) {
+        const cut = Math.floor(c.army.troops * 0.12 * K);
         c.army.troops = Math.max(0, c.army.troops - cut);
         c.treasury += cut * 0.3 * (1 + c.tech / 10);
         if (c.isPlayer) news('کسری بودجه', 'بخشی از ارتش به دلیل ناتوانی در پرداخت حقوق منحل شد.', 'crisis', { c: c.id });
       }
     } else {
       c.deficitYears = 0;
-      c.army.pay = clamp(c.army.pay + 12, 0, 100);
+      c.army.pay = clamp(c.army.pay + 12 * cycK(), 0, 100);
     }
     /* اندوخته راکد آب می‌رود */
     treasuryLeak(c, rev.revenue);
@@ -5800,6 +5862,7 @@ function inspectCountry(id) {
     armsLimit: armsResourceLimit(c), armsUnitCost: r3(armsMoneyCost(c)),
     armsRecipe: armsRecipe(c), armsNeedText: ARMS_RES_NAMES[eraOf(c.tech).id] || '',
     armsBlocked: c.armsBlocked ? (RES_NAMES[c.armsBlocked] || '') : '',
+    armsMoneyShort: !!c.armsMoneyShort,
     armsTarget: Math.round(armsTargetPerCycle(c)),
     strike: c.strike || 0, shield: c.shield || 0, stratMax: stratMaxLevel(c),
     stratTech: STRAT_TECH, stratCap: STRAT_MAX,
@@ -6219,7 +6282,7 @@ function command(cmd, a) {
     case 'pushTech': {
       const amount = Math.max(1, Math.floor(+a.amount || 0));
       if (pc.treasury < amount) return { ok: false, why: 'خزانه کافی نیست.' };
-      const scale = Math.max(6, avgStateRevenue(pc)) * Math.max(1, pc.owned.length);
+      const scale = Math.max(6 * cycK(), avgStateRevenue(pc)) * Math.max(1, pc.owned.length);
       const add = (amount / scale) * 0.55;
       const cap = 0.9;
       pc.treasury -= amount;
@@ -6235,7 +6298,7 @@ function command(cmd, a) {
       return command('recruit', { n: gap });
     }
     case 'boostReadiness': {
-      const scale = Math.max(6, avgStateRevenue(pc)) * Math.max(1, pc.owned.length);
+      const scale = Math.max(6 * cycK(), avgStateRevenue(pc)) * Math.max(1, pc.owned.length);
       const amount = Math.max(1, Math.floor(+a.amount || Math.round(scale * 0.25)));
       if (pc.treasury < amount) return { ok: false, why: 'خزانه کافی نیست.' };
       pc.treasury -= amount;
@@ -6457,6 +6520,8 @@ function money(v) {
   var a = Math.abs(v);
   if (a >= 1e6) return faf(v / 1e6, 2) + ' تریلیون';
   if (a >= 1000) return faf(v / 1000, 2) + ' میلیارد';
+  /* بهای واحد منابع اغلب کمتر از یک است و نباید «۰ میلیون» دیده شود */
+  if (a > 0 && a < 10) return faf(v, a < 1 ? 2 : 1) + ' میلیون';
   return fa(v) + ' میلیون';
 }
 function ppl(v) {
