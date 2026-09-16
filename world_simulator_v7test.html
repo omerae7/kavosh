@@ -799,8 +799,9 @@ const BAL = {
   ARMS_LOSS: 0.75,        // سهم سلاح از دست رفته با کشته‌شدن سرباز
 
   /* ---- کارخانه، کمپانی و بورس ---- */
-  FACTORY_K: 40,         // سرعت رشد شاخص کارخانه (عمداً کند)
-  FACTORY_COST: 3.0,      // گرانی رشد صنعت در سطوح بالا (ملایم‌تر از شاخص‌های داخلی)
+  FACTORY_K: 28,         // سرعت رشد شاخص کارخانه (عمداً کند)
+  FACTORY_COST: 7.5,      // گرانی رشد صنعت در سطوح بالا
+  FACTORY_START: 84,      // سختی ساختن نخستین کارخانه‌ها؛ با رشد صنعت سریع آب می‌رود
   NUKE_LANDS: 5,          // شمار ایالت‌های هسته‌ای، یکی روی هر خشکی بزرگ
   NUKE_BONUS: 0.10,       // سهم هر ایالت هسته‌ای از افزایش توان نظامی و فناوری
   SUPERPOWER: 4,          // شمار ابرقدرت‌های جهانی در صدر جدول
@@ -2350,10 +2351,13 @@ function warEnergyCost(c, force, isDefense) {
 }
 
 /* ---------- کارخانه، کمپانی و تأسیسات ---------- */
-/* گرانی رشد صنعت. برخلاف شاخص‌های داخلی نمایی نیست، وگرنه آخرین درصدها
-   قرن‌ها طول می‌کشند و هیچ کشوری به صد درصد نمی‌رسد. */
+/* گرانی رشد صنعت.
+   سخت‌ترین بخش، ساختن نخستین کارخانه‌ها از هیچ است: بی‌زیرساخت، بی‌کارگر ماهر،
+   بی‌بازار. پس از آن صنعت خودش را می‌سازد و کار آسان‌تر می‌شود. در سطوح بالا
+   دوباره اندکی گران می‌شود، ولی نه چندان که صد درصد دست‌نیافتنی بماند. */
 function factoryCost(level) {
-  return 1 + Math.pow(clamp(level, 0, 100) / 100, 1.35) * BAL.FACTORY_COST;
+  const x = clamp(level, 0, 100) / 100;
+  return 1 + BAL.FACTORY_START * Math.exp(-x * 14) + Math.pow(x, 1.35) * BAL.FACTORY_COST;
 }
 function factoryGrow(c, relSpend) {
   if (!hasEnergy(c)) {
@@ -5249,6 +5253,14 @@ function aiBudgetWeights(c) {
     diplomacy: 0.03 + c.bias.diplomacy * 0.09 + (W.un ? W.un.power * 0.05 : 0),
     security: 0.05 + clamp(c.unrestAvg / 130, 0, 0.16) + g.repress * 0.06
   };
+  /* فشار پرده روی بودجه: در پردهٔ یکم رسیدن به بورس هدف ملی است،
+     در دوم بالا رفتن از نردبان آن، و در سوم صنعتِ کامل شرط بقا در رقابت هسته‌ای. */
+  if (hasEnergy(c)) {
+    const P = actPush(c);
+    if (P.market > 0) w.factory *= 1 + 2.6 * P.market;
+    else if ((W.act || 1) >= 2 && (c.factory || 0) < 100) w.factory *= 2.2;
+    if ((W.act || 1) >= 3 && !nukeReady(c)) w.factory *= 1.7;
+  }
   /* راهبرد قدرت، اولویت‌های بودجه را جابه‌جا می‌کند */
   const D = doctrineOf(c);
   const drive = c.drive == null ? 0.7 : c.drive;
@@ -5293,8 +5305,12 @@ function savingGoal(c) {
     put('air', airBuildCost(c) * 2.0, 'یگان هوایی', 1.8 * (D.k === 'conquest' ? 1.4 : 1));
   }
   /* کارخانه و صنعت */
-  if (c.tech >= 15 && (D.k === 'industry' || D.k === 'wealth') && (c.factory || 0) < 55) {
-    put('factory', rev * (D.k === 'industry' ? 1.5 : 0.9), 'سرمایه‌گذاری صنعتی', D.k === 'industry' ? 2.6 : 1.9);
+  if (c.tech >= 15 && (c.factory || 0) < 100 && hasEnergy(c)) {
+    /* از عصر بورس به بعد، صنعت برای همه اولویت است نه فقط برای صنعت‌گران */
+    const act = W.act || 1;
+    const base = (D.k === 'industry' ? 2.6 : D.k === 'wealth' ? 1.9 : 1.2);
+    const bump = act >= 3 && !nukeReady(c) ? 2.2 : (act >= 2 ? 1.4 : (inMarket(c) ? 0 : 0.9));
+    put('factory', rev * (D.k === 'industry' ? 1.5 : 1.0), 'سرمایه‌گذاری صنعتی', base + bump);
   }
   /* واردات منابعی که کشور در آنها کم دارد */
   let short = 0;
