@@ -3890,39 +3890,58 @@ function declareWar(a, b, reason) {
 /* ---------- ترازنامه جنگ و صلح شرط‌دار ----------
    تا پیش از این هر صلحی سفید بود: برنده سر میز هیچ نمی‌گرفت و نقشه جهان
    هرگز تجمیع نمی‌شد. حالا هر جنگی برنده و بازنده دارد و بازنده خاک می‌دهد. */
+/* ترازنامه جنگ تنها از میدان می‌آید. برتری نظامی دستاورد میدان را بزرگ‌تر
+   می‌کند، ولی خودش به‌تنهایی هیچ زمینی نمی‌آورد؛ وگرنه کشور قوی می‌توانست
+   اعلان جنگ کند، همان لحظه صلح کند و بی‌آنکه تیری شلیک شود ایالت بگیرد. */
 function warScore(a, b) {
   const ra = relOf(a, b.id);
-  let s = ((ra.warTaken || 0) - (ra.warLost || 0)) * 13;
-  s += clamp(militaryPower(a) / Math.max(militaryPower(b), 1) - 1, -2, 3) * 13;
-  s += ((b.warWeariness || 0) - (a.warWeariness || 0)) * 0.45;
+  let field = ((ra.warTaken || 0) - (ra.warLost || 0)) * 18;
   for (const op of W.ops) {
-    if (op.att === a.id && W.states[op.target - 1].controller === b.id) s += 4 + op.progress / 25;
-    if (op.att === b.id && W.states[op.target - 1].controller === a.id) s -= 4 + op.progress / 25;
+    if (op.att === a.id && W.states[op.target - 1].controller === b.id) field += 3 + op.progress / 18;
+    if (op.att === b.id && W.states[op.target - 1].controller === a.id) field -= 3 + op.progress / 18;
   }
-  return s;
+  field += ((b.warWeariness || 0) - (a.warWeariness || 0)) * 0.5;
+  const edge = clamp(militaryPower(a) / Math.max(militaryPower(b), 1) - 1, -1, 3);
+  return field * (1 + clamp(edge, 0, 3) * 0.28);
+}
+/* آیا در این جنگ کاری کرده‌ایم که پای میز صلح چیزی بخواهیم؟
+   ایالتی به زور گرفته باشیم، یا محاصره‌ای پیشرفته در دست داشته باشیم. */
+function warAchieved(win, lose) {
+  const ra = relOf(win, lose.id);
+  if ((ra.warTaken || 0) > 0) return true;
+  for (const op of W.ops) {
+    if (op.att === win.id && W.states[op.target - 1].controller === lose.id && op.progress >= 40) return true;
+  }
+  return false;
 }
 /* چند ایالت باید دست به دست شود */
 function peaceTermCount(win, lose) {
+  if (!warAchieved(win, lose)) return 0;
   const s = warScore(win, lose);
   /* اگر بازنده ذخیرهٔ هسته‌ای دارد و برنده می‌تواند از آن بهره ببرد،
-     میز صلح با دست خالی ترک نمی‌شود */
+     آستانه پایین‌تر است — ولی باز هم بدون دستاورد میدانی چیزی داده نمی‌شود */
   const nukeAtStake = (W.act || 1) >= 3 && nukeReady(win) && nukeHeld(lose) > 0;
-  const thr = nukeAtStake ? 10 : 26;
+  const thr = nukeAtStake ? 12 : 26;
   if (s < thr) return 0;
   return clamp(Math.floor((s - thr) / 26) + 1, 1, Math.max(1, Math.floor(lose.owned.length * 0.45)));
 }
-/* کدام ایالت‌ها واگذار می‌شوند: نخست ذخیره هسته‌ای، سپس آنچه در محاصره است، سپس هم‌مرز */
+/* کدام ایالت‌ها واگذار می‌شوند. تنها خاکی که واقعاً در دسترس ماست:
+   در محاصره ما، هم‌مرز ما، یا ساحلیِ در برد ناوگان ما. */
 function pickCeded(win, lose, n) {
   const cand = [];
   for (const sid of lose.owned.concat(lose.ctrl)) {
     const st = W.states[sid - 1];
     if (st.controller !== lose.id) continue;
+    const besieged = W.ops.some(op => op.att === win.id && op.target === st.id);
+    const adjacent = landBorder(win, sid - 1);
+    const bySea = !besieged && !adjacent && GEO.coastal[sid - 1] && win.army.navy > 0 &&
+      supplyFor(win, sid - 1).naval > 0.2;
+    if (!besieged && !adjacent && !bySea) continue;
     let v = strategicValue(win, st);
     if (st.nuke && nukeReady(win)) v += 60;
     else if (st.nuke) v += 20;
-    if (st.siege > 0) v += 6;
-    if (landBorder(win, sid - 1)) v += 5;
-    else if (!GEO.coastal[sid - 1]) v -= 12;       /* خاک دورافتاده و محصور، قابل نگهداری نیست */
+    if (besieged) v += 8;
+    if (adjacent) v += 5;
     cand.push({ sid, v });
   }
   cand.sort((x, y) => y.v - x.v);
@@ -7857,7 +7876,11 @@ return {
     militaryPower: militaryPower, countryPop: countryPop, avgSat: avgSat,
     maxManpower: maxManpower, stateOutput: stateOutput, avgStateRevenue: avgStateRevenue,
     countryRevenue: countryRevenue, countryCosts: countryCosts, eraOf: eraOf,
-    BAL: BAL, GOVS: GOVS, ERAS: ERAS, TRAITS: TRAITS
+    BAL: BAL, GOVS: GOVS, ERAS: ERAS, TRAITS: TRAITS,
+    /* برای آزمون‌های موتور */
+    makePeace: makePeace, declareWar: declareWar, warScore: warScore,
+    peaceTermCount: peaceTermCount, canOperate: canOperate, supplyFor: supplyFor,
+    controlledStates: controlledStates, nukeHeld: nukeHeld
   }
 };
 /*ENGINE-END*/
